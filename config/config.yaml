@@ -6,14 +6,27 @@ server:
 
 database:
   type: postgres
-  host: 127.0.0.1
-  port: 5432
-  user: postgres
-  password: "123456"
-  dbname: aigo
-  prefix: 
-  sslmode: disable
-  timezone: Asia/Shanghai
-  max_open_conns: 25
-  max_idle_conns: 10
-  conn_max_lifetime: 300 # 秒
+  prefix:
+  write:
+    host: 127.0.0.1
+    port: 5432
+    user: postgres
+    password: "123456"
+    dbname: aigo
+    sslmode: disable
+    timezone: Asia/Shanghai
+    max_open_conns: 25
+    max_idle_conns: 10
+    conn_max_lifetime: 300 # 秒
+  read:
+    enabled: false # 是否启用读写分离
+    host: 
+    port: 5433 # 读副本默认配置了不同的端口号
+    user: 
+    password: 
+    dbname: 
+    sslmode: disable
+    timezone: Asia/Shanghai
+    max_open_conns: 50
+    max_idle_conns: 20
+    conn_max_lifetime: 300 # 秒

@@ -12,24 +12,22 @@ import (
 	"github.com/spf13/viper"
 )
 
-// App 应用配置
+// 应用配置
 type App struct {
 	Name string
 }
 
-// Server 服务配置
+// 服务配置
 type Server struct {
 	Port int
 }
 
-// Database 数据库配置
-type Database struct {
-	Type            string
+// 单个数据库连接配置
+type DatabaseSource struct {
 	Host            string
 	Port            int
 	User            string
 	Password        string
-	Prefix          string
 	DBName          string `mapstructure:"dbname"`
 	SSLMode         string `mapstructure:"sslmode"`
 	Timezone        string `mapstructure:"timezone"`
@@ -38,11 +36,25 @@ type Database struct {
 	ConnMaxLifetime int    `mapstructure:"conn_max_lifetime"`
 }
 
-// Config 聚合配置
+// 读库配置，额外包含 enabled 字段控制是否启用读库
+type ReadConfig struct {
+	Enabled        bool
+	DatabaseSource `mapstructure:",squash"`
+}
+
+// 数据库配置
+type DatabaseConfig struct {
+	Type   string
+	Prefix string
+	Write  DatabaseSource
+	Read   ReadConfig
+}
+
+// 聚合配置
 type Config struct {
 	App      App
 	Server   Server
-	Database Database
+	Database DatabaseConfig
 }
 
 var (
@@ -51,7 +63,7 @@ var (
 	mu     sync.RWMutex
 )
 
-// 初始化配置
+// 初始化配置系统
 func Init() error {
 	if vip == nil {
 		vip = viper.New()
@@ -100,7 +112,7 @@ func Init() error {
 	return nil
 }
 
-// 返回全局配置副本。
+// 返回全局配置副本
 func Get() Config {
 	mu.RLock()
 	defer mu.RUnlock()
