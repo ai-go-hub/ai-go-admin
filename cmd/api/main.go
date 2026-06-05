@@ -3,38 +3,36 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
 
 	"ai-go-mall/config"
 	"ai-go-mall/internal/database"
+	"ai-go-mall/internal/router"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	// 初始化文件配置系统
 	if err := config.Init(); err != nil {
 		log.Fatalf("config init: %v", err)
 	}
 
+	// 初始化数据库连接
 	if err := database.Init(); err != nil {
 		log.Fatalf("database init: %v", err)
 	}
 
-	cfg := config.Get()
-
-	r := gin.Default()
+	engine := gin.Default()
 
 	// 注册数据库中间件
-	r.Use(database.Middleware())
+	engine.Use(database.Middleware())
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+	// 注册路由
+	router.Setup(engine)
 
+	cfg := config.Get()
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
-	if err := r.Run(addr); err != nil {
+	if err := engine.Run(addr); err != nil {
 		log.Fatalf("server start: %v", err)
 	}
 }

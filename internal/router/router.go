@@ -1,0 +1,17 @@
+package router
+
+import (
+	// 空白导入触发子目录 init() 自动注册路由
+	_ "ai-go-mall/internal/router/user"
+
+	"ai-go-mall/internal/router/registry"
+
+	"github.com/gin-gonic/gin"
+)
+
+// Setup 遍历所有已注册的路由模块，传入 Engine 完成注册
+func Setup(r *gin.Engine) {
+	for _, fn := range registry.Routes {
+		fn(r)
+	}
+}
