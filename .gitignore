@@ -4,7 +4,6 @@ Thumbs.db
 
 # IDE
 .idea/
-.vscode/
 *.sw?
 
 # Local config
