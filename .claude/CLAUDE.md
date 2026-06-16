@@ -21,7 +21,7 @@
 - **导出符号**：大驼峰，私有符号小驼峰
 - **数据库字段**：蛇形命名（`user_name`、`created_at`）
 - **统一响应**：`response.Success(c, opts...)` / `response.Fail(c, opts...)`，支持 functional options 和链式调用两种风格，优先使用 functional options
-- **GORM**：尽量使用 `GORM` 的 `Generics API（gorm.G[Model](db)....）`，而不是 `Traditional API`；在使用 `Generics API` 时，一般应直接使用全局 db 实例（`internal\database\database.go` 中的 `DB` 可获取），调用操作方法时再传递合适的 ctx 即可。
+- **GORM**：尽量使用 `GORM` 的 `Generics API（gorm.G[Model](db)....）`，而不是 `Traditional API`；在使用 `Generics API` 时，一般应直接使用全局 db 实例（`internal\infra\database\database.go` 中的 `DB` 可获取），调用操作方法时再传递合适的 ctx 即可。
 - **避免 stutter**：包名已经表达的含义，结构体 / 函数不要再重复，如 `admin.AdminService` 改用 `admin.Service`。
 
 ## 四层应用架构和泛型基类

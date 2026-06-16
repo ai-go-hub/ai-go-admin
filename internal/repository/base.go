@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"ai-go-mall/internal/database"
+	"ai-go-mall/internal/infra/database"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

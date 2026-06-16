@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"ai-go-mall/config"
-	"ai-go-mall/internal/database"
+	"ai-go-mall/internal/infra/database"
 	"ai-go-mall/internal/router"
 
 	"github.com/gin-gonic/gin"
