@@ -4,6 +4,9 @@ app:
 server:
   port: 8080
 
+token:
+  driver: database
+
 database:
   type: postgres
   prefix:

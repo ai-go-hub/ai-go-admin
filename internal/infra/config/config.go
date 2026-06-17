@@ -42,6 +42,11 @@ type ReadConfig struct {
 	DatabaseSource `mapstructure:",squash"`
 }
 
+// 令牌配置
+type TokenConfig struct {
+	Driver string
+}
+
 // 数据库配置
 type DatabaseConfig struct {
 	Type   string
@@ -54,6 +59,7 @@ type DatabaseConfig struct {
 type Config struct {
 	App      App
 	Server   Server
+	Token    TokenConfig
 	Database DatabaseConfig
 }
 

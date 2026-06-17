@@ -1,0 +1,90 @@
+package token
+
+import (
+	"context"
+	"crypto/sha256"
+	"fmt"
+	"sync"
+	"time"
+
+	"ai-go-mall/internal/infra/config"
+	"ai-go-mall/internal/infra/token/driver"
+	"ai-go-mall/internal/model"
+)
+
+// Driver 令牌存储驱动接口
+type Driver interface {
+	Create(ctx context.Context, token *model.Token) error
+	Get(ctx context.Context, token string) (*model.Token, error)
+	Delete(ctx context.Context, token string) error
+	Clear(ctx context.Context, userID uint, tokenType string) error
+}
+
+// Manager 令牌管理器
+type Manager struct {
+	driver Driver
+}
+
+// NewManager 创建令牌管理器
+func NewManager(driver Driver) *Manager {
+	return &Manager{driver: driver}
+}
+
+// Create 创建令牌，入库前自动对 Token 做 SHA256
+func (m *Manager) Create(ctx context.Context, token *model.Token) error {
+	token.Token = sha256Hex(token.Token)
+	return m.driver.Create(ctx, token)
+}
+
+// Get 获取令牌信息
+func (m *Manager) Get(ctx context.Context, token string) (*model.Token, error) {
+	return m.driver.Get(ctx, sha256Hex(token))
+}
+
+// Check 检查令牌是否存在且未过期
+func (m *Manager) Check(ctx context.Context, token string) bool {
+	t, err := m.Get(ctx, token)
+	if err != nil || t == nil {
+		return false
+	}
+	return time.Now().Before(t.ExpiredAt)
+}
+
+// Delete 删除令牌
+func (m *Manager) Delete(ctx context.Context, token string) error {
+	return m.driver.Delete(ctx, sha256Hex(token))
+}
+
+// Clear 清除指定用户指定类型的所有令牌
+func (m *Manager) Clear(ctx context.Context, userID uint, tokenType string) error {
+	return m.driver.Clear(ctx, userID, tokenType)
+}
+
+// sha256Hex 返回 raw 的 SHA256 十六进制字符串
+func sha256Hex(raw string) string {
+	sum := sha256.Sum256([]byte(raw))
+	return fmt.Sprintf("%x", sum)
+}
+
+// ==================== 全局单例 ====================
+
+var (
+	instance *Manager
+	once     sync.Once
+)
+
+// Instance 返回全局令牌管理器实例，首次调用时根据配置自动初始化
+func Instance() *Manager {
+	once.Do(func() {
+		instance = NewManager(newDriver(config.Get().Token.Driver))
+	})
+	return instance
+}
+
+// newDriver 根据配置创建存储驱动
+func newDriver(name string) Driver {
+	switch name {
+	default:
+		return driver.NewDatabase()
+	}
+}
