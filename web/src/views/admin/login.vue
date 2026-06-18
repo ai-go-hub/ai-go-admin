@@ -142,8 +142,13 @@ import { Lock, User } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules, InputInstance } from 'element-plus'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { adminLogin } from '/@/api/admin'
+import { useAdminInfo } from '/@/stores/adminInfo'
 
 const { t } = useI18n()
+const router = useRouter()
+const adminInfo = useAdminInfo()
 
 // ==================== 表单相关 ====================
 
@@ -183,14 +188,14 @@ async function onSubmit() {
 
     submitLoading.value = true
 
-    try {
-        // TODO: 接入实际登录 API
-        await new Promise((resolve) => setTimeout(resolve, 1500))
-    } catch {
-        // 登录失败由接口返回处理
-    } finally {
-        submitLoading.value = false
-    }
+    adminLogin(loginForm)
+        .then((res) => {
+            adminInfo.dataFill(res.data.data, false)
+            router.push('/admin')
+        })
+        .finally(() => {
+            submitLoading.value = false
+        })
 }
 
 // ==================== 角色动画状态 ====================

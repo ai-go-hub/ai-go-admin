@@ -30,9 +30,9 @@ func NewService(repo *repoAdmin.Repository) *Service {
 
 // LoginRequest 登录请求参数
 type LoginRequest struct {
-	Username string `form:"username" binding:"required"`
-	Password string `form:"password" binding:"required"`
-	Remember bool   `form:"remember"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	Remember bool   `json:"remember"`
 }
 
 // LoginResponse 登录响应数据
