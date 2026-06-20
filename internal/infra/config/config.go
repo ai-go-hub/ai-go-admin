@@ -47,6 +47,24 @@ type TokenConfig struct {
 	Driver string
 }
 
+// 图标元数据配置
+type IconConfig struct {
+	EnName string `mapstructure:"en_name"`
+	CnName string `mapstructure:"cn_name"`
+}
+
+// 验证码配置
+type CaptchaConfig struct {
+	Elements        []string     `mapstructure:"elements"`
+	Length          int          `mapstructure:"length"`
+	ConfusionLength int          `mapstructure:"confusion_length"`
+	Expire          int          `mapstructure:"expire"`
+	FontPath        string       `mapstructure:"font_path"`
+	BackgroundDir   string       `mapstructure:"background_dir"`
+	IconDir         string       `mapstructure:"icon_dir"`
+	Icons           []IconConfig `mapstructure:"icons"`
+}
+
 // 跨域配置
 type CORSConfig struct {
 	Origins []string
@@ -69,6 +87,7 @@ type Config struct {
 	Server   Server
 	Token    TokenConfig
 	CORS     CORSConfig
+	Captcha  CaptchaConfig
 	Database DatabaseConfig
 }
 

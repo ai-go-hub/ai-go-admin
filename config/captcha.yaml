@@ -1,0 +1,59 @@
+captcha:
+  # 验证元素类型，可选值:chinese=中文文字,uppercase=大写字母,icon=图标
+  elements:
+    - chinese
+    - icon
+  # 验证元素个数（用户需要按顺序点击的正确元素数量）
+  length: 2
+  # 混淆元素个数
+  confusion_length: 2
+  # 验证码默认过期时间（秒）
+  expire: 600
+  # 字体文件
+  font_path: "asset/font/SourceHanSansCN-Normal.ttf"
+  # 背景图资源目录
+  background_dir: "asset/captcha/click/background"
+  # 图标资源目录
+  icon_dir: "asset/captcha/click/icon"
+  # 图标元数据:cn_name=中文名,en_name=英文名和文件名
+  icons:
+    - en_name: "aeroplane"
+      cn_name: "飞机"
+    - en_name: "apple"
+      cn_name: "苹果"
+    - en_name: "banana"
+      cn_name: "香蕉"
+    - en_name: "bell"
+      cn_name: "铃铛"
+    - en_name: "bicycle"
+      cn_name: "自行车"
+    - en_name: "bird"
+      cn_name: "小鸟"
+    - en_name: "bomb"
+      cn_name: "炸弹"
+    - en_name: "butterfly"
+      cn_name: "蝴蝶"
+    - en_name: "candy"
+      cn_name: "糖果"
+    - en_name: "crab"
+      cn_name: "螃蟹"
+    - en_name: "cup"
+      cn_name: "杯子"
+    - en_name: "dolphin"
+      cn_name: "海豚"
+    - en_name: "fire"
+      cn_name: "火"
+    - en_name: "guitar"
+      cn_name: "吉他"
+    - en_name: "hexagon"
+      cn_name: "六边形"
+    - en_name: "pear"
+      cn_name: "梨"
+    - en_name: "rocket"
+      cn_name: "火箭"
+    - en_name: "sailboat"
+      cn_name: "帆船"
+    - en_name: "snowflake"
+      cn_name: "雪花"
+    - en_name: "wolf head"
+      cn_name: "狼头"
