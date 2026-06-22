@@ -2,8 +2,10 @@ package admin
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
+	"ai-go-mall/internal/infra/captcha"
 	"ai-go-mall/internal/infra/token"
 	"ai-go-mall/internal/model"
 	repoAdmin "ai-go-mall/internal/repository/admin"
@@ -30,9 +32,10 @@ func NewAdminService(repo *repoAdmin.AdminRepository) *AdminService {
 
 // LoginRequest 登录请求参数
 type LoginRequest struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Remember bool   `json:"remember"`
+	Username string               `json:"username" binding:"required"`
+	Password string               `json:"password" binding:"required"`
+	Remember bool                 `json:"remember"`
+	Captcha  captcha.ClickRequest `json:"captcha"`
 }
 
 // LoginResponse 登录响应数据
@@ -43,6 +46,10 @@ type LoginResponse struct {
 
 // Login 管理员登录
 func (s *AdminService) Login(c *gin.Context, req *LoginRequest) (*LoginResponse, error) {
+	if ok, err := captcha.Check(req.Captcha, true); !ok {
+		return nil, fmt.Errorf("验证码错误：%w", err)
+	}
+
 	// 根据用户名查询管理员
 	admin, err := s.repo.FindByUsername(c, req.Username)
 	if err != nil {

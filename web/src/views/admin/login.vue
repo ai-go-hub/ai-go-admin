@@ -144,6 +144,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } 
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { adminLogin } from '/@/api/admin'
+import clickCaptcha from '/@/components/clickCaptcha'
 import { useAdminInfo } from '/@/stores/adminInfo'
 
 const { t } = useI18n()
@@ -186,16 +187,17 @@ async function onSubmit() {
         return
     }
 
-    submitLoading.value = true
-
-    adminLogin(loginForm)
-        .then((res) => {
-            adminInfo.dataFill(res.data.data, false)
-            router.push('/admin')
-        })
-        .finally(() => {
-            submitLoading.value = false
-        })
+    clickCaptcha((data) => {
+        submitLoading.value = true
+        adminLogin({ ...loginForm, captcha: data })
+            .then((res) => {
+                adminInfo.dataFill(res.data.data, false)
+                router.push('/admin')
+            })
+            .finally(() => {
+                submitLoading.value = false
+            })
+    })
 }
 
 // ==================== 角色动画状态 ====================
