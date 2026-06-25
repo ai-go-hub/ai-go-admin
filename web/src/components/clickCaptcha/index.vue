@@ -7,7 +7,7 @@
                     ref="captchaImgRef"
                     class="captcha-img"
                     :src="state.captcha.image_base64"
-                    :alt="i18n.global.t('common.Captcha loading failed, please click refresh button')"
+                    :alt="i18n.global.t('common.captchaLoadFailed')"
                     @click.prevent="onRecord($event)"
                 />
                 <span
@@ -24,7 +24,7 @@
                 {{ state.tip }}
             </div>
             <div v-else class="captcha-prompt">
-                {{ i18n.global.t('common.Please click') }}
+                {{ i18n.global.t('common.pleaseClick') }}
                 <span v-for="(text, index) in state.captcha.elements" :key="index" :class="state.clicks.length > index ? 'clicked' : ''">
                     {{ text }}
                 </span>
@@ -49,8 +49,8 @@ import { SYSTEM_ZINDEX } from '/@/stores/constant/common'
 const props = withDefaults(defineProps<Props>(), {
     class: '',
     callback: () => {},
-    error: i18n.global.t('common.The correct area is not clicked, please try again!'),
-    success: i18n.global.t('common.Verification is successful!'),
+    error: i18n.global.t('common.captchaAreaNotClicked'),
+    success: i18n.global.t('common.verificationSuccess'),
 })
 
 const captchaImgRef = ref<HTMLImageElement | null>(null)

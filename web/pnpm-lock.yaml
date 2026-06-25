@@ -53,6 +53,9 @@ importers:
       vue-router:
         specifier: 5.0.6
         version: 5.0.6(@vue/compiler-sfc@3.5.35)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
     devDependencies:
       '@eslint/js':
         specifier: 10.0.1

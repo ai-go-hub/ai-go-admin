@@ -1,0 +1,9 @@
+refresh: refresh
+loading: loading
+operationSuccess: Operation successful
+operationFailed: Operation failed
+networkError: Network error
+captchaLoadFailed: Captcha loading failed, please click refresh button
+captchaAreaNotClicked: The correct area is not clicked, please try again!
+verificationSuccess: Verification is successful!
+pleaseClick: Please click

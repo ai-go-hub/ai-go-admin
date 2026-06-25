@@ -1,6 +1,7 @@
 import { merge, set } from 'lodash-es'
 import type { App } from 'vue'
 import { createI18n } from 'vue-i18n'
+import { parse as parseYaml } from 'yaml'
 import { useConfig } from '/@/stores/config'
 
 /**
@@ -31,10 +32,10 @@ const i18n = createI18n({
     messages: {},
 })
 
-// 使用 vite import.meta.glob 批量导入 lang 目录下所有 .ts 文件（包括子目录）
-const langGlobs: Record<LangKey, Record<string, () => Promise<{ default: any }>>> = {
-    en: import.meta.glob('./en/**/*.ts') as Record<string, () => Promise<{ default: any }>>,
-    'zh-cn': import.meta.glob('./zh-cn/**/*.ts') as Record<string, () => Promise<{ default: any }>>,
+// 使用 vite import.meta.glob 批量导入 lang 目录下所有 .yaml 文件（包括子目录）
+const langGlobs = {
+    en: import.meta.glob('./en/**/*.yaml', { query: '?raw', import: 'default' }),
+    'zh-cn': import.meta.glob('./zh-cn/**/*.yaml', { query: '?raw', import: 'default' }),
 }
 
 /**
@@ -73,27 +74,28 @@ export async function loadMessages(lang: LangKey): Promise<void> {
     }
 
     try {
-        // 批量加载 lang 目录下所有 .ts 文件
+        // 批量加载 lang 目录下所有 .yaml 文件
         const glob = langGlobs[lang]
         const promises = Object.entries(glob).map(async ([path, loader]) => {
-            const module = await loader()
-            return { path, default: module.default }
+            const raw = (await loader()) as string
+            const data = parseYaml(raw)
+            return { path, data }
         })
         const modules = await Promise.all(promises)
 
         // 按文件路径构建嵌套的 messages 结构
         const mergedMessages: Record<string, any> = {}
-        for (const { path, default: moduleData } of modules) {
-            if (typeof moduleData !== 'object' || moduleData === null) {
+        for (const { path, data } of modules) {
+            if (typeof data !== 'object' || data === null) {
                 continue
             }
             const keys = filePathToKeys(lang, path)
             if (keys.length === 0) {
                 // 合并到顶层
-                merge(mergedMessages, moduleData)
+                merge(mergedMessages, data)
             } else {
                 // 子模块 — 按路径嵌套
-                merge(mergedMessages, set({}, keys, moduleData))
+                merge(mergedMessages, set({}, keys, data))
             }
         }
 

@@ -1,0 +1,33 @@
+# 主视觉区
+heroBadge: AI 做舟，人掌分寸
+heroTitle: 爱购商城
+heroSubtitle: AI GO MALL
+heroDesc: 基于 Golang + GORM + TypeScript + Vite + Element Plus 等流行技术栈
+enterAdmin: 进入后台
+learnTech: 了解技术栈
+scrollDown: 向下滚动
+
+# 技术栈
+techTitle: 技术栈
+techSubtitle: 流行、稳定、高效的技术选型
+techGolang: 高性能后端语言，Gin 框架 + GORM + 泛型驱动的服务端架构
+techTypeScript: 类型安全的 JavaScript 超集，前端顶流，Vue3 使用它编写
+techPostgreSQL: 强大的开源关系型数据库，GORM AutoMigrate 自动建表，读写分离
+techVue: 渐进式前端框架搭配轻量级状态管理，setup 语法糖 + Vite 构建
+techElementPlus: Vue 3 生态最流行的组件库，统一的 UI 风格，国际化开箱即用
+techClaudeCode: AI 驱动的编码助手，负责代码生成、重构与审查，人机协同高效开发
+
+# 开发理念
+philosophyTitle: 开发理念
+philosophySubtitle: AI 执笔快速构建，人掌分寸雕琢商用级电商工程
+humanCommand: 人工指挥
+humanDesc: 作者以丰富的开发经验把控项目架构与方向，确保每一行代码都经过深思熟虑，杜绝 AI 幻觉带来的隐患。
+aiWriter: AI 执笔
+aiDesc: Claude Code 作为主力编码助手，高效完成重复性工作与代码生成，大幅提升开发效率与代码质量。
+
+# 开源博客
+blogTitle: 开源博客
+blogSubtitle: 全程记录开发细节，与社区共同成长
+
+# 页脚
+footerTagline: AI 做舟 · 人掌分寸

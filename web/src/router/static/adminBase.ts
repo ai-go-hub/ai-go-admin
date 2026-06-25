@@ -15,7 +15,7 @@ const adminBaseRoute: RouteRecordRaw = {
     // 直接重定向到 loading 路由
     redirect: adminBaseRoutePath + '/loading',
     meta: {
-        title: `pageTitles.Loading`,
+        title: `common.loading`,
     },
     children: [
         {
@@ -23,7 +23,7 @@ const adminBaseRoute: RouteRecordRaw = {
             name: 'adminMainLoading',
             component: () => import('/@/layouts/common/loading.vue'),
             meta: {
-                title: `pageTitles.Loading`,
+                title: `common.loading`,
             },
         },
     ],

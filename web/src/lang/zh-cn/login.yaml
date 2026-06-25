@@ -1,0 +1,9 @@
+login: 登 录
+username: 用户名
+password: 密码
+loggingIn: 登录中...
+remember: 记住30天
+welcomePrompt: 欢迎使用 {siteName} 后台管理系统
+usernameRequired: 请输入用户名
+passwordRequired: 请输入密码
+passwordMinLength: 密码长度不能小于6位

@@ -1,0 +1,9 @@
+login: Login
+username: Username
+password: Password
+loggingIn: Logging in...
+remember: Remember for 30 days
+welcomePrompt: Welcome to the {siteName} backend management system
+usernameRequired: Please enter username
+passwordRequired: Please enter password
+passwordMinLength: Password must be at least 6 characters
