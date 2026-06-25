@@ -11,5 +11,14 @@
     "[vue]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "eslint.validate": ["javascript", "vue", "typescript"]
+    "eslint.validate": ["javascript", "vue", "typescript"],
+
+    // ==================== i18n-ally 插件配置 ====================
+    "i18n-ally.localesPaths": ["src/lang"],
+    "i18n-ally.namespace": true,
+    "i18n-ally.pathMatcher": "{locale}/{namespaces?}.{ext}",
+    "i18n-ally.sourceLanguage": "zh-cn",
+    "i18n-ally.displayLanguage": "zh-cn",
+    "i18n-ally.enabledParsers": ["yaml", "json"],
+    "i18n-ally.enabledFrameworks": ["vue", "vue-sfc"]
 }
