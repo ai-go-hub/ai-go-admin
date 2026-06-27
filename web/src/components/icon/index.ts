@@ -1,6 +1,7 @@
 import * as elIcons from '@element-plus/icons-vue'
 import { camelCase, kebabCase, upperFirst } from 'lodash-es'
 import { App, defineAsyncComponent, type Component } from 'vue'
+import Icon from '/@/components/icon/index.vue'
 
 type IconMap = Record<string, Component>
 
@@ -49,6 +50,13 @@ export function getLucideComponent(name: string): Component | null {
  * 全局注册 icon 组件
  */
 export function registerIcons(app: App) {
+    /*
+     * 全局注册 Icon 组件
+     * 使用方式: <Icon name="name" size="size" color="color" strokeWidth="线条宽度（仅 lucide 支持）" />
+     * name 支持两种前缀 el- 和 lucide-，分别表示 element plus 图标和 lucide 图标
+     */
+    app.component('Icon', Icon)
+
     /*
      * Element Plus 的 icon
      */
