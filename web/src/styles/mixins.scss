@@ -1,0 +1,30 @@
+@mixin set-css-var-value($name, $value) {
+    #{join-var-name($name)}: #{$value};
+}
+
+@function join-var-name($list) {
+    $name: '--ag';
+    @each $item in $list {
+        @if $item != '' {
+            $name: $name + '-' + $item;
+        }
+    }
+    @return $name;
+}
+
+@function get-css-var-name($args...) {
+    @return join-var-name($args);
+}
+
+/*
+ * 通过映射设置所有的CSS变量
+ */
+@mixin set-component-css-var($name, $variables) {
+    @each $attribute, $value in $variables {
+        @if $attribute == 'default' {
+            #{get-css-var-name($name)}: #{$value};
+        } @else {
+            #{get-css-var-name($name, $attribute)}: #{$value};
+        }
+    }
+}
