@@ -7,3 +7,7 @@ captchaLoadFailed: Captcha loading failed, please click refresh button
 captchaAreaNotClicked: The correct area is not clicked, please try again!
 verificationSuccess: Verification is successful!
 pleaseClick: Please click
+arrayKey: key
+arrayValue: value
+add: Add
+pleaseInstallEditor: Please install editor

@@ -7,3 +7,7 @@ captchaLoadFailed: 验证码加载失败，请点击刷新按钮
 captchaAreaNotClicked: 未点中正确区域，请重试！
 verificationSuccess: 验证成功！
 pleaseClick: 请依次点击
+arrayKey: 键名
+arrayValue: 键值
+add: 添加
+pleaseInstallEditor: 请先安装富文本编辑器
