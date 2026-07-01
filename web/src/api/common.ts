@@ -10,15 +10,17 @@ export function getClickCaptcha(apiBaseURL?: string) {
 }
 
 export function checkClickCaptcha(data: ClickRequest, apiBaseURL?: string) {
-    return request({
-        url: '/common/captcha/verify',
-        method: 'POST',
-        data,
-        ...(apiBaseURL ? { baseURL: apiBaseURL } : {}),
-        requestOptions: {
-            showErrorMessage: false,
+    return request(
+        {
+            url: '/common/captcha/verify',
+            method: 'POST',
+            data,
+            ...(apiBaseURL ? { baseURL: apiBaseURL } : {}),
         },
-    })
+        {
+            showErrorMessage: false,
+        }
+    )
 }
 
 /**

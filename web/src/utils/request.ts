@@ -19,10 +19,6 @@ export interface RequestOptions {
     showNetworkErrorMessage?: boolean
 }
 
-export interface RequestConfig extends AxiosRequestConfig {
-    requestOptions?: RequestOptions
-}
-
 interface InternalRequestConfig extends InternalAxiosRequestConfig {
     requestOptions?: RequestOptions
 }
@@ -193,8 +189,10 @@ instance.interceptors.response.use(
 
 // ==================== 对外 API ====================
 
-function request<T = any>(config: RequestConfig) {
-    return instance<ApiResponse<T>>(config)
+function request<T = any>(config: AxiosRequestConfig, options?: RequestOptions) {
+    const merged = { ...config } as InternalRequestConfig
+    if (options) merged.requestOptions = options
+    return instance<ApiResponse<T>>(merged)
 }
 
 export default request
