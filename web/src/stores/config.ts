@@ -1,8 +1,10 @@
+import { pick } from 'lodash-es'
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 import { LangKey } from '/@/lang'
 import { CONFIG } from '/@/stores/constant/cacheKey'
-import type { Lang, Layout } from '/@/stores/interface/config'
+import type { Lang, Layout, Site } from '/@/stores/interface/config'
+import { useMenu } from '/@/stores/menu'
 
 export const useConfig = defineStore(
     'config',
@@ -13,6 +15,17 @@ export const useConfig = defineStore(
         const lang: Lang = reactive({
             active: 'zh-cn',
             fallback: 'zh-cn',
+        })
+
+        /**
+         * 站点配置
+         */
+        const site: Site = reactive({
+            name: '',
+            version: '',
+            timezone: '',
+            record_number: '',
+            initialized: false,
         })
 
         /**
@@ -33,7 +46,7 @@ export const useConfig = defineStore(
             menuActiveColor: ['#409eff', '#3375b9'],
             menuHoverBackground: ['#ecf5ff', '#18222c'],
             menuWidth: 260,
-            menuDefaultIcon: 'fa fa-circle-o',
+            menuDefaultIcon: 'lucide-circle-small',
             menuCollapse: false,
             menuUniqueOpened: false,
             menuShowTopBar: true,
@@ -75,12 +88,26 @@ export const useConfig = defineStore(
         }
 
         /**
+         * 批量填充站点配置数据
+         */
+        function siteDataFill(data: Record<string, any>) {
+            Object.assign(site, pick(data, Object.keys(site)))
+        }
+
+        function setSiteInitStatus(status: boolean) {
+            site.initialized = status
+        }
+
+        /**
          * 设置布局配置项
          */
         const setLayoutValue = (name: keyof Layout, value: any) => {
             ;(layout[name] as any) = value
         }
 
+        /**
+         * 获取布局配置中的颜色值
+         */
         const getColorValue = function (name: keyof Layout): string {
             const colors = layout[name] as string[]
             if (layout.dark) {
@@ -90,7 +117,47 @@ export const useConfig = defineStore(
             }
         }
 
-        return { lang, layout, setLang, setLayoutValue, getColorValue }
+        /**
+         * 获取菜单宽度
+         */
+        function getMenuWidth() {
+            // 菜单折叠时基本宽度
+            const menuCollapseBaseWidth = 64
+
+            // 左分布局特有
+            if (layout.mode == 'LeftSplit') {
+                const menu = useMenu()
+
+                // 本布局带来的额外菜单宽度，主菜单宽度 80 + 次级菜单的左右内边距 16
+                const modeMenuWidth = 96
+                // 最终菜单宽度
+                let leftSplitMenuWidth = layout.menuCollapse
+                    ? menuCollapseBaseWidth + modeMenuWidth
+                    : parseInt(layout.menuWidthLeftSplit.toString()) + modeMenuWidth
+
+                // 无次级菜单，固定宽度
+                if (!menu.children.length) {
+                    leftSplitMenuWidth = 80
+                }
+
+                // 小屏模式
+                if (layout.shrink) {
+                    return layout.menuCollapse ? 0 : `${leftSplitMenuWidth}px`
+                }
+
+                return `${leftSplitMenuWidth}px`
+            }
+
+            // 小屏模式
+            if (layout.shrink) {
+                return layout.menuCollapse ? 0 : `${layout.menuWidth}px`
+            }
+
+            // 菜单是否折叠
+            return layout.menuCollapse ? `${menuCollapseBaseWidth}px` : `${layout.menuWidth}px`
+        }
+
+        return { lang, site, layout, setLang, siteDataFill, setSiteInitStatus, setLayoutValue, getColorValue, getMenuWidth }
     },
     {
         persist: {

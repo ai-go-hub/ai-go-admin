@@ -7,7 +7,8 @@
 }
 
 html,
-body {
+body,
+#app {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -22,6 +23,11 @@ body {
         sans-serif;
     color: var(--el-text-color-primary);
     font-size: var(--el-font-size-base);
+    background-color: var(--ag-bg-color);
+}
+
+.default-main {
+    margin: var(--ag-main-space) var(--ag-main-space) 60px var(--ag-main-space);
 }
 
 .ai-go-mask {

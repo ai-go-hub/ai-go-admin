@@ -1,0 +1,73 @@
+searchSimple: Search is actually very simple
+exitFullscreen: Exit full screen
+menuTypeUnrecognized: Navigation failed, the menu type is unrecognized!
+invalidRoute: Invalid route
+untitled: Untitled
+noChildMenu: No sub-menus found for navigation!
+layoutConfiguration: Layout configuration
+layoutMode: Layout mode
+default: Default
+classic: Classic
+leftSplit: Left split
+singleColumn: Single column
+doubleColumn: Double column
+overallSituation: Overall situation
+darkMode: Dark mode
+backgroundPageSwitchingAnimation: Background page switching animation
+pleaseSelectAnimationName: Please select an animation name
+sidebar: Sidebar
+sideMenuBarBackgroundColor: Side menu bar background color
+sideMenuTextColor: Side menu text color
+sideMenuActiveItemBackgroundColor: Side menu active item background color
+sideMenuActiveItemTextColor: Side menu active item text color
+sideMenuHoverBackgroundColor: Side menu hover background color
+showSideMenuTopBar: Show side menu top bar (title bar)
+sideMenuTopBarBackgroundColor: Side menu top bar background color
+sideMenuTopBarTextColor: Side menu top bar text color
+sideMenuTopBarCenterContent: Center the content of the top bar of the side menu
+sideMenuTopBarDisplayLogo: The top bar of the side menu displays the LOGO
+sideMenuBottomToolbarAutoHide: The toolbar at the bottom of the side menu automatically hides
+sideMenuBottomToolbarIconColor: Color of the toolbar icons at the bottom of the side menu
+sideMenuBottomToolbarHoverIconColor: Icon color of the bottom toolbar in the side menu when hovered over
+sideMenuBottomToolbarHoverBackgroundColor: Background color of the bottom toolbar in the side menu when hovered over
+sideMenuWidth: Side menu width (when expanded)
+sideMenuDefaultIcon: Side menu default icon
+sideMenuHorizontalCollapse: Side menu horizontal collapse
+sideMenuAccordion: Side menu accordion
+topBar: Top bar
+topBarBackgroundColor: Top bar background color
+topBarTextColor: Top bar text color
+topBarHoverBackgroundColor: Background color when hovering over the top bar
+topBarMenuActiveItemBackgroundColor: Top bar menu active item background color
+topBarMenuActiveItemTextColor: Top bar menu active item text color
+restoreConfigConfirm: Are you sure you want to restore all configurations to the default values?
+restoreDefault: Restore default
+sidebarTopAndBottom: The top and bottom of the sidebar
+mainMenu: (Main Menu)
+submenu: (Submenu)
+mainAndSecondaryMenus: (Main and secondary menus)
+profile: Profile
+logout: Logout
+fullscreenNotSupported: Full screen is not supported~
+later: Later
+restartHotUpdate: Restart hot update
+closeTypeTerminal: WEB terminal execution command
+closeTypeCrud: CRUD code generation service
+closeTypePlugin: Plugin installation service
+closeTypeConfig: Modify system configuration
+reloadHotServerTitle: Need to restart Vite hot update service
+reloadHotServerTips1: To ensure
+reloadHotServerTips2: To avoid interruption, the system has paused Vite's hot update feature. During this period, front-end file changes will not be updated in real time and the webpage will not auto-reload. It has been detected that files have been updated during the service pause, and the hot update service needs to be restarted.
+reloadHotServerTips3: The hot update pause does not affect already loaded features. You can continue to operate and click to restart the hot update service when ready.
+cleanSystemCache: Clean system cache
+cleanBrowserCache: Clean browser cache
+cleanAllCache: One key clean all
+contextmenu: Context menu
+contextmenuTips: Right-click a tab to bring up tab-related menus, such as refresh, full screen, close others, etc.
+layoutConfigurationTips: Click to open the layout configuration, where you can switch the overall backend layout mode, enable dark mode, adjust theme colors, toggle the site title bar display, etc.
+menuSearch: Menu search
+menuSearchTips: Quickly search and switch menus. If you find this feature infrequently used, you can enable the auto-hide feature for the bottom toolbar in the layout configuration.
+closeTab: Close tab
+tabFullscreen: Full screen
+closeOtherTabs: Close other tabs
+closeAllTabs: Close all tabs

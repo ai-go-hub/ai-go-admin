@@ -7,6 +7,17 @@ export interface Lang {
     fallback: LangKey
 }
 
+/**
+ * 站点配置
+ */
+export interface Site {
+    name: string
+    version: string
+    timezone: string
+    record_number: string
+    initialized: boolean
+}
+
 export interface Layout {
     // ==================== 全局 ====================
     // 后台布局方式，可选值<Default|Classic|Streamline|Double|LeftSplit>

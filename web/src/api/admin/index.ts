@@ -21,3 +21,13 @@ export function adminLogin(data: AdminLoginParams) {
         data,
     })
 }
+
+/**
+ * 管理员注销请求
+ */
+export function adminLogout() {
+    return request({
+        url: '/admin/logout',
+        method: 'POST',
+    })
+}

@@ -1,5 +1,5 @@
 <template>
-    <div>公共布局 loading</div>
+    <div class="default-main">后台控制台页面</div>
 </template>
 
 <script setup lang="ts"></script>
