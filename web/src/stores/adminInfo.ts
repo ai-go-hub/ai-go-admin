@@ -20,11 +20,11 @@ export const useAdminInfo = defineStore('adminInfo', {
         /**
          * 状态批量填充
          * @param state 新状态数据
-         * @param [exclude=true] 是否排除某些字段（忽略填充），默认值 true 排除 token，传递 false 则不排除，还可传递 string[] 指定排除字段列表
+         * @param [exclude=true] 是否排除某些字段（忽略填充），默认值 true 排除 token 和 super 字段，传递 false 则不排除，还可传递 string[] 指定排除字段列表
          */
         dataFill(state: Record<string, any>, exclude: boolean | string[] = true) {
             if (exclude === true) {
-                exclude = ['token']
+                exclude = ['token', 'super']
             } else if (exclude === false) {
                 exclude = []
             }
