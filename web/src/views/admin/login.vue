@@ -140,6 +140,7 @@
 <script setup lang="ts">
 import { Lock, User } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules, InputInstance } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -460,7 +461,13 @@ onMounted(() => {
     // 获取人机验证码开关配置
     getCaptchaConfig()
         .then((res) => {
-            captchaEnabled.value = res.data.data.adminLogin
+            if (res.data.data.type == 'logged_in') {
+                ElMessage.success(t('login.loggedIn'))
+                router.push('/admin')
+                return
+            }
+
+            captchaEnabled.value = res.data.data.captcha
         })
         .catch(() => {
             captchaEnabled.value = true

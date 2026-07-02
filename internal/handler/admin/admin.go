@@ -3,6 +3,7 @@ package admin
 import (
 	"ai-go-mall/internal/handler"
 	"ai-go-mall/internal/infra/config"
+	"ai-go-mall/internal/middleware"
 	"ai-go-mall/internal/model"
 	"ai-go-mall/internal/response"
 	svcAdmin "ai-go-mall/internal/service/admin"
@@ -26,8 +27,15 @@ func NewAdminHandler(svc *svcAdmin.AdminService) *AdminHandler {
 
 // GetLoginConfig 返回管理员登录页配置（供前端判断是否启用人机验证码）
 func (h *AdminHandler) GetLoginConfig(c *gin.Context) {
+	admin := middleware.GetAdmin(c)
+	flagType := middleware.FlagNeedLogin
+	if admin != nil {
+		flagType = middleware.FlagLoggedIn
+	}
+
 	response.Success(c, response.WithData(gin.H{
-		"admin_login": config.Get().Captcha.Switches.AdminLogin,
+		"type":    flagType,
+		"captcha": config.Get().Captcha.Switches.AdminLogin,
 	}))
 }
 
@@ -53,5 +61,5 @@ func (h *AdminHandler) RegisterRoutes(group *gin.RouterGroup) {
 	// 只注册自定义路由
 	// 不注册基控制器的 CRUD 路由
 	group.POST("/login", h.Login)
-	group.GET("/login-config", h.GetLoginConfig)
+	group.GET("/login-config", middleware.AdminAuthOptional(), h.GetLoginConfig)
 }

@@ -7,3 +7,4 @@ welcomePrompt: 欢迎使用 {siteName} 后台管理系统
 usernameRequired: 请输入用户名
 passwordRequired: 请输入密码
 passwordMinLength: 密码长度不能小于6位
+loggedIn: 您已登录，无需重复登录
