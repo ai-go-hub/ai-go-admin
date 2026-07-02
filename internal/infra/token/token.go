@@ -23,6 +23,7 @@ type Driver interface {
 	Get(ctx context.Context, token string) (*model.Token, error)
 	Delete(ctx context.Context, token string) error
 	Clear(ctx context.Context, userID uint, tokenType string) error
+	ClearExpired(ctx context.Context) error
 }
 
 // Manager 令牌管理器
@@ -37,6 +38,9 @@ func NewManager(driver Driver) *Manager {
 
 // Create 创建令牌，入库前自动对 Token 做 SHA256
 func (m *Manager) Create(ctx context.Context, token *model.Token) error {
+	// 清理过期令牌（Create 为低频操作，使用独立 context 不受请求生命周期影响）
+	_ = m.driver.ClearExpired(context.Background())
+
 	token.Token = sha256Hex(token.Token)
 	return m.driver.Create(ctx, token)
 }

@@ -3,6 +3,7 @@ package driver
 import (
 	"context"
 	"errors"
+	"time"
 
 	"ai-go-mall/internal/infra/database"
 	"ai-go-mall/internal/model"
@@ -47,6 +48,14 @@ func (d *Database) Delete(ctx context.Context, token string) error {
 func (d *Database) Clear(ctx context.Context, userID uint, tokenType string) error {
 	_, err := gorm.G[model.Token](database.DB()).
 		Where("user_id = ? AND type = ?", userID, tokenType).
+		Delete(ctx)
+	return err
+}
+
+// ClearExpired 清除所有已过期的令牌
+func (d *Database) ClearExpired(ctx context.Context) error {
+	_, err := gorm.G[model.Token](database.DB()).
+		Where("expired_at < ?", time.Now()).
 		Delete(ctx)
 	return err
 }
