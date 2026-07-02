@@ -53,16 +53,22 @@ type IconConfig struct {
 	CnName string `mapstructure:"cn_name"`
 }
 
+// 验证码开关配置，按接口控制是否启用人机验证
+type CaptchaSwitches struct {
+	AdminLogin bool `mapstructure:"admin_login"`
+}
+
 // 验证码配置
 type CaptchaConfig struct {
-	Elements        []string     `mapstructure:"elements"`
-	Length          int          `mapstructure:"length"`
-	ConfusionLength int          `mapstructure:"confusion_length"`
-	Expire          int          `mapstructure:"expire"`
-	FontPath        string       `mapstructure:"font_path"`
-	BackgroundDir   string       `mapstructure:"background_dir"`
-	IconDir         string       `mapstructure:"icon_dir"`
-	Icons           []IconConfig `mapstructure:"icons"`
+	Switches        CaptchaSwitches `mapstructure:"switches"`
+	Elements        []string        `mapstructure:"elements"`
+	Length          int             `mapstructure:"length"`
+	ConfusionLength int             `mapstructure:"confusion_length"`
+	Expire          int             `mapstructure:"expire"`
+	FontPath        string          `mapstructure:"font_path"`
+	BackgroundDir   string          `mapstructure:"background_dir"`
+	IconDir         string          `mapstructure:"icon_dir"`
+	Icons           []IconConfig    `mapstructure:"icons"`
 }
 
 // 跨域配置

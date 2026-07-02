@@ -1,4 +1,7 @@
 captcha:
+  # 分模块的验证码开关
+  switches:
+    admin_login: true
   # 验证元素类型，可选值:chinese=中文文字,uppercase=大写字母,icon=图标
   elements:
     - chinese

@@ -144,7 +144,9 @@ import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } 
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { adminLogin } from '/@/api/admin'
+import { getCaptchaConfig } from '/@/api/admin/index'
 import clickCaptcha from '/@/components/clickCaptcha'
+import type { ClickRequest } from '/@/components/clickCaptcha/index'
 import { useAdminInfo } from '/@/stores/adminInfo'
 
 const { t } = useI18n()
@@ -167,6 +169,7 @@ const loginForm = reactive<LoginForm>({
 
 const formRef = ref<FormInstance>()
 const submitLoading = ref(false)
+const captchaEnabled = ref(true)
 const usernameInputRef = ref<InputInstance>()
 const passwordInputRef = ref<InputInstance>()
 
@@ -187,9 +190,9 @@ async function onSubmit() {
         return
     }
 
-    clickCaptcha((data) => {
+    const doLogin = (captcha?: ClickRequest) => {
         submitLoading.value = true
-        adminLogin({ ...loginForm, captcha: data })
+        adminLogin({ ...loginForm, captcha })
             .then((res) => {
                 adminInfo.dataFill(res.data.data, false)
                 router.push('/admin')
@@ -197,7 +200,13 @@ async function onSubmit() {
             .finally(() => {
                 submitLoading.value = false
             })
-    })
+    }
+
+    if (captchaEnabled.value) {
+        clickCaptcha((data) => doLogin(data))
+    } else {
+        doLogin()
+    }
 }
 
 // ==================== 角色动画状态 ====================
@@ -447,6 +456,15 @@ onMounted(() => {
     stopPurpleBlink = setupBlink(isPurpleBlinking)
     stopBlackBlink = setupBlink(isBlackBlinking)
     rafId = requestAnimationFrame(tick)
+
+    // 获取人机验证码开关配置
+    getCaptchaConfig()
+        .then((res) => {
+            captchaEnabled.value = res.data.data.adminLogin
+        })
+        .catch(() => {
+            captchaEnabled.value = true
+        })
 
     nextTick(() => {
         if (!loginForm.username) {

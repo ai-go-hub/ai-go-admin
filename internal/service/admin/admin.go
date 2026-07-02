@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"ai-go-mall/internal/infra/captcha"
+	"ai-go-mall/internal/infra/config"
 	"ai-go-mall/internal/infra/token"
 	"ai-go-mall/internal/model"
 	repoAdmin "ai-go-mall/internal/repository/admin"
@@ -46,8 +47,10 @@ type LoginResponse struct {
 
 // Login 管理员登录
 func (s *AdminService) Login(c *gin.Context, req *LoginRequest) (*LoginResponse, error) {
-	if ok, err := captcha.Check(req.Captcha, true); !ok {
-		return nil, fmt.Errorf("验证码错误：%w", err)
+	if config.Get().Captcha.Switches.AdminLogin {
+		if ok, err := captcha.Check(req.Captcha, true); !ok {
+			return nil, fmt.Errorf("验证码错误：%w", err)
+		}
 	}
 
 	// 根据用户名查询管理员

@@ -8,7 +8,7 @@ export interface AdminLoginParams {
     username: string
     password: string
     remember: boolean
-    captcha: ClickRequest
+    captcha?: ClickRequest
 }
 
 /**
@@ -19,6 +19,16 @@ export function adminLogin(data: AdminLoginParams) {
         url: '/admin/login',
         method: 'POST',
         data,
+    })
+}
+
+/**
+ * 管理员登录配置获取
+ */
+export function getCaptchaConfig() {
+    return request({
+        url: '/admin/login-config',
+        method: 'GET',
     })
 }
 
