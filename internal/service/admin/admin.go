@@ -87,7 +87,7 @@ func (s *AdminService) Login(c *gin.Context, req *LoginRequest) (*LoginResponse,
 	// 创建令牌
 	tk := &model.Token{
 		Token:     tokenStr,
-		Type:      "admin_login",
+		Type:      token.TypeAdminLogin,
 		UserID:    admin.ID,
 		CreatedAt: time.Now(),
 		ExpiredAt: expiredAt,

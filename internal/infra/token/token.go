@@ -12,6 +12,11 @@ import (
 	"ai-go-mall/internal/model"
 )
 
+// 令牌类型标识
+const (
+	TypeAdminLogin = "admin_login" // 管理员登录令牌
+)
+
 // Driver 令牌存储驱动接口
 type Driver interface {
 	Create(ctx context.Context, token *model.Token) error
