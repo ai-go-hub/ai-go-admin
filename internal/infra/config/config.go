@@ -42,9 +42,16 @@ type ReadConfig struct {
 	DatabaseSource `mapstructure:",squash"`
 }
 
+// 令牌过期时间配置
+type TokenExpireConfig struct {
+	Admin         int `mapstructure:"admin"`
+	AdminRemember int `mapstructure:"admin_remember"`
+}
+
 // 令牌配置
 type TokenConfig struct {
-	Driver string
+	Driver string            `mapstructure:"driver"`
+	Expire TokenExpireConfig `mapstructure:"expire"`
 }
 
 // 图标元数据配置

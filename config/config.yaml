@@ -6,6 +6,9 @@ server:
 
 token:
   driver: database
+  expire:
+    admin: 72           # 管理员 token 有效期，单位：小时（3 天）
+    admin_remember: 720 # 管理员 token 有效期（记住登录），单位：小时（30 天）
 
 database:
   type: postgres

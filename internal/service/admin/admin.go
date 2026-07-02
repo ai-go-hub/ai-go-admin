@@ -77,10 +77,11 @@ func (s *AdminService) Login(c *gin.Context, req *LoginRequest) (*LoginResponse,
 	// 使用 UUID v7 生成令牌
 	tokenStr := uuid.Must(uuid.NewV7()).String()
 
-	// 计算过期时间：记住登录为 30 天，否则为 3 天
-	expiredAt := time.Now().Add(3 * 24 * time.Hour)
+	// 计算过期时间
+	expireCfg := config.Get().Token.Expire
+	expiredAt := time.Now().Add(time.Duration(expireCfg.Admin) * time.Hour)
 	if req.Remember {
-		expiredAt = time.Now().Add(30 * 24 * time.Hour)
+		expiredAt = time.Now().Add(time.Duration(expireCfg.AdminRemember) * time.Hour)
 	}
 
 	// 创建令牌

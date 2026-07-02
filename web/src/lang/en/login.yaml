@@ -2,7 +2,7 @@ login: Login
 username: Username
 password: Password
 loggingIn: Logging in...
-remember: Remember for 30 days
+remember: Remember me
 welcomePrompt: Welcome to the {siteName} backend management system
 usernameRequired: Please enter username
 passwordRequired: Please enter password
