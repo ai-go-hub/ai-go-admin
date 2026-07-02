@@ -88,5 +88,11 @@ func extractAdmin(c *gin.Context) (*model.Admin, string) {
 	if err != nil {
 		return nil, "请重新登录"
 	}
+
+	// 检查账号状态
+	if admin.Status == "disable" {
+		return nil, "账号已被禁用"
+	}
+
 	return admin, ""
 }
