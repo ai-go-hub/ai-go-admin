@@ -56,10 +56,21 @@ func (h *AdminHandler) Login(c *gin.Context) {
 	response.Success(c, response.WithData(result))
 }
 
+// Logout 管理员退出登录
+func (h *AdminHandler) Logout(c *gin.Context) {
+	if err := h.svc.Logout(c, middleware.GetToken(c)); err != nil {
+		response.Fail(c)
+		return
+	}
+
+	response.Success(c)
+}
+
 // RegisterRoutes 注册路由
 func (h *AdminHandler) RegisterRoutes(group *gin.RouterGroup) {
 	// 只注册自定义路由
 	// 不注册基控制器的 CRUD 路由
 	group.POST("/login", h.Login)
+	group.POST("/logout", middleware.AdminAuth(), h.Logout)
 	group.GET("/login-config", middleware.AdminAuthOptional(), h.GetLoginConfig)
 }

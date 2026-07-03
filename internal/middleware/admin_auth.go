@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	// 上下文中存储管理员信息的键
+	// 上下文中存储管理员会话信息的键
 	CtxAdminKey = "admin"
 )
 
@@ -24,12 +24,18 @@ const (
 	FlagLoggedIn  = "logged_in"  // 已经登录
 )
 
+// AdminSession 管理员会话信息，由认证中间件注入到请求上下文
+type AdminSession struct {
+	Admin *model.Admin
+	Token string
+}
+
 // AdminAuth 管理员认证中间件，未登录时阻断请求
 func AdminAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		admin, msg := extractAdmin(c)
-		if admin != nil {
-			c.Set(CtxAdminKey, admin)
+		session, msg := extractAdmin(c)
+		if session != nil {
+			c.Set(CtxAdminKey, session)
 			c.Next()
 		} else {
 			response.Fail(c,
@@ -45,24 +51,33 @@ func AdminAuth() gin.HandlerFunc {
 // AdminAuthOptional 可选管理员认证中间件，有 token 则注入管理员信息，没有也放行
 func AdminAuthOptional() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if admin, _ := extractAdmin(c); admin != nil {
-			c.Set(CtxAdminKey, admin)
+		if session, _ := extractAdmin(c); session != nil {
+			c.Set(CtxAdminKey, session)
 		}
 		c.Next()
 	}
 }
 
 // GetAdmin 从上下文中取出管理员信息，未登录时返回 nil
-func GetAdmin(c *gin.Context) *model.Admin {
-	admin, ok := c.Get(CtxAdminKey)
+func GetAdmin(c *gin.Context) *AdminSession {
+	session, ok := c.Get(CtxAdminKey)
 	if !ok {
 		return nil
 	}
-	return admin.(*model.Admin)
+	return session.(*AdminSession)
 }
 
-// extractAdmin 提取并验证 token，返回 (管理员信息, 错误消息)
-func extractAdmin(c *gin.Context) (*model.Admin, string) {
+// GetToken 从上下文中取出当前令牌字符串，未登录时返回空
+func GetToken(c *gin.Context) string {
+	session, ok := c.Get(CtxAdminKey)
+	if !ok {
+		return ""
+	}
+	return session.(*AdminSession).Token
+}
+
+// extractAdmin 提取并验证 token，返回 (会话信息, 错误消息)
+func extractAdmin(c *gin.Context) (*AdminSession, string) {
 	// 提取请求 token
 	authHeader := c.GetHeader("authorization")
 
@@ -94,5 +109,5 @@ func extractAdmin(c *gin.Context) (*model.Admin, string) {
 		return nil, "账号已被禁用"
 	}
 
-	return admin, ""
+	return &AdminSession{Admin: admin, Token: parts[1]}, ""
 }

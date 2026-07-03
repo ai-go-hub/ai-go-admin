@@ -101,3 +101,8 @@ func (s *AdminService) Login(c *gin.Context, req *LoginRequest) (*LoginResponse,
 		Token: tokenStr,
 	}, nil
 }
+
+// Logout 注销当前管理员令牌
+func (s *AdminService) Logout(c *gin.Context, tokenStr string) error {
+	return token.Manager().Delete(c.Request.Context(), tokenStr)
+}
