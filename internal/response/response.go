@@ -37,7 +37,7 @@ func WithData(data any) Option {
 
 // Success 成功响应，默认 code = 0
 func Success(c *gin.Context, opts ...Option) {
-	r := &Response{Code: 0, Message: "ok", Time: time.Now().Unix()}
+	r := &Response{Code: 0, Time: time.Now().Unix()}
 	for _, opt := range opts {
 		opt(r)
 	}
