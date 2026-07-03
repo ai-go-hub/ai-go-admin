@@ -74,6 +74,14 @@ func (h *AdminHandler) Logout(c *gin.Context) {
 	response.Success(c)
 }
 
+// ClearCache 清理后台缓存
+//
+// 当前后端无可清理的缓存（暂无 Redis/进程内运行时缓存层等）
+// 此接口作为契约占位，待后续引入缓存层时在此补充清理逻辑
+func (h *AdminHandler) ClearCache(c *gin.Context) {
+	response.Success(c)
+}
+
 // RegisterRoutes 注册路由
 func (h *AdminHandler) RegisterRoutes(group *gin.RouterGroup) {
 	// 只注册自定义路由
@@ -81,4 +89,6 @@ func (h *AdminHandler) RegisterRoutes(group *gin.RouterGroup) {
 	group.POST("/login", h.Login)
 	group.POST("/logout", middleware.AdminAuthOptional(), h.Logout)
 	group.GET("/login-config", middleware.AdminAuthOptional(), h.GetLoginConfig)
+
+	group.POST("/clear-cache", middleware.AdminAuth(), h.ClearCache)
 }

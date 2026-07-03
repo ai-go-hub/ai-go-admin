@@ -179,7 +179,7 @@ const init = () => {
     config.setSiteInitStatus(true)
 
     if (!isEmpty(res.data.adminInfo)) {
-        adminInfo.dataFill(res.data.adminInfo)
+        adminInfo.dataFill({ ...res.data.adminInfo, super: true }, ['token'])
     }
 
     if (res.data.menus) {

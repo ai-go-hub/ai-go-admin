@@ -206,7 +206,10 @@ const onClearCache = (type: string) => {
         Session.clear()
         Local.clear()
         Local.set(ADMIN_INFO, adminInfo)
-        if (type == 'storage') return
+        if (type == 'storage') {
+            ElMessage.success(t('common.operationSuccess'))
+            return
+        }
     }
     postClearCache(type).then(() => {})
 }
