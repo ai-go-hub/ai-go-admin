@@ -69,11 +69,11 @@ func GetAdmin(c *gin.Context) *AdminSession {
 
 // GetToken 从上下文中取出当前令牌字符串，未登录时返回空
 func GetToken(c *gin.Context) string {
-	session, ok := c.Get(CtxAdminKey)
-	if !ok {
+	session := GetAdmin(c)
+	if session == nil {
 		return ""
 	}
-	return session.(*AdminSession).Token
+	return session.Token
 }
 
 // extractAdmin 提取并验证 token，返回 (会话信息, 错误消息)
