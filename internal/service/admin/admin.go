@@ -92,7 +92,7 @@ func (s *AdminService) Login(c *gin.Context, req *LoginRequest) (*LoginResponse,
 		CreatedAt: time.Now(),
 		ExpiredAt: expiredAt,
 	}
-	if err := token.Instance().Create(c.Request.Context(), tk); err != nil {
+	if err := token.Manager().Create(c.Request.Context(), tk); err != nil {
 		return nil, errors.New("保存令牌失败")
 	}
 

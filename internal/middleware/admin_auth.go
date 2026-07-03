@@ -72,7 +72,7 @@ func extractAdmin(c *gin.Context) (*model.Admin, string) {
 	}
 
 	// 校验令牌
-	tk, err := token.Instance().Get(c.Request.Context(), parts[1])
+	tk, err := token.Manager().Get(c.Request.Context(), parts[1])
 	if err != nil || tk == nil || time.Now().After(tk.ExpiredAt) {
 		return nil, "身份认证令牌失效，请重新登录"
 	}
