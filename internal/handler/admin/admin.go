@@ -58,6 +58,14 @@ func (h *AdminHandler) Login(c *gin.Context) {
 
 // Logout 管理员退出登录
 func (h *AdminHandler) Logout(c *gin.Context) {
+	admin := middleware.GetAdmin(c)
+	if admin == nil {
+		// 未登录，直接生成成功响应，其意图已自然完成
+		// 不能执行任何 token 删除逻辑，因为管理员未认证
+		response.Success(c)
+		return
+	}
+
 	if err := h.svc.Logout(c, middleware.GetToken(c)); err != nil {
 		response.Fail(c)
 		return
@@ -71,6 +79,6 @@ func (h *AdminHandler) RegisterRoutes(group *gin.RouterGroup) {
 	// 只注册自定义路由
 	// 不注册基控制器的 CRUD 路由
 	group.POST("/login", h.Login)
-	group.POST("/logout", middleware.AdminAuth(), h.Logout)
+	group.POST("/logout", middleware.AdminAuthOptional(), h.Logout)
 	group.GET("/login-config", middleware.AdminAuthOptional(), h.GetLoginConfig)
 }
