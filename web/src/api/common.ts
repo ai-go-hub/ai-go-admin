@@ -26,7 +26,7 @@ export function checkClickCaptcha(data: ClickRequest, apiBaseURL?: string) {
 /**
  * 缓存清理接口
  */
-export function postClearCache(type: string) {
+export function clearCache(type: string) {
     return request(
         {
             url: '/admin/clear-cache',

@@ -14,7 +14,7 @@ export interface AdminLoginParams {
 /**
  * 管理员登录请求
  */
-export function adminLogin(data: AdminLoginParams) {
+export function login(data: AdminLoginParams) {
     return request({
         url: '/admin/login',
         method: 'POST',
@@ -23,21 +23,21 @@ export function adminLogin(data: AdminLoginParams) {
 }
 
 /**
- * 管理员登录配置获取
+ * 管理员注销请求
  */
-export function getCaptchaConfig() {
+export function logout() {
     return request({
-        url: '/admin/login-config',
-        method: 'GET',
+        url: '/admin/logout',
+        method: 'POST',
     })
 }
 
 /**
- * 管理员注销请求
+ * 获取管理员登录配置
  */
-export function adminLogout() {
+export function getLoginConfig() {
     return request({
-        url: '/admin/logout',
-        method: 'POST',
+        url: '/admin/login-config',
+        method: 'GET',
     })
 }

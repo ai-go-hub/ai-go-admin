@@ -142,8 +142,8 @@ import screenfull from 'screenfull'
 import { reactive, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Config from './config.vue'
-import { adminLogout } from '/@/api/admin/index'
-import { postClearCache } from '/@/api/common'
+import { logout } from '/@/api/admin/index'
+import { clearCache } from '/@/api/common'
 import { langNames, setLang } from '/@/lang'
 import router from '/@/router'
 import { useAdminInfo } from '/@/stores/adminInfo'
@@ -194,7 +194,7 @@ const onAdminInfo = () => {
 }
 
 const onLogout = () => {
-    adminLogout().then(() => {
+    logout().then(() => {
         Local.remove(ADMIN_INFO)
         router.go(0)
     })
@@ -211,7 +211,7 @@ const onClearCache = (type: string) => {
             return
         }
     }
-    postClearCache(type).then(() => {})
+    clearCache(type).then(() => {})
 }
 </script>
 

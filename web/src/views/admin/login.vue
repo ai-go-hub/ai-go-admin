@@ -144,8 +144,8 @@ import { ElMessage } from 'element-plus'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { adminLogin } from '/@/api/admin'
-import { getCaptchaConfig } from '/@/api/admin/index'
+import { login } from '/@/api/admin'
+import { getLoginConfig } from '/@/api/admin/index'
 import clickCaptcha from '/@/components/clickCaptcha'
 import type { ClickRequest } from '/@/components/clickCaptcha/index'
 import { useAdminInfo } from '/@/stores/adminInfo'
@@ -193,7 +193,7 @@ async function onSubmit() {
 
     const doLogin = (captcha?: ClickRequest) => {
         submitLoading.value = true
-        adminLogin({ ...loginForm, captcha })
+        login({ ...loginForm, captcha })
             .then((res) => {
                 adminInfo.dataFill(res.data.data, false)
                 router.push('/admin')
@@ -458,8 +458,8 @@ onMounted(() => {
     stopBlackBlink = setupBlink(isBlackBlinking)
     rafId = requestAnimationFrame(tick)
 
-    // 获取人机验证码开关配置
-    getCaptchaConfig()
+    // 获取人机验证码开关配置等
+    getLoginConfig()
         .then((res) => {
             if (res.data.data.type == 'logged_in') {
                 ElMessage.success(t('login.loggedIn'))
