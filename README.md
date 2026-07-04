@@ -41,6 +41,7 @@
 <br>
 
 ### 介绍
+
 🌈 基于 Golang + GORM + TypeScript + Vite + Pinia + Element Plus 等流行技术栈的后台管理系统，目前开发工作以【AI 执笔 + 人工逐行雕琢】的模式积极进行中，作者指挥左手 AI，右手同步手搓 Blog，全程记录开发细节，Blog 开源：[Github](https://github.com/ai-go-hub/ai-go-blog) | [Gitee](https://gitee.com/ai-go-hub/ai-go-blog)。
 
 ### 安装使用
@@ -87,6 +88,7 @@ pnpm dev
 ```
 
 ### 联系我们
+
 - [加 QQ 群：860406643](https://qm.qq.com/q/GE0qcmaTo6)
 - [Gitee 仓库](https://gitee.com/ai-go-hub/ai-go-admin)、[GitHub 仓库](https://github.com/ai-go-hub/ai-go-admin)
 - [开发手记（掘金）](https://juejin.cn/column/7654319240119369737)
@@ -94,9 +96,10 @@ pnpm dev
 - [官方邮箱 1094963513@qq.com](mailto:1094963513@qq.com)
 
 ### 项目预览
-|  |  |
-|---------------------|---------------------|
-|![登录](https://thankphp.com/ai-go/preview/login-admin.png)|![点选验证码](https://thankphp.com/ai-go/preview/captcha-admin.png)|
+
+|                                                             |                                                                     |
+| ----------------------------------------------------------- | ------------------------------------------------------------------- |
+| ![登录](https://thankphp.com/ai-go/preview/login-admin.png) | ![点选验证码](https://thankphp.com/ai-go/preview/captcha-admin.png) |
 
 ### 特别鸣谢
 
@@ -116,8 +119,7 @@ pnpm dev
 🔐 AI GO ADMIN 遵循 `Apache2.0` 开源协议发布，提供无需授权的免费商用。
 
 - ✅ 允许个人和企业直接商用、修改、二次开发、外包、私有化部署。
-- ✅ 允许自由复制、修改、增删源码。
-- ✅ 衍生作品可以闭源分发、售卖，且无需开源修改部分。
+- ✅ 允许自由复制、修改、增删源码，衍生作品可以闭源分发、售卖，且无需开源修改部分。
 - ✅ 约束：请保留原项目 `LICENSE` 文件、若需开源衍生作品，请于 `README` 的显著位置添加本仓库链接。
 - ❌ 禁止冒充自有开源项目对外分发售卖。
-- ❌ 擅自使用原项目商标、产品名、品牌名。
+- ❌ 禁止擅自使用本项目商标、产品名、品牌名。
