@@ -4,7 +4,7 @@
         <div class="left-panel" :style="{ background: `linear-gradient(135deg, ${primaryColor}e6, ${primaryColor}, ${primaryColor}cc)` }">
             <!-- 站点名称 -->
             <div class="site-name">
-                <span>AI GO MALL</span>
+                <span>{{ config.site.name }}</span>
             </div>
 
             <!-- 角色区域 -->
@@ -76,7 +76,7 @@
             <!-- 底部链接 -->
             <div class="footer-links">
                 <a href="#">©{{ new Date().getFullYear() }} AI GO MALL</a>
-                <a href="http://beian.miit.gov.cn/" target="_blank">渝ICP备8888888号-1</a>
+                <a href="http://beian.miit.gov.cn/" target="_blank">{{ config.site.recordNumber }}</a>
             </div>
 
             <!-- 装饰 -->
@@ -90,7 +90,7 @@
             <div class="form-wrapper">
                 <div class="form-header">
                     <h1>{{ $t('login.login') }}</h1>
-                    <p>{{ $t('login.welcomePrompt', { siteName: 'AI GO MALL' }) }}</p>
+                    <p>{{ $t('login.welcomePrompt', { siteName: config.site.name }) }}</p>
                 </div>
 
                 <el-form ref="formRef" :model="loginForm" :rules="rules" size="large" @keyup.enter="onSubmit">
@@ -149,9 +149,11 @@ import { getLoginConfig } from '/@/api/admin/index'
 import clickCaptcha from '/@/components/clickCaptcha'
 import type { ClickRequest } from '/@/components/clickCaptcha/index'
 import { useAdminInfo } from '/@/stores/adminInfo'
+import { useConfig } from '/@/stores/config'
 
 const { t } = useI18n()
 const router = useRouter()
+const config = useConfig()
 const adminInfo = useAdminInfo()
 
 // ==================== 表单相关 ====================

@@ -1,7 +1,5 @@
 # 主视觉区
 heroBadge: AI 做舟，人掌分寸
-heroTitle: 爱购商城
-heroSubtitle: AI GO MALL
 heroDesc: 基于 Golang + GORM + TypeScript + Vite + Element Plus 等流行技术栈
 enterAdmin: 进入后台
 learnTech: 了解技术栈

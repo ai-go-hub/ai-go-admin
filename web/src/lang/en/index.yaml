@@ -1,7 +1,5 @@
 # Hero section
 heroBadge: AI Paddles, Human Steers
-heroTitle: AI GO MALL
-heroSubtitle: AI GO MALL
 heroDesc: Built with Golang + GORM + TypeScript + Vite + Element Plus and other popular tech stacks
 enterAdmin: Admin Panel
 learnTech: Tech Stack
