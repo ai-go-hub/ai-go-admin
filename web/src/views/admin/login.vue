@@ -75,7 +75,7 @@
 
             <!-- 底部链接 -->
             <div class="footer-links">
-                <a href="#">&copy; {{ new Date().getFullYear() }} AI GO MALL. All rights reserved.</a>
+                <a href="#">&copy; {{ new Date().getFullYear() }} {{ config.site.name }}. All rights reserved.</a>
                 <a href="http://beian.miit.gov.cn/" target="_blank">{{ config.site.recordNumber }}</a>
             </div>
 

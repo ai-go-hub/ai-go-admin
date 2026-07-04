@@ -152,7 +152,7 @@
                     <span class="footer-divider">·</span>
                     <a href="http://beian.miit.gov.cn/" target="_blank">{{ config.site.recordNumber }}</a>
                 </div>
-                <p class="footer-copy">&copy; {{ new Date().getFullYear() }} AI GO MALL. All rights reserved.</p>
+                <p class="footer-copy">&copy; {{ new Date().getFullYear() }} {{ config.site.name }}. All rights reserved.</p>
             </div>
         </footer>
     </div>
