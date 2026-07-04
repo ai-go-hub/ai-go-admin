@@ -5,8 +5,8 @@
             <div class="navbar-inner">
                 <span class="logo">AI GO MALL</span>
                 <nav class="nav-links">
-                    <a href="https://github.com/ai-go-hub/ai-go-mall" target="_blank" class="nav-link">GitHub</a>
-                    <a href="https://gitee.com/ai-go-hub/ai-go-mall" target="_blank" class="nav-link">Gitee</a>
+                    <a href="https://github.com/ai-go-hub/ai-go-admin" target="_blank" class="nav-link">GitHub</a>
+                    <a href="https://gitee.com/ai-go-hub/ai-go-admin" target="_blank" class="nav-link">Gitee</a>
                 </nav>
             </div>
         </header>
@@ -147,9 +147,9 @@
                     <span class="footer-tagline">{{ $t('index.footerTagline') }}</span>
                 </div>
                 <div class="footer-links">
-                    <a href="https://github.com/ai-go-hub/ai-go-mall" target="_blank">GitHub</a>
+                    <a href="https://github.com/ai-go-hub/ai-go-admin" target="_blank">GitHub</a>
                     <span class="footer-divider">·</span>
-                    <a href="https://gitee.com/ai-go-hub/ai-go-mall" target="_blank">Gitee</a>
+                    <a href="https://gitee.com/ai-go-hub/ai-go-admin" target="_blank">Gitee</a>
                     <span class="footer-divider">·</span>
                     <a href="http://beian.miit.gov.cn/" target="_blank">渝ICP备8888888号-1</a>
                 </div>
