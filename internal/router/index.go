@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"ai-go-mall/internal/router/registry"
+	"github.com/ai-go-hub/ai-go-admin/internal/router/registry"
 
 	"github.com/gin-gonic/gin"
 )

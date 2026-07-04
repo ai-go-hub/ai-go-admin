@@ -1,10 +1,10 @@
 package admin
 
 import (
-	handlerAdmin "ai-go-mall/internal/handler/admin"
-	repoAdmin "ai-go-mall/internal/repository/admin"
-	"ai-go-mall/internal/router/registry"
-	svcAdmin "ai-go-mall/internal/service/admin"
+	handlerAdmin "github.com/ai-go-hub/ai-go-admin/internal/handler/admin"
+	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
+	"github.com/ai-go-hub/ai-go-admin/internal/router/registry"
+	svcAdmin "github.com/ai-go-hub/ai-go-admin/internal/service/admin"
 
 	"github.com/gin-gonic/gin"
 )

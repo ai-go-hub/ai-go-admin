@@ -1,9 +1,9 @@
 package common
 
 import (
-	"ai-go-mall/internal/infra/captcha"
-	"ai-go-mall/internal/response"
-	svcCommon "ai-go-mall/internal/service/common"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/captcha"
+	"github.com/ai-go-hub/ai-go-admin/internal/response"
+	svcCommon "github.com/ai-go-hub/ai-go-admin/internal/service/common"
 
 	"github.com/gin-gonic/gin"
 )

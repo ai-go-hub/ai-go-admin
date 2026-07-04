@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"ai-go-mall/internal/infra/captcha"
-	"ai-go-mall/internal/infra/config"
-	"ai-go-mall/internal/infra/token"
-	"ai-go-mall/internal/model"
-	repoAdmin "ai-go-mall/internal/repository/admin"
-	"ai-go-mall/internal/service"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/captcha"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/token"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
+	"github.com/ai-go-hub/ai-go-admin/internal/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

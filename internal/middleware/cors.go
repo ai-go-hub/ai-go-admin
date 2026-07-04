@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"ai-go-mall/internal/infra/config"
 	"net/url"
 	"slices"
 	"time"
+
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

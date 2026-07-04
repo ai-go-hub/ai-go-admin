@@ -1,8 +1,8 @@
 package common
 
 import (
-	"ai-go-mall/internal/infra/captcha"
-	repoCommon "ai-go-mall/internal/repository/common"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/captcha"
+	repoCommon "github.com/ai-go-hub/ai-go-admin/internal/repository/common"
 )
 
 // CaptchaService 验证码服务

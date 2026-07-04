@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"ai-go-mall/internal/infra/token"
-	"ai-go-mall/internal/model"
-	repoAdmin "ai-go-mall/internal/repository/admin"
-	"ai-go-mall/internal/response"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/token"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
+	"github.com/ai-go-hub/ai-go-admin/internal/response"
 
 	"github.com/gin-gonic/gin"
 )

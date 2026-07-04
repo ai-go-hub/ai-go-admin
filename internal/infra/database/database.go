@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"ai-go-mall/internal/infra/config"
-	"ai-go-mall/internal/model"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"

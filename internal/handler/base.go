@@ -3,8 +3,8 @@ package handler
 import (
 	"strconv"
 
-	"ai-go-mall/internal/response"
-	"ai-go-mall/internal/service"
+	"github.com/ai-go-hub/ai-go-admin/internal/response"
+	"github.com/ai-go-hub/ai-go-admin/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

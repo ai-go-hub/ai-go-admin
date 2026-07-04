@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"ai-go-mall/internal/infra/config"
-	"ai-go-mall/internal/infra/token/driver"
-	"ai-go-mall/internal/model"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/token/driver"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
 )
 
 // 令牌类型标识

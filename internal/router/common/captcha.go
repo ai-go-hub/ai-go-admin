@@ -1,10 +1,10 @@
 package common
 
 import (
-	handlerCommon "ai-go-mall/internal/handler/common"
-	repoCommon "ai-go-mall/internal/repository/common"
-	"ai-go-mall/internal/router/registry"
-	svcCommon "ai-go-mall/internal/service/common"
+	handlerCommon "github.com/ai-go-hub/ai-go-admin/internal/handler/common"
+	repoCommon "github.com/ai-go-hub/ai-go-admin/internal/repository/common"
+	"github.com/ai-go-hub/ai-go-admin/internal/router/registry"
+	svcCommon "github.com/ai-go-hub/ai-go-admin/internal/service/common"
 
 	"github.com/gin-gonic/gin"
 )

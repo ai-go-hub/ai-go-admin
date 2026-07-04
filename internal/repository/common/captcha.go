@@ -1,8 +1,8 @@
 package common
 
 import (
-	"ai-go-mall/internal/model"
-	"ai-go-mall/internal/repository"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	"github.com/ai-go-hub/ai-go-admin/internal/repository"
 )
 
 // CaptchaRepository 验证码仓储

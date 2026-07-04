@@ -1,12 +1,12 @@
 package admin
 
 import (
-	"ai-go-mall/internal/handler"
-	"ai-go-mall/internal/infra/config"
-	"ai-go-mall/internal/middleware"
-	"ai-go-mall/internal/model"
-	"ai-go-mall/internal/response"
-	svcAdmin "ai-go-mall/internal/service/admin"
+	"github.com/ai-go-hub/ai-go-admin/internal/handler"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
+	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	"github.com/ai-go-hub/ai-go-admin/internal/response"
+	svcAdmin "github.com/ai-go-hub/ai-go-admin/internal/service/admin"
 
 	"github.com/gin-gonic/gin"
 )

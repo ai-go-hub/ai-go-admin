@@ -5,8 +5,8 @@ import (
 	"errors"
 	"time"
 
-	"ai-go-mall/internal/infra/database"
-	"ai-go-mall/internal/model"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
 
 	"gorm.io/gorm"
 )

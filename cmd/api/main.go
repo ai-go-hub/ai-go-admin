@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 
-	"ai-go-mall/internal/infra/config"
-	"ai-go-mall/internal/infra/database"
-	"ai-go-mall/internal/middleware"
-	"ai-go-mall/internal/router"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
+	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
+	"github.com/ai-go-hub/ai-go-admin/internal/router"
 
 	"github.com/gin-gonic/gin"
 )

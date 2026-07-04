@@ -1,4 +1,4 @@
-module ai-go-mall
+module github.com/ai-go-hub/ai-go-admin
 
 go 1.25.0
 

@@ -15,11 +15,11 @@ import (
 	"sync"
 	"time"
 
-	"ai-go-mall/internal/infra/config"
-	"ai-go-mall/internal/infra/database"
-	"ai-go-mall/internal/model"
-	"ai-go-mall/pkg/filesystem"
-	"ai-go-mall/pkg/random"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	"github.com/ai-go-hub/ai-go-admin/pkg/filesystem"
+	"github.com/ai-go-hub/ai-go-admin/pkg/random"
 
 	"github.com/google/uuid"
 	"golang.org/x/image/font"
