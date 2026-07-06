@@ -33,3 +33,25 @@ type Captcha struct {
 func (Captcha) TableName() string {
 	return "captchas"
 }
+
+// Config 系统配置模型
+type Config struct {
+	ID          uint   `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
+	Name        string `gorm:"comment:变量名;type:varchar(50);uniqueIndex;not null;default:''" json:"name"`
+	Group       string `gorm:"comment:分组;type:varchar(50);not null;default:''" json:"group"`
+	Title       string `gorm:"comment:变量标题;type:varchar(50);not null;default:''" json:"title"`
+	Tip         string `gorm:"comment:变量描述;type:varchar(100);not null;default:''" json:"tip"`
+	Type        string `gorm:"comment:变量输入组件类型;type:varchar(50);not null;default:''" json:"type"`
+	Value       string `gorm:"comment:变量值;type:text" json:"value"`
+	Content     string `gorm:"comment:字典数据;type:text" json:"content"`
+	Rule        string `gorm:"comment:验证规则;type:varchar(100);not null;default:''" json:"rule"`
+	Extend      string `gorm:"comment:扩展属性;type:varchar(255);not null;default:''" json:"extend"`
+	InputExtend string `gorm:"comment:输入框扩展属性;type:varchar(255);not null;default:''" json:"input_extend"`
+	AllowDel    uint8  `gorm:"comment:允许删除:0=否,1=是;not null;default:0" json:"allow_del"`
+	Weigh       int    `gorm:"comment:权重;not null;default:0" json:"weigh"`
+}
+
+// TableName 指定 Config 模型表名
+func (Config) TableName() string {
+	return "config"
+}
