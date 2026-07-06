@@ -80,6 +80,9 @@ const load = () => {
             state.clicks = []
             state.captcha = res.data.data
         })
+        .catch(() => {
+            onClose()
+        })
         .finally(() => {
             state.loading = false
         })
