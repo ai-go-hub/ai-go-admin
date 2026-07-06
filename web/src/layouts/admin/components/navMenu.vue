@@ -52,7 +52,7 @@
             </div>
             <template #dropdown>
                 <el-dropdown-menu class="dropdown-menu-box">
-                    <el-dropdown-item v-for="(key, item) in langNames" :key="key" @click="setLang(item)">
+                    <el-dropdown-item v-for="(item, key) in langNames" :key="key" @click="setLang(key)">
                         {{ item }}
                     </el-dropdown-item>
                 </el-dropdown-menu>
