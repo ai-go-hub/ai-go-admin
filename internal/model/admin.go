@@ -6,10 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func init() {
-	Register(&Admin{})
-}
-
 type Admin struct {
 	ID           uint           `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
 	Username     string         `gorm:"comment:用户名;type:varchar(64)" json:"username"`

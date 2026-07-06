@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
-	"github.com/ai-go-hub/ai-go-admin/internal/model"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
@@ -54,13 +53,6 @@ func Init() error {
 
 		if err := db.Use(resolver); err != nil {
 			return fmt.Errorf("configure read database: %w", err)
-		}
-	}
-
-	// 自动迁移所有已注册的模型
-	if models := model.All(); len(models) > 0 {
-		if err := db.AutoMigrate(models...); err != nil {
-			return fmt.Errorf("auto migrate: %w", err)
 		}
 	}
 

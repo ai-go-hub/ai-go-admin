@@ -2,10 +2,6 @@ package model
 
 import "time"
 
-func init() {
-	Register(&Token{}, &Captcha{})
-}
-
 // Token 令牌模型，用于存储各类用户令牌
 type Token struct {
 	Token     string    `gorm:"comment:令牌;type:varchar(64);primaryKey" json:"-"`
