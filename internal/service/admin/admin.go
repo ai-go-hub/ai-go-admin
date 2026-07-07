@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/captcha"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/token"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
@@ -15,6 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 // AdminService 管理员服务，嵌入通用服务接口并扩展自定义方法
@@ -43,6 +47,14 @@ type LoginRequest struct {
 type LoginResponse struct {
 	model.Admin
 	Token string `json:"token,omitempty"`
+}
+
+// InitResponse 后台初始化响应数据
+type InitResponse struct {
+	Admin      *dto.AdminSession `json:"admin"`
+	Super      bool              `json:"super"`
+	SiteConfig map[string]string `json:"site_config"`
+	Rules      []model.AdminRule `json:"rules"`
 }
 
 // Login 管理员登录
@@ -105,4 +117,44 @@ func (s *AdminService) Login(c *gin.Context, req *LoginRequest) (*LoginResponse,
 // Logout 注销当前管理员令牌
 func (s *AdminService) Logout(c *gin.Context, tokenStr string) error {
 	return token.Manager().Delete(c.Request.Context(), tokenStr)
+}
+
+// Init 后台初始化数据聚合
+func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*InitResponse, error) {
+	ctx := c.Request.Context()
+
+	// 1. 站点配置
+	configSiteNames := []string{"name", "entrance", "record_number", "version"}
+	siteConfig := make(map[string]string, len(configSiteNames)+1)
+
+	configs, err := gorm.G[model.Config](database.DB()).
+		Where("name IN ?", configSiteNames).
+		Find(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, cfg := range configs {
+		siteConfig[cfg.Name] = cfg.Value
+	}
+	siteConfig["timezone"] = config.Get().App.Timezone
+
+	// 2. 当前管理员拥有的权限规则（菜单）列表
+	perm := permission.New()
+	rules, err := perm.GetRules(ctx, adminSession.Admin.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 3. 是否为超级管理员
+	super, err := perm.IsSuperAdmin(ctx, adminSession.Admin.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &InitResponse{
+		Admin:      adminSession,
+		Super:      super,
+		SiteConfig: siteConfig,
+		Rules:      rules,
+	}, nil
 }

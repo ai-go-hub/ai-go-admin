@@ -82,6 +82,17 @@ func (h *AdminHandler) ClearCache(c *gin.Context) {
 	response.Success(c)
 }
 
+// Init 后台数据初始化接口
+func (h *AdminHandler) Init(c *gin.Context) {
+	result, err := h.svc.Init(c, middleware.GetAdmin(c))
+	if err != nil {
+		response.Fail(c, response.WithMessage("初始化失败: "+err.Error()))
+		return
+	}
+
+	response.Success(c, response.WithData(result))
+}
+
 // RegisterRoutes 注册路由
 func (h *AdminHandler) RegisterRoutes(group *gin.RouterGroup) {
 	// 只注册自定义路由
@@ -90,5 +101,6 @@ func (h *AdminHandler) RegisterRoutes(group *gin.RouterGroup) {
 	group.POST("/logout", middleware.AdminAuthOptional(), h.Logout)
 	group.GET("/login-config", middleware.AdminAuthOptional(), h.GetLoginConfig)
 
+	group.GET("/init", middleware.AdminAuth(), h.Init)
 	group.POST("/clear-cache", middleware.AdminAuth(), h.ClearCache)
 }
