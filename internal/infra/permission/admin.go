@@ -48,6 +48,15 @@ func (p *Permission) GetGroups(ctx context.Context, adminId uint) ([]model.Admin
 	return groups, nil
 }
 
+// IsSuperAdmin 是否超级管理员
+func (p *Permission) IsSuperAdmin(ctx context.Context, adminId uint) (bool, error) {
+	groups, err := p.GetGroups(ctx, adminId)
+	if err != nil {
+		return false, err
+	}
+	return slices.ContainsFunc(groups, isSuperAdminGroup), nil
+}
+
 // GetRuleIds 根据管理员 ID 获取管理员拥有权限的全部规则 ID（去重）
 func (p *Permission) GetRuleIds(ctx context.Context, adminId uint) ([]uint, error) {
 	groups, err := p.GetGroups(ctx, adminId)
@@ -63,10 +72,6 @@ func (p *Permission) GetRules(ctx context.Context, adminId uint) ([]model.AdminR
 	groups, err := p.GetGroups(ctx, adminId)
 	if err != nil {
 		return nil, err
-	}
-
-	if slices.ContainsFunc(groups, isSuperAdminGroup) {
-		return gorm.G[model.AdminRule](database.DB()).Where("status = 1").Find(ctx)
 	}
 
 	ruleIDs, err := p.ruleIdsFromGroups(ctx, groups)
@@ -88,11 +93,16 @@ func (p *Permission) GetRules(ctx context.Context, adminId uint) ([]model.AdminR
 
 // Check 检查管理员是否拥有指定名称的权限规则
 func (p *Permission) Check(ctx context.Context, adminId uint, ruleName string) (bool, error) {
+	if ruleName == "" {
+		return false, nil
+	}
+
 	groups, err := p.GetGroups(ctx, adminId)
 	if err != nil {
 		return false, err
 	}
 
+	// 超管则提前短路
 	if slices.ContainsFunc(groups, isSuperAdminGroup) {
 		return true, nil
 	}
@@ -158,7 +168,7 @@ func (p *Permission) ruleIdsFromGroups(ctx context.Context, groups []model.Admin
 
 // allRuleIDs 返回全部启用规则的 ID
 func (p *Permission) allRuleIDs(ctx context.Context) ([]uint, error) {
-	rules, err := gorm.G[model.AdminRule](database.DB()).Where("status = 1").Find(ctx)
+	rules, err := gorm.G[model.AdminRule](database.DB()).Select("id").Where("status = 1").Find(ctx)
 	if err != nil {
 		return nil, err
 	}
