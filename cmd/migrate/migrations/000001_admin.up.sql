@@ -35,7 +35,7 @@ COMMENT ON COLUMN "__PREFIX__admins"."updated_at" IS '更新时间';
 COMMENT ON COLUMN "__PREFIX__admins"."created_at" IS '创建时间';
 COMMENT ON COLUMN "__PREFIX__admins"."deleted_at" IS '删除时间';
 
--- ===== admin_rule 菜单和权限规则表 =====
+-- ===== admin_rules 菜单和权限规则表 =====
 CREATE TABLE IF NOT EXISTS "__PREFIX__admin_rules" (
     "id"          bigserial PRIMARY KEY,
     "pid"         bigint DEFAULT NULL,
@@ -76,3 +76,35 @@ COMMENT ON COLUMN "__PREFIX__admin_rules"."weigh" IS '权重';
 COMMENT ON COLUMN "__PREFIX__admin_rules"."status" IS '状态:0=禁用,1=启用';
 COMMENT ON COLUMN "__PREFIX__admin_rules"."update_time" IS '更新时间';
 COMMENT ON COLUMN "__PREFIX__admin_rules"."create_time" IS '创建时间';
+
+-- ===== admin_groups 管理员分组表 =====
+CREATE TABLE IF NOT EXISTS "__PREFIX__admin_groups" (
+    "id"          bigserial PRIMARY KEY,
+    "pid"         bigint DEFAULT NULL,
+    "name"        varchar(100) NOT NULL DEFAULT '',
+    "rules"       text,
+    "status"      smallint NOT NULL DEFAULT 1,
+    "update_time" bigint DEFAULT NULL,
+    "create_time" bigint DEFAULT NULL
+);
+
+COMMENT ON TABLE "__PREFIX__admin_groups" IS '管理员分组表';
+COMMENT ON COLUMN "__PREFIX__admin_groups"."id" IS 'ID';
+COMMENT ON COLUMN "__PREFIX__admin_groups"."pid" IS '上级分组';
+COMMENT ON COLUMN "__PREFIX__admin_groups"."name" IS '组名';
+COMMENT ON COLUMN "__PREFIX__admin_groups"."rules" IS '权限规则ID集';
+COMMENT ON COLUMN "__PREFIX__admin_groups"."status" IS '状态:0=禁用,1=启用';
+COMMENT ON COLUMN "__PREFIX__admin_groups"."update_time" IS '更新时间';
+COMMENT ON COLUMN "__PREFIX__admin_groups"."create_time" IS '创建时间';
+
+-- ===== admin_group_access 管理员分组映射表 =====
+CREATE TABLE IF NOT EXISTS "__PREFIX__admin_group_access" (
+    "uid"      bigint NOT NULL,
+    "group_id" bigint NOT NULL
+);
+CREATE INDEX IF NOT EXISTS "__PREFIX__idx_admin_group_access_uid" ON "__PREFIX__admin_group_access" ("uid");
+CREATE INDEX IF NOT EXISTS "__PREFIX__idx_admin_group_access_group_id" ON "__PREFIX__admin_group_access" ("group_id");
+
+COMMENT ON TABLE "__PREFIX__admin_group_access" IS '管理员分组映射表';
+COMMENT ON COLUMN "__PREFIX__admin_group_access"."uid" IS '管理员ID';
+COMMENT ON COLUMN "__PREFIX__admin_group_access"."group_id" IS '分组ID';

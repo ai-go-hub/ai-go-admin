@@ -52,3 +52,28 @@ type AdminRule struct {
 func (AdminRule) TableName() string {
 	return "admin_rules"
 }
+
+// AdminGroup 管理员分组模型
+type AdminGroup struct {
+	ID         uint    `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
+	Pid        *uint   `gorm:"comment:上级分组" json:"pid"`
+	Name       string  `gorm:"comment:组名;type:varchar(100);not null;default:''" json:"name"`
+	Rules      *string `gorm:"comment:权限规则ID集;type:text" json:"rules"`
+	Status     uint8   `gorm:"comment:状态:0=禁用,1=启用;not null;default:1" json:"status"`
+	UpdateTime *int64  `gorm:"comment:更新时间" json:"update_time"`
+	CreateTime *int64  `gorm:"comment:创建时间" json:"create_time"`
+}
+
+func (AdminGroup) TableName() string {
+	return "admin_groups"
+}
+
+// AdminGroupAccess 管理员分组映射模型
+type AdminGroupAccess struct {
+	UID     uint `gorm:"comment:管理员ID;not null;index" json:"uid"`
+	GroupID uint `gorm:"comment:分组ID;not null;index" json:"group_id"`
+}
+
+func (AdminGroupAccess) TableName() string {
+	return "admin_group_access"
+}
