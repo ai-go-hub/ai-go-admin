@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/token"
-	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
 	"github.com/ai-go-hub/ai-go-admin/internal/response"
 
@@ -23,12 +23,6 @@ const (
 	FlagNeedLogin = "need_login" // 需要登录
 	FlagLoggedIn  = "logged_in"  // 已经登录
 )
-
-// AdminSession 管理员会话信息，由认证中间件注入到请求上下文
-type AdminSession struct {
-	Admin *model.Admin
-	Token string
-}
 
 // AdminAuth 管理员认证中间件，未登录时阻断请求
 func AdminAuth() gin.HandlerFunc {
@@ -59,12 +53,12 @@ func AdminAuthOptional() gin.HandlerFunc {
 }
 
 // GetAdmin 从上下文中取出管理员信息，未登录时返回 nil
-func GetAdmin(c *gin.Context) *AdminSession {
+func GetAdmin(c *gin.Context) *dto.AdminSession {
 	session, ok := c.Get(CtxAdminKey)
 	if !ok {
 		return nil
 	}
-	return session.(*AdminSession)
+	return session.(*dto.AdminSession)
 }
 
 // GetToken 从上下文中取出当前令牌字符串，未登录时返回空
@@ -77,7 +71,7 @@ func GetToken(c *gin.Context) string {
 }
 
 // extractAdmin 提取并验证 token，返回 (会话信息, 错误消息)
-func extractAdmin(c *gin.Context) (*AdminSession, string) {
+func extractAdmin(c *gin.Context) (*dto.AdminSession, string) {
 	// 提取请求 token
 	authHeader := c.GetHeader("authorization")
 
@@ -109,5 +103,5 @@ func extractAdmin(c *gin.Context) (*AdminSession, string) {
 		return nil, "账号已被禁用"
 	}
 
-	return &AdminSession{Admin: admin, Token: parts[1]}, ""
+	return &dto.AdminSession{Admin: admin, Token: parts[1]}, ""
 }
