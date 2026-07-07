@@ -64,8 +64,8 @@ func dsn() string {
 	}
 	q := u.Query()
 	q.Set("sslmode", c.SSLMode)
-	if c.Timezone != "" {
-		q.Set("TimeZone", c.Timezone)
+	if tz := config.Get().App.Timezone; tz != "" {
+		q.Set("TimeZone", tz)
 	}
 	u.RawQuery = q.Encode()
 	return u.String()

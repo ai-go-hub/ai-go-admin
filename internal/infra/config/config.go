@@ -14,7 +14,8 @@ import (
 
 // 应用配置
 type App struct {
-	Name string
+	Name     string
+	Timezone string
 }
 
 // 服务配置
@@ -30,7 +31,6 @@ type DatabaseSource struct {
 	Password        string
 	DBName          string `mapstructure:"dbname"`
 	SSLMode         string `mapstructure:"sslmode"`
-	Timezone        string `mapstructure:"timezone"`
 	MaxOpenConns    int    `mapstructure:"max_open_conns"`
 	MaxIdleConns    int    `mapstructure:"max_idle_conns"`
 	ConnMaxLifetime int    `mapstructure:"conn_max_lifetime"`

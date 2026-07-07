@@ -80,6 +80,6 @@ func FromContext(c *gin.Context) *gorm.DB {
 // 根据配置构建 PostgreSQL DSN
 func buildDSN(src config.DatabaseSource) string {
 	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
-		src.Host, src.User, src.Password, src.DBName, src.Port, src.SSLMode, src.Timezone,
+		src.Host, src.User, src.Password, src.DBName, src.Port, src.SSLMode, config.Get().App.Timezone,
 	)
 }
