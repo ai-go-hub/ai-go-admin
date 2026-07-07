@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS "__PREFIX__admin_rules" (
     "remark"      varchar(255) NOT NULL DEFAULT '',
     "weigh"       bigint NOT NULL DEFAULT 0,
     "status"      smallint NOT NULL DEFAULT 1,
-    "update_time" timestamptz,
-    "create_time" timestamptz
+    "updated_at" timestamptz,
+    "created_at" timestamptz
 );
 
 CREATE INDEX IF NOT EXISTS "__PREFIX__idx_admin_rules_pid" ON "__PREFIX__admin_rules" ("pid");
@@ -74,8 +74,8 @@ COMMENT ON COLUMN "__PREFIX__admin_rules"."extend" IS '扩展属性:add_route_on
 COMMENT ON COLUMN "__PREFIX__admin_rules"."remark" IS '备注';
 COMMENT ON COLUMN "__PREFIX__admin_rules"."weigh" IS '权重';
 COMMENT ON COLUMN "__PREFIX__admin_rules"."status" IS '状态:0=禁用,1=启用';
-COMMENT ON COLUMN "__PREFIX__admin_rules"."update_time" IS '更新时间';
-COMMENT ON COLUMN "__PREFIX__admin_rules"."create_time" IS '创建时间';
+COMMENT ON COLUMN "__PREFIX__admin_rules"."updated_at" IS '更新时间';
+COMMENT ON COLUMN "__PREFIX__admin_rules"."created_at" IS '创建时间';
 
 -- ===== admin_groups 管理员分组表 =====
 CREATE TABLE IF NOT EXISTS "__PREFIX__admin_groups" (
@@ -84,8 +84,8 @@ CREATE TABLE IF NOT EXISTS "__PREFIX__admin_groups" (
     "name"        varchar(100) NOT NULL DEFAULT '',
     "rules"       text,
     "status"      smallint NOT NULL DEFAULT 1,
-    "update_time" bigint DEFAULT NULL,
-    "create_time" bigint DEFAULT NULL
+    "updated_at" timestamptz DEFAULT NULL,
+    "created_at" timestamptz DEFAULT NULL
 );
 
 COMMENT ON TABLE "__PREFIX__admin_groups" IS '管理员分组表';
@@ -94,8 +94,8 @@ COMMENT ON COLUMN "__PREFIX__admin_groups"."pid" IS '上级分组';
 COMMENT ON COLUMN "__PREFIX__admin_groups"."name" IS '组名';
 COMMENT ON COLUMN "__PREFIX__admin_groups"."rules" IS '权限规则ID集';
 COMMENT ON COLUMN "__PREFIX__admin_groups"."status" IS '状态:0=禁用,1=启用';
-COMMENT ON COLUMN "__PREFIX__admin_groups"."update_time" IS '更新时间';
-COMMENT ON COLUMN "__PREFIX__admin_groups"."create_time" IS '创建时间';
+COMMENT ON COLUMN "__PREFIX__admin_groups"."updated_at" IS '更新时间';
+COMMENT ON COLUMN "__PREFIX__admin_groups"."created_at" IS '创建时间';
 
 -- ===== admin_group_access 管理员分组映射表 =====
 CREATE TABLE IF NOT EXISTS "__PREFIX__admin_group_access" (
