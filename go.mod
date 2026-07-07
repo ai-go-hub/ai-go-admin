@@ -13,7 +13,16 @@ require (
 
 require github.com/google/uuid v1.6.0
 
-require github.com/gin-contrib/cors v1.7.7
+require (
+	github.com/gin-contrib/cors v1.7.7
+	github.com/golang-migrate/migrate/v4 v4.19.1
+	github.com/spf13/cobra v1.10.2
+)
+
+require (
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/lib/pq v1.10.9 // indirect
+)
 
 require golang.org/x/image v0.43.0 // direct
 

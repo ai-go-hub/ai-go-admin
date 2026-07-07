@@ -40,9 +40,21 @@
 
 `internal/router/registry/registry.go` 维护 `Routes []func(*gin.Engine)`。每个业务路由包在 `init()` 中调用 `registry.Register(...)` 注册自己；`router/index.go` 通过**空白导入** `_ ".../router/admin"`、`_ ".../router/common"` 触发 init，`router.Setup(engine)` 遍历执行。新增路由模块后，记得在 `router/index.go` 加空白导入。
 
-### 模型自动迁移
+### 数据库迁移
 
-`internal/model/model.go` 维护 `registered []any`。各模型文件在 `init()` 中调用 `Register(&Admin{})`；`database.Init()` 调用 `db.AutoMigrate(model.All()...)`。新增模型只需在 `model` 包内写 `init() { Register(&X{}) }`，并创建 `TableName()` 函数。
+迁移文件位于 `cmd/migrate/migrations/`，遵循 golang-migrate 命名规范 `{版本号}_{名称}.up.sql` / `{版本号}_{名称}.down.sql`，经 `go:embed` 内嵌进二进制。
+
+迁移按模型文件对应：`000001_admin` 对应 `internal/model/admin.go`，`000002_common` 对应 `internal/model/common.go`。种子数据保留单独迁移（`000003_seed`）。
+
+```bash
+aigo migrate up              # 应用全部待执行迁移
+aigo migrate down            # 回滚 1 个迁移
+aigo migrate status          # 查看迁移状态
+aigo migrate force -1        # 强制重置版本（修复 dirty）
+aigo migrate create <name>   # 创建迁移文件
+```
+
+新增模型需创建对应的 up/down 迁移 SQL 文件，并按版本号递增命名；SQL 内以 `__PREFIX__` 作为表前缀占位符，执行迁移时将自动替换为 `config/config.yaml` 中的表前缀配置值。
 
 ### 身份令牌（Token）
 
