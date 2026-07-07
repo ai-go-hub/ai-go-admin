@@ -1,1 +1,2 @@
+DROP TABLE IF EXISTS "__PREFIX__admin_rules";
 DROP TABLE IF EXISTS "__PREFIX__admins";

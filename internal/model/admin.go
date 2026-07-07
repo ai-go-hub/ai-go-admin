@@ -27,3 +27,28 @@ type Admin struct {
 func (Admin) TableName() string {
 	return "admins"
 }
+
+// AdminRule 菜单和权限规则模型
+type AdminRule struct {
+	ID         uint      `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
+	Pid        *uint     `gorm:"comment:上级规则" json:"pid"`
+	Type       string    `gorm:"comment:规则类型:dir=规则目录,menu=菜单项,node=权限节点;type:varchar(50);not null;default:''" json:"type"`
+	Title      string    `gorm:"comment:规则标题;type:varchar(50);not null;default:''" json:"title"`
+	Name       string    `gorm:"comment:规则名称;type:varchar(50);not null;default:''" json:"name"`
+	Path       string    `gorm:"comment:菜单路由路径;type:varchar(255);not null;default:''" json:"path"`
+	Icon       string    `gorm:"comment:菜单图标;type:varchar(50);not null;default:''" json:"icon"`
+	OpenType   string    `gorm:"comment:菜单打开方式:tab=选项卡,link=链接,iframe=Iframe;type:varchar(50);not null;default:''" json:"open_type"`
+	URL        string    `gorm:"comment:菜单URL;type:varchar(255);not null;default:''" json:"url"`
+	Component  string    `gorm:"comment:菜单组件路径;type:varchar(255);not null;default:''" json:"component"`
+	Keepalive  uint8     `gorm:"comment:缓存:0=关闭,1=开启;not null;default:0" json:"keepalive"`
+	Extend     string    `gorm:"comment:扩展属性:add_route_only=只添加为路由,add_menu_only=只添加为菜单;type:varchar(50);not null;default:''" json:"extend"`
+	Remark     string    `gorm:"comment:备注;type:varchar(255);not null;default:''" json:"remark"`
+	Weigh      int       `gorm:"comment:权重;not null;default:0" json:"weigh"`
+	Status     uint8     `gorm:"comment:状态:0=禁用,1=启用;not null;default:1" json:"status"`
+	UpdateTime time.Time `gorm:"comment:更新时间" json:"update_time"`
+	CreateTime time.Time `gorm:"comment:创建时间" json:"create_time"`
+}
+
+func (AdminRule) TableName() string {
+	return "admin_rules"
+}
