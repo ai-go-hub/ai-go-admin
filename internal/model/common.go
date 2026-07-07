@@ -49,5 +49,5 @@ type Config struct {
 
 // TableName 指定 Config 模型表名
 func (Config) TableName() string {
-	return "config"
+	return "configs"
 }

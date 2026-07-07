@@ -1,6 +1,6 @@
 -- 初始化系统配置预设数据
 -- ON CONFLICT DO NOTHING: 兼容重复执行（按 id 主键或 name 唯一索引冲突时跳过）
-INSERT INTO "__PREFIX__config" ("id", "name", "group", "title", "tip", "type", "value", "content", "rule", "extend", "input_extend", "allow_del", "weigh") VALUES
+INSERT INTO "__PREFIX__configs" ("id", "name", "group", "title", "tip", "type", "value", "content", "rule", "extend", "input_extend", "allow_del", "weigh") VALUES
     (1, 'config_group', 'basic', '配置分组', '', 'array', '[{"key":"basic","value":"基础配置"},{"key":"mail","value":"邮件配置"},{"key":"config_quick_entrance","value":"快捷配置入口"}]', NULL, 'required', '', '', 0, -1),
     (2, 'name', 'basic', '站点名称', '', 'string', 'AI GO ADMIN', NULL, 'required', '', '', 0, 99),
     (3, 'entrance', 'basic', '自定义后台入口', '', 'string', '/admin', NULL, 'required', '', '', 0, 98),
@@ -18,4 +18,4 @@ INSERT INTO "__PREFIX__config" ("id", "name", "group", "title", "tip", "type", "
 ON CONFLICT DO NOTHING;
 
 -- 手动插入了显式 id，需将序列推进到当前最大值，避免后续自增插入冲突
-SELECT setval('__PREFIX__config_id_seq', (SELECT COALESCE(MAX("id"), 1) FROM "__PREFIX__config"));
+SELECT setval('__PREFIX__configs_id_seq', (SELECT COALESCE(MAX("id"), 1) FROM "__PREFIX__configs"));
