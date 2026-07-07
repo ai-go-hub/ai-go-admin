@@ -70,11 +70,38 @@ git clone https://github.com/ai-go-hub/ai-go-admin
 # 安装依赖
 go mod tidy
 
-# 启动服务（带热更新）
+# 1. 应用数据库迁移
+go run cmd/main.go migrate up
+
+# 2. 启动 API 服务
+go run cmd/main.go
+
+# 或编译后再运行
+go build -o ./tmp/aigo.exe ./cmd/main.go
+tmp/aigo.exe migrate up
+tmp/aigo.exe serve
+```
+
+其他常用命令：
+
+```bash
+# 启动服务（带文件热更新，开发用）
 air
 
-# 或使用 go 原生 run 命令启动服务
-go run cmd/api/main.go
+# 查看迁移状态
+tmp/aigo.exe migrate status
+
+# 创建新的迁移 SQL 文件
+tmp/aigo.exe migrate create test
+
+# 回滚最近一次迁移
+tmp/aigo.exe migrate down
+
+# 回滚全部迁移
+tmp/aigo.exe migrate down --all
+
+# 修复 dirty 状态
+tmp/aigo.exe migrate force -1
 ```
 
 **🧑‍💻 前端**
