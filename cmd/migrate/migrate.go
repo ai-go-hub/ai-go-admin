@@ -21,11 +21,11 @@ func NewCommand() *cobra.Command {
 	root := &cobra.Command{
 		Use:           "migrate",
 		Short:         "数据库迁移工具，基于 golang-migrate",
-		Long:          "基于 golang-migrate 的数据库迁移工具，支持 up / down / status / force 子命令",
+		Long:          "基于 golang-migrate 的数据库迁移工具，支持 up / down / status / version / drop / force / create 子命令",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	root.AddCommand(upCmd(), downCmd(), statusCmd(), forceCmd(), createCmd())
+	root.AddCommand(upCmd(), downCmd(), statusCmd(), versionCmd(), dropCmd(), forceCmd(), createCmd())
 	return root
 }
 

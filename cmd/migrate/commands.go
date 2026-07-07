@@ -220,3 +220,41 @@ func createCmd() *cobra.Command {
 		},
 	}
 }
+
+// versionCmd 查看当前迁移版本
+func versionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "version",
+		Short: "查看当前迁移版本",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			m, err := newMigrate()
+			if err != nil {
+				return err
+			}
+			defer m.Close()
+
+			return printVersion(m)
+		},
+	}
+}
+
+// dropCmd 删除数据库中所有表（危险操作，需谨慎）
+func dropCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "drop",
+		Short: "删除数据库中所有表（危险操作）",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			m, err := newMigrate()
+			if err != nil {
+				return err
+			}
+			defer m.Close()
+
+			if err := m.Drop(); err != nil {
+				return err
+			}
+			fmt.Println("已删除数据库中所有表。")
+			return nil
+		},
+	}
+}
