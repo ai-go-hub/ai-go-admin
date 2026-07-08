@@ -14,6 +14,7 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
+	"github.com/ai-go-hub/ai-go-admin/pkg/tree"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -54,7 +55,7 @@ type InitResponse struct {
 	Admin      *dto.AdminSession `json:"admin"`
 	Super      bool              `json:"super"`
 	SiteConfig map[string]string `json:"site_config"`
-	Rules      []model.AdminRule `json:"rules"`
+	Rules      []map[string]any  `json:"rules"`
 }
 
 // Login 管理员登录
@@ -145,6 +146,36 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*In
 		return nil, err
 	}
 
+	// 将菜单规则列表转为树状结构
+	// model.AdminRule 转 map[string]any，此方法调用频率较高，使用性能更高的硬编码
+	ruleData := make([]map[string]any, len(rules))
+	for i, r := range rules {
+		pid := uint(0)
+		if r.Pid != nil {
+			pid = *r.Pid
+		}
+		ruleData[i] = map[string]any{
+			"id":         r.ID,
+			"pid":        pid,
+			"type":       r.Type,
+			"title":      r.Title,
+			"name":       r.Name,
+			"path":       r.Path,
+			"icon":       r.Icon,
+			"open_type":  r.OpenType,
+			"url":        r.URL,
+			"component":  r.Component,
+			"keepalive":  r.Keepalive,
+			"extend":     r.Extend,
+			"remark":     r.Remark,
+			"weigh":      r.Weigh,
+			"status":     r.Status,
+			"updated_at": r.UpdatedAt,
+			"created_at": r.CreatedAt,
+		}
+	}
+	ruleTree := tree.Build(ruleData, "id", "pid", "children")
+
 	// 3. 是否为超级管理员
 	super, err := perm.IsSuperAdmin(ctx, adminSession.Admin.ID)
 	if err != nil {
@@ -155,6 +186,6 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*In
 		Admin:      adminSession,
 		Super:      super,
 		SiteConfig: siteConfig,
-		Rules:      rules,
+		Rules:      ruleTree,
 	}, nil
 }
