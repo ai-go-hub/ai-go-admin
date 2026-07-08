@@ -41,3 +41,13 @@ export function getLoginConfig() {
         method: 'GET',
     })
 }
+
+/**
+ * 后台初始化请求
+ */
+export function getInit() {
+    return request({
+        url: '/admin/init',
+        method: 'GET',
+    })
+}

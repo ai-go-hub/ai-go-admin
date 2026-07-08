@@ -125,7 +125,7 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*In
 	ctx := c.Request.Context()
 
 	// 1. 站点配置
-	configSiteNames := []string{"name", "entrance", "record_number", "version"}
+	configSiteNames := []string{"name", "record_number", "version"}
 	siteConfig := make(map[string]string, len(configSiteNames)+1)
 
 	configs, err := gorm.G[model.Config](database.DB()).

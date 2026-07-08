@@ -7,6 +7,7 @@ import { useEventListener } from '@vueuse/core'
 import { isEmpty } from 'lodash-es'
 import { onBeforeMount, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
+import { getInit } from '/@/api/admin/index'
 import Classic from '/@/layouts/admin/container/classic.vue'
 import Default from '/@/layouts/admin/container/default.vue'
 import Double from '/@/layouts/admin/container/double.vue'
@@ -21,7 +22,6 @@ import { useMenu } from '/@/stores/menu'
 import { setNavTabsWidth } from '/@/utils/layout'
 import { getFirstMenu, handleAdminRoute } from '/@/utils/router'
 import { Session } from '/@/utils/storage'
-import { keysToCamelCase } from '/@/utils/common'
 
 defineOptions({
     components: { Default, Classic, Streamline, Double, LeftSplit },
@@ -54,160 +54,39 @@ onBeforeMount(() => {
  * 后台初始化请求，获取站点配置，动态路由等信息
  */
 const init = () => {
-    // 临时 MOCK 数据
-    const res = keysToCamelCase({
-        data: {
-            site: {
-                name: 'AI GO MALL',
-                version: '1.0.0',
-                timezone: 'Asia/Shanghai',
-                record_number: '渝ICP备8888888号',
-                initialized: true,
-            },
-            adminInfo: {
-                id: 1,
-                username: 'admin',
-                nickname: '超级管理员',
-                avatar: '/static/avatar.png',
-                last_login_at: '2021-01-01 00:00:00',
-                last_login_ip: '127.0.0.1',
-                token: 'token',
-            },
-            menus: [
-                {
-                    id: 1,
-                    type: 'menu',
-                    title: '控制台',
-                    name: 'dashboard',
-                    path: 'dashboard',
-                    icon: 'lucide-layout-dashboard',
-                    menu_type: 'tab',
-                    component: '/src/views/admin/dashboard.vue',
-                    keepalive: 'dashboard',
-                    extend: 'none',
-                    children: [
-                        {
-                            id: 89,
-                            pid: 1,
-                            type: 'button',
-                            title: '查看',
-                            name: 'dashboard/index',
-                        },
-                    ],
-                },
-                {
-                    id: 2,
-                    type: 'menu_dir',
-                    title: '权限管理',
-                    name: 'auth',
-                    path: 'auth',
-                    icon: 'lucide-users',
-                    extend: 'none',
-                    children: [
-                        {
-                            id: 3,
-                            pid: 2,
-                            type: 'menu',
-                            title: '角色组管理',
-                            name: 'auth/group',
-                            path: 'auth/group',
-                            icon: 'lucide-users-round',
-                            menu_type: 'tab',
-                            component: '/src/views/admin/dashboard.vue',
-                            keepalive: 'auth/group',
-                            extend: 'none',
-                            children: [
-                                {
-                                    id: 4,
-                                    pid: 3,
-                                    type: 'button',
-                                    title: '查看',
-                                    name: 'auth/group/index',
-                                },
-                                {
-                                    id: 5,
-                                    pid: 3,
-                                    type: 'button',
-                                    title: '添加',
-                                    name: 'auth/group/add',
-                                },
-                            ],
-                        },
-                        {
-                            id: 8,
-                            pid: 2,
-                            type: 'menu',
-                            title: '管理员管理',
-                            name: 'auth/admin',
-                            path: 'auth/admin',
-                            icon: 'lucide-user-lock',
-                            menu_type: 'tab',
-                            component: '/src/views/backend/auth/admin/index.vue',
-                            keepalive: 'auth/admin',
-                            extend: 'none',
-                            children: [
-                                {
-                                    id: 9,
-                                    pid: 8,
-                                    type: 'button',
-                                    title: '查看',
-                                    name: 'auth/admin/index',
-                                },
-                                {
-                                    id: 11,
-                                    pid: 8,
-                                    type: 'button',
-                                    title: '编辑',
-                                    name: 'auth/admin/edit',
-                                },
-                                {
-                                    id: 12,
-                                    pid: 8,
-                                    type: 'button',
-                                    title: '删除',
-                                    name: 'auth/admin/del',
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-    })
+    getInit().then((res) => {
+        adminInfo.dataFill({ ...res.data.data.admin, super: res.data.data.super }, ['token'])
 
-    config.siteDataFill(res.data.site)
-    config.setSiteInitStatus(true)
+        config.siteDataFill(res.data.data.siteConfig)
+        config.setSiteInitStatus(true)
 
-    if (!isEmpty(res.data.adminInfo)) {
-        adminInfo.dataFill({ ...res.data.adminInfo, super: true }, ['token'])
-    }
+        if (res.data.data.rules.length) {
+            handleAdminRoute(res.data.data.rules)
 
-    if (res.data.menus) {
-        handleAdminRoute(res.data.menus)
+            // 显示布局引导
+            if (config.layout.tourUnfinished) {
+                setTimeout(() => {
+                    config.setLayoutValue('showTour', true)
+                }, 1000)
+            }
 
-        // 显示布局引导
-        if (config.layout.tourUnfinished) {
-            setTimeout(() => {
-                config.setLayoutValue('showTour', true)
-            }, 1000)
-        }
+            // 预跳转到上次路径
+            if (route.params.to) {
+                const lastRoute = JSON.parse(route.params.to as string)
+                if (lastRoute.path != adminBaseRoutePath) {
+                    let query = !isEmpty(lastRoute.query) ? lastRoute.query : {}
+                    router.push({ path: lastRoute.path, query: query })
+                    return
+                }
+            }
 
-        // 预跳转到上次路径
-        if (route.params.to) {
-            const lastRoute = JSON.parse(route.params.to as string)
-            if (lastRoute.path != adminBaseRoutePath) {
-                let query = !isEmpty(lastRoute.query) ? lastRoute.query : {}
-                router.push({ path: lastRoute.path, query: query })
-                return
+            // 跳转到第一个菜单
+            let firstRoute = getFirstMenu(menu.rawData)
+            if (firstRoute) {
+                router.push(firstRoute.path)
             }
         }
-
-        // 跳转到第一个菜单
-        let firstRoute = getFirstMenu(menu.rawData)
-        if (firstRoute) {
-            router.push(firstRoute.path)
-        }
-    }
+    })
 }
 
 const onAdaptiveLayout = () => {

@@ -37,7 +37,7 @@ export const getFirstMenu = (routes: RouteRecordRaw[]): false | RouteRecordRaw =
  * @param menu 菜单数据
  */
 export const openMenu = (menu: RouteRecordRaw) => {
-    switch (menu.meta?.menuType) {
+    switch (menu.meta?.openType) {
         case 'iframe':
         case 'tab':
             router.push(menu.path)
@@ -102,25 +102,25 @@ export const getMenuKey = (menu: RouteRecordRaw, prefix = '') => {
 /**
  * 菜单处理
  */
-const handleMenuRule = (routes: any, pathPrefix = '/', type = ['menu', 'menu_dir']) => {
+const handleMenuRule = (routes: any, pathPrefix = '/', type = ['menu', 'dir']) => {
     const menuRule: RouteRecordRaw[] = []
     for (const key in routes) {
-        if (routes[key].extend == 'add_rules_only') {
+        if (routes[key].extend == 'add_route_only') {
             continue
         }
         if (!type.includes(routes[key].type)) {
             continue
         }
-        if (routes[key].type == 'menu_dir' && routes[key].children && !routes[key].children.length) {
+        if (routes[key].type == 'dir' && routes[key].children && !routes[key].children.length) {
             continue
         }
         if (
             ['route', 'menu'].includes(routes[key].type) &&
-            ((routes[key].menuType == 'tab' && !routes[key].component) || (['link', 'iframe'].includes(routes[key].menuType) && !routes[key].url))
+            ((routes[key].openType == 'tab' && !routes[key].component) || (['link', 'iframe'].includes(routes[key].openType) && !routes[key].url))
         ) {
             continue
         }
-        const currentPath = ['link', 'iframe'].includes(routes[key].menuType) ? routes[key].url : pathPrefix + routes[key].path
+        const currentPath = ['link', 'iframe'].includes(routes[key].openType) ? routes[key].url : pathPrefix + routes[key].path
         let children: RouteRecordRaw[] = []
         if (routes[key].children && routes[key].children.length > 0) {
             children = handleMenuRule(routes[key].children, pathPrefix, type)
@@ -134,7 +134,7 @@ const handleMenuRule = (routes: any, pathPrefix = '/', type = ['menu', 'menu_dir
                 title: routes[key].title,
                 icon: routes[key].icon,
                 keepalive: routes[key].keepalive,
-                menuType: routes[key].menuType,
+                openType: routes[key].openType,
                 type: routes[key].type,
             },
             children: children,
@@ -157,7 +157,7 @@ const handleAuthNode = (routes: any, prefix = '/') => {
 const assembleAuthNode = (routes: any, authNode: Map<string, string[]>, prefix = '/', parent = '/') => {
     const authNodeTemp = []
     for (const key in routes) {
-        if (routes[key].type == 'button') {
+        if (routes[key].type == 'node') {
             authNodeTemp.push(prefix + routes[key].name)
         }
         if (routes[key].children && routes[key].children.length > 0) {
@@ -181,7 +181,7 @@ export const addRouteAll = (viewsComponent: Record<string, any>, routes: any, pa
         if (routes[idx].extend == 'add_menu_only') {
             continue
         }
-        if ((routes[idx].menuType == 'tab' && viewsComponent[routes[idx].component]) || routes[idx].menuType == 'iframe') {
+        if ((routes[idx].openType == 'tab' && viewsComponent[routes[idx].component]) || routes[idx].openType == 'iframe') {
             addRouteItem(viewsComponent, routes[idx], parentName, analyticRelation)
         }
 
@@ -201,7 +201,7 @@ export const addRouteAll = (viewsComponent: Record<string, any>, routes: any, pa
 export const addRouteItem = (viewsComponent: Record<string, any>, route: any, parentName: string, analyticRelation: boolean) => {
     let path = '',
         component
-    if (route.menuType == 'iframe') {
+    if (route.openType == 'iframe') {
         path = (isAdminApp() ? adminBaseRoute.path : '/') + '/iframe/' + encodeURIComponent(route.url)
         component = () => import('/@/layouts/common/router-view/iframe.vue')
     } else {
@@ -209,7 +209,7 @@ export const addRouteItem = (viewsComponent: Record<string, any>, route: any, pa
         component = viewsComponent[route.component]
     }
 
-    if (route.menuType == 'tab' && analyticRelation) {
+    if (route.openType == 'tab' && analyticRelation) {
         const parentNames = getParentNames(route.name)
         if (parentNames.length) {
             for (const key in parentNames) {
@@ -230,7 +230,7 @@ export const addRouteItem = (viewsComponent: Record<string, any>, route: any, pa
             extend: route.extend,
             icon: route.icon,
             keepalive: route.keepalive,
-            menuType: route.menuType,
+            openType: route.openType,
             type: route.type,
             url: route.url,
             addtab: true,

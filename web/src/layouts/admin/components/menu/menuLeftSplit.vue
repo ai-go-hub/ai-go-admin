@@ -92,7 +92,7 @@ const findRouteChildren = (menu: RouteRecordRaw | RouteLocationNormalized) => {
 }
 
 const onClickPrimaryMenu = (menu: RouteRecordRaw) => {
-    if (menu.meta?.type == 'menu_dir') {
+    if (menu.meta?.type == 'dir') {
         return findRouteChildren(menu)
     } else if (menu.meta?.type == 'menu' && route.fullPath == menu.path) {
         return findRouteChildren(menu)
