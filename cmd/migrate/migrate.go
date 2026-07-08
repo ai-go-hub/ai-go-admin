@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
 
@@ -24,6 +25,17 @@ func NewCommand() *cobra.Command {
 		Long:          "基于 golang-migrate 的数据库迁移工具，支持 up / down / status / version / drop / force / create 子命令",
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := config.Init(); err != nil {
+				return fmt.Errorf("初始化配置: %w", err)
+			}
+			loc, err := time.LoadLocation(config.Get().App.Timezone)
+			if err != nil {
+				return fmt.Errorf("加载时区: %w", err)
+			}
+			time.Local = loc
+			return nil
+		},
 	}
 	root.AddCommand(upCmd(), downCmd(), statusCmd(), versionCmd(), dropCmd(), forceCmd(), createCmd())
 	return root
@@ -31,10 +43,6 @@ func NewCommand() *cobra.Command {
 
 // newMigrate 基于内嵌迁移文件与项目数据库配置构造迁移实例
 func newMigrate() (*migrate.Migrate, error) {
-	if err := config.Init(); err != nil {
-		return nil, fmt.Errorf("初始化配置: %w", err)
-	}
-
 	src, err := iofs.New(migrationFS, "migrations")
 	if err != nil {
 		return nil, fmt.Errorf("加载内嵌迁移文件: %w", err)

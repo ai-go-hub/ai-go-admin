@@ -2,6 +2,7 @@ package serve
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
@@ -29,6 +30,13 @@ func Run(cmd *cobra.Command, args []string) error {
 	if err := config.Init(); err != nil {
 		return fmt.Errorf("初始化配置: %w", err)
 	}
+
+	// 设置全局时区
+	loc, err := time.LoadLocation(config.Get().App.Timezone)
+	if err != nil {
+		return fmt.Errorf("加载时区: %w", err)
+	}
+	time.Local = loc
 
 	// 初始化数据库连接
 	if err := database.Init(); err != nil {
