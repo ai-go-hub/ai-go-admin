@@ -141,7 +141,7 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*In
 
 	// 2. 当前管理员拥有的权限规则（菜单）列表
 	perm := permission.New()
-	rules, err := perm.GetRules(ctx, adminSession.Admin.ID)
+	rules, err := perm.GetRules(ctx, adminSession.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*In
 	ruleTree := tree.Build(ruleData, "id", "pid", "children")
 
 	// 3. 是否为超级管理员
-	super, err := perm.IsSuperAdmin(ctx, adminSession.Admin.ID)
+	super, err := perm.IsSuperAdmin(ctx, adminSession.ID)
 	if err != nil {
 		return nil, err
 	}
