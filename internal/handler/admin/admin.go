@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/handler"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
@@ -41,7 +42,7 @@ func (h *AdminHandler) GetLoginConfig(c *gin.Context) {
 
 // Login 管理员登录
 func (h *AdminHandler) Login(c *gin.Context) {
-	var req svcAdmin.LoginRequest
+	var req dto.LoginRequest
 	if err := c.ShouldBind(&req); err != nil {
 		response.Fail(c, response.WithMessage("参数错误: "+err.Error()))
 		return

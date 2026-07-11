@@ -36,30 +36,8 @@ func NewAdminService(repo *repoAdmin.AdminRepository) *AdminService {
 	}
 }
 
-// LoginRequest 登录请求参数
-type LoginRequest struct {
-	Username string               `json:"username" binding:"required"`
-	Password string               `json:"password" binding:"required"`
-	Remember bool                 `json:"remember"`
-	Captcha  captcha.ClickRequest `json:"captcha"`
-}
-
-// LoginResponse 登录响应数据
-type LoginResponse struct {
-	model.Admin
-	Token string `json:"token,omitempty"`
-}
-
-// InitResponse 后台初始化响应数据
-type InitResponse struct {
-	Admin      *dto.AdminSession `json:"admin"`
-	Super      bool              `json:"super"`
-	SiteConfig map[string]string `json:"site_config"`
-	Rules      []map[string]any  `json:"rules"`
-}
-
 // Login 管理员登录
-func (s *AdminService) Login(c *gin.Context, req *LoginRequest) (*LoginResponse, error) {
+func (s *AdminService) Login(c *gin.Context, req *dto.LoginRequest) (*dto.LoginResponse, error) {
 	if config.Get().Captcha.Switches.AdminLogin {
 		if ok, err := captcha.Check(req.Captcha, true); !ok {
 			return nil, fmt.Errorf("验证码错误：%w", err)
@@ -109,10 +87,11 @@ func (s *AdminService) Login(c *gin.Context, req *LoginRequest) (*LoginResponse,
 		return nil, errors.New("保存令牌失败")
 	}
 
-	return &LoginResponse{
-		Admin: *admin,
-		Token: tokenStr,
-	}, nil
+	adminDTO, err := dto.NewAdmin(admin)
+	if err != nil {
+		return nil, errors.New("数据转 DTO 失败")
+	}
+	return &dto.LoginResponse{Admin: adminDTO, Token: tokenStr}, nil
 }
 
 // Logout 注销当前管理员令牌
@@ -121,7 +100,7 @@ func (s *AdminService) Logout(c *gin.Context, tokenStr string) error {
 }
 
 // Init 后台初始化数据聚合
-func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*InitResponse, error) {
+func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*dto.InitResponse, error) {
 	ctx := c.Request.Context()
 
 	// 1. 站点配置
@@ -155,23 +134,21 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*In
 			pid = *r.Pid
 		}
 		ruleData[i] = map[string]any{
-			"id":         r.ID,
-			"pid":        pid,
-			"type":       r.Type,
-			"title":      r.Title,
-			"name":       r.Name,
-			"path":       r.Path,
-			"icon":       r.Icon,
-			"open_type":  r.OpenType,
-			"url":        r.URL,
-			"component":  r.Component,
-			"keepalive":  r.Keepalive,
-			"extend":     r.Extend,
-			"remark":     r.Remark,
-			"weigh":      r.Weigh,
-			"status":     r.Status,
-			"updated_at": r.UpdatedAt,
-			"created_at": r.CreatedAt,
+			"id":        r.ID,
+			"pid":       pid,
+			"type":      r.Type,
+			"title":     r.Title,
+			"name":      r.Name,
+			"path":      r.Path,
+			"icon":      r.Icon,
+			"open_type": r.OpenType,
+			"url":       r.URL,
+			"component": r.Component,
+			"keepalive": r.Keepalive,
+			"extend":    r.Extend,
+			"remark":    r.Remark,
+			"weigh":     r.Weigh,
+			"status":    r.Status,
 		}
 	}
 	ruleTree := tree.Build(ruleData, "id", "pid", "children")
@@ -182,8 +159,14 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*In
 		return nil, err
 	}
 
-	return &InitResponse{
-		Admin:      adminSession,
+	// 4. 将 AdminSession 内的 *model.Admin 转换为 DTO，转换期间会格式化时间
+	adminDTO, err := dto.NewAdmin(adminSession.Admin)
+	if err != nil {
+		return nil, errors.New("数据转 DTO 失败")
+	}
+
+	return &dto.InitResponse{
+		Admin:      adminDTO,
 		Super:      super,
 		SiteConfig: siteConfig,
 		Rules:      ruleTree,
