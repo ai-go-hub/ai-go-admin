@@ -1,0 +1,20 @@
+upload:
+  # 最大上传大小（字节），默认 10MB，填 0 则不限制
+  max_size: 10485760
+  # 存储文件名格式化方法，支持变量:topic=业务的主题或分类,fileName=原始文件名（最多前 15 位）
+  filename: "/upload/{topic}/{year}{mon}{day}/{fileName}{fileSha1}{.suffix}"
+  # 上传文件后缀白名单，请永远使用最少配置，此处有意设计为不支持通配符
+  allow_suffix:
+    - jpg
+    - png
+    - bmp
+    - jpeg
+    - gif
+    - webp
+    - svg
+    - avif
+    - zip
+    - rar
+    - wav
+    - mp4
+    - mp3

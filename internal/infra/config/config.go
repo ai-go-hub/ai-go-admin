@@ -86,6 +86,13 @@ type CORSConfig struct {
 	MaxAge  int `mapstructure:"max_age"`
 }
 
+// 上传配置
+type UploadConfig struct {
+	MaxSize     int
+	Filename    string
+	AllowSuffix []string `mapstructure:"allow_suffix"`
+}
+
 // 数据库配置
 type DatabaseConfig struct {
 	Type   string
@@ -102,6 +109,7 @@ type Config struct {
 	CORS     CORSConfig
 	Captcha  CaptchaConfig
 	Database DatabaseConfig
+	Upload   UploadConfig
 }
 
 var (
