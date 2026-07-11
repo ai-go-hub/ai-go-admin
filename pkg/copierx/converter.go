@@ -3,6 +3,7 @@ package copierx
 import (
 	"time"
 
+	"github.com/ai-go-hub/ai-go-admin/pkg/timex"
 	"github.com/jinzhu/copier"
 )
 
@@ -13,11 +14,7 @@ func Time(layout string) copier.TypeConverter {
 		SrcType: time.Time{},
 		DstType: copier.String,
 		Fn: func(src any) (any, error) {
-			t := src.(time.Time)
-			if t.IsZero() {
-				return "", nil
-			}
-			return t.Format(layout), nil
+			return timex.Format(src.(time.Time), layout), nil
 		},
 	}
 }
