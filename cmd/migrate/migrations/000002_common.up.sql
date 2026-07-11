@@ -62,3 +62,35 @@ COMMENT ON COLUMN "__PREFIX__configs"."extend" IS '扩展属性';
 COMMENT ON COLUMN "__PREFIX__configs"."input_extend" IS '输入框扩展属性';
 COMMENT ON COLUMN "__PREFIX__configs"."allow_del" IS '允许删除:0=否,1=是';
 COMMENT ON COLUMN "__PREFIX__configs"."weigh" IS '权重';
+
+-- ===== attachments 附件表 =====
+CREATE TABLE IF NOT EXISTS "__PREFIX__attachments" (
+    "id"             bigserial PRIMARY KEY,
+    "topic"          varchar(20) NOT NULL DEFAULT '',
+    "user_id"        bigint NOT NULL DEFAULT 0,
+    "user_type"      varchar(50) NOT NULL DEFAULT '',
+    "url"            varchar(255) NOT NULL DEFAULT '',
+    "name"           varchar(120) NOT NULL DEFAULT '',
+    "size"           bigint NOT NULL DEFAULT 0,
+    "mimetype"       varchar(100) NOT NULL DEFAULT '',
+    "quote"          bigint NOT NULL DEFAULT 0,
+    "driver"         varchar(50) NOT NULL DEFAULT '',
+    "sha1"           varchar(40) NOT NULL DEFAULT '',
+    "create_at"      timestamptz DEFAULT NULL,
+    "last_upload_at" timestamptz DEFAULT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "__PREFIX__idx_attachments_sha1" ON "__PREFIX__attachments" ("sha1");
+COMMENT ON TABLE "__PREFIX__attachments" IS '附件表';
+COMMENT ON COLUMN "__PREFIX__attachments"."id" IS 'ID';
+COMMENT ON COLUMN "__PREFIX__attachments"."topic" IS '主题分类';
+COMMENT ON COLUMN "__PREFIX__attachments"."user_id" IS '上传用户ID';
+COMMENT ON COLUMN "__PREFIX__attachments"."user_type" IS '上传用户身份类型';
+COMMENT ON COLUMN "__PREFIX__attachments"."url" IS '存储路径';
+COMMENT ON COLUMN "__PREFIX__attachments"."name" IS '原始名称';
+COMMENT ON COLUMN "__PREFIX__attachments"."size" IS '大小';
+COMMENT ON COLUMN "__PREFIX__attachments"."mimetype" IS 'MIME类型';
+COMMENT ON COLUMN "__PREFIX__attachments"."quote" IS '上传（引用）次数';
+COMMENT ON COLUMN "__PREFIX__attachments"."driver" IS '存储驱动';
+COMMENT ON COLUMN "__PREFIX__attachments"."sha1" IS 'SHA1编码';
+COMMENT ON COLUMN "__PREFIX__attachments"."create_at" IS '创建时间';
+COMMENT ON COLUMN "__PREFIX__attachments"."last_upload_at" IS '最后上传时间';

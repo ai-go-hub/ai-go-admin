@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS "__PREFIX__attachments";
 DROP TABLE IF EXISTS "__PREFIX__configs";
 DROP TABLE IF EXISTS "__PREFIX__captchas";
 DROP TABLE IF EXISTS "__PREFIX__tokens";

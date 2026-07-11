@@ -51,3 +51,25 @@ type Config struct {
 func (Config) TableName() string {
 	return "configs"
 }
+
+// Attachment 附件模型
+type Attachment struct {
+	ID           uint      `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
+	Topic        string    `gorm:"comment:主题分类;type:varchar(20);not null;default:''" json:"topic"`
+	UserID       uint      `gorm:"comment:上传用户ID;not null;default:0" json:"user_id"`
+	UserType     string    `gorm:"comment:上传用户身份类型;type:varchar(50);not null;default:''" json:"user_type"`
+	URL          string    `gorm:"comment:存储路径;type:varchar(255);not null;default:''" json:"url"`
+	Name         string    `gorm:"comment:原始名称;type:varchar(120);not null;default:''" json:"name"`
+	Size         int64     `gorm:"comment:大小;not null;default:0" json:"size"`
+	Mimetype     string    `gorm:"comment:MIME类型;type:varchar(100);not null;default:''" json:"mimetype"`
+	Quote        int64     `gorm:"comment:上传（引用）次数;not null;default:0" json:"quote"`
+	Driver       string    `gorm:"comment:存储驱动;type:varchar(50);not null;default:''" json:"driver"`
+	Sha1         string    `gorm:"comment:SHA1编码;type:varchar(40);not null;default:'';uniqueIndex" json:"sha1"`
+	CreateAt     time.Time `gorm:"comment:创建时间" json:"create_at"`
+	LastUploadAt time.Time `gorm:"comment:最后上传时间" json:"last_upload_at"`
+}
+
+// TableName 指定 Attachment 模型表名
+func (Attachment) TableName() string {
+	return "attachments"
+}
