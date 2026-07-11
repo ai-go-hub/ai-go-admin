@@ -21,6 +21,7 @@ require (
 
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/jinzhu/copier v0.4.0 // direct
 	github.com/lib/pq v1.10.9 // indirect
 )
 
