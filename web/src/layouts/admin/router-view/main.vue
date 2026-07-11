@@ -50,23 +50,23 @@ const addKeepAliveComponentName = function (keepAliveName: string | undefined) {
 const addActiveRouteKeepAlive = () => {
     if (navTab.state.activeRoute) {
         const tabView = getMenuDataByRoute(navTab.state.activeRoute)
-        if (tabView && typeof tabView.meta?.keepalive == 'string') {
-            addKeepAliveComponentName(tabView.meta.keepalive)
+        if (tabView && tabView.meta?.keepalive === 1) {
+            addKeepAliveComponentName(tabView.name as string)
         }
     }
 }
 
 onBeforeMount(() => {
     globalProperties.eventBus.on('onTabViewRefresh', (menu: RouteLocationNormalized) => {
-        state.keepAliveComponentNameList = state.keepAliveComponentNameList.filter((name: string) => menu.meta.keepalive !== name)
+        state.keepAliveComponentNameList = state.keepAliveComponentNameList.filter((name: string) => menu.name !== name)
         state.componentKey = ''
         nextTick(() => {
             state.componentKey = menu.fullPath
-            addKeepAliveComponentName(menu.meta.keepalive as string)
+            addKeepAliveComponentName(menu.name as string)
         })
     })
     globalProperties.eventBus.on('onTabViewClose', (menu: RouteLocationNormalized) => {
-        state.keepAliveComponentNameList = state.keepAliveComponentNameList.filter((name: string) => menu.meta.keepalive !== name)
+        state.keepAliveComponentNameList = state.keepAliveComponentNameList.filter((name: string) => menu.name !== name)
     })
 })
 
