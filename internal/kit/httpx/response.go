@@ -1,4 +1,4 @@
-package response
+package httpx
 
 import (
 	"net/http"

@@ -2,7 +2,7 @@ package common
 
 import (
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/captcha"
-	"github.com/ai-go-hub/ai-go-admin/internal/response"
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	svcCommon "github.com/ai-go-hub/ai-go-admin/internal/service/common"
 
 	"github.com/gin-gonic/gin"
@@ -22,26 +22,26 @@ func NewCaptchaHandler(svc *svcCommon.CaptchaService) *CaptchaHandler {
 func (h *CaptchaHandler) Create(c *gin.Context) {
 	result, err := h.svc.Create()
 	if err != nil {
-		response.Fail(c, response.WithMessage(err.Error()))
+		httpx.Fail(c, httpx.WithMessage(err.Error()))
 		return
 	}
-	response.Success(c, response.WithData(result))
+	httpx.Success(c, httpx.WithData(result))
 }
 
 // Verify 校验点选验证码，仅用于预验场景，校验成功不会使验证码失效
 func (h *CaptchaHandler) Verify(c *gin.Context) {
 	var req captcha.Request
 	if err := c.ShouldBind(&req); err != nil {
-		response.Fail(c, response.WithMessage("参数错误: "+err.Error()))
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
 		return
 	}
 
 	_, err := h.svc.Verify(req)
 	if err != nil {
-		response.Fail(c, response.WithMessage(err.Error()))
+		httpx.Fail(c, httpx.WithMessage(err.Error()))
 		return
 	}
-	response.Success(c)
+	httpx.Success(c)
 }
 
 // RegisterRoutes 注册验证码路由

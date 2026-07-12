@@ -4,9 +4,9 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/handler"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
-	"github.com/ai-go-hub/ai-go-admin/internal/response"
 	svcAdmin "github.com/ai-go-hub/ai-go-admin/internal/service/admin"
 
 	"github.com/gin-gonic/gin"
@@ -34,7 +34,7 @@ func (h *AdminHandler) GetLoginConfig(c *gin.Context) {
 		flagType = middleware.FlagLoggedIn
 	}
 
-	response.Success(c, response.WithData(gin.H{
+	httpx.Success(c, httpx.WithData(gin.H{
 		"type":    flagType,
 		"captcha": config.Get().Captcha.Switches.AdminLogin,
 	}))
@@ -44,17 +44,17 @@ func (h *AdminHandler) GetLoginConfig(c *gin.Context) {
 func (h *AdminHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if err := c.ShouldBind(&req); err != nil {
-		response.Fail(c, response.WithMessage("参数错误: "+err.Error()))
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
 		return
 	}
 
 	result, err := h.svc.Login(c, &req)
 	if err != nil {
-		response.Fail(c, response.WithMessage(err.Error()))
+		httpx.Fail(c, httpx.WithMessage(err.Error()))
 		return
 	}
 
-	response.Success(c, response.WithData(result))
+	httpx.Success(c, httpx.WithData(result))
 }
 
 // Logout 管理员退出登录
@@ -63,16 +63,16 @@ func (h *AdminHandler) Logout(c *gin.Context) {
 	if admin == nil {
 		// 未登录，直接生成成功响应，其意图已自然完成
 		// 不能执行任何 token 删除逻辑，因为管理员未认证
-		response.Success(c)
+		httpx.Success(c)
 		return
 	}
 
 	if err := h.svc.Logout(c, middleware.GetToken(c)); err != nil {
-		response.Fail(c)
+		httpx.Fail(c)
 		return
 	}
 
-	response.Success(c)
+	httpx.Success(c)
 }
 
 // ClearCache 清理后台缓存
@@ -80,18 +80,18 @@ func (h *AdminHandler) Logout(c *gin.Context) {
 // 当前后端无可清理的缓存（暂无 Redis/进程内运行时缓存层等）
 // 此接口作为契约占位，待后续引入缓存层时在此补充清理逻辑
 func (h *AdminHandler) ClearCache(c *gin.Context) {
-	response.Success(c)
+	httpx.Success(c)
 }
 
 // Init 后台数据初始化接口
 func (h *AdminHandler) Init(c *gin.Context) {
 	result, err := h.svc.Init(c, middleware.GetAdmin(c))
 	if err != nil {
-		response.Fail(c, response.WithMessage("初始化失败: "+err.Error()))
+		httpx.Fail(c, httpx.WithMessage("初始化失败: "+err.Error()))
 		return
 	}
 
-	response.Success(c, response.WithData(result))
+	httpx.Success(c, httpx.WithData(result))
 }
 
 // RegisterRoutes 注册路由

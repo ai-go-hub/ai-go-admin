@@ -66,7 +66,7 @@ aigo migrate create <name>   # 创建迁移文件
 
 ### 统一响应
 
-`internal/response/response.go`：响应体 `{code, message, time, data}`，`code=0` 成功、`code=1` 失败（均 HTTP 200）。两种用法：函数式选项 `response.Success(c, response.WithData(x))` / 链式 `response.New(c).Code(...).Message(...).Send()`，日常使用函数式选项用法。
+`internal/kit/httpx/response.go`：响应体 `{code, message, time, data}`，`code=0` 成功、`code=1` 失败（均 HTTP 200）。两种用法：函数式选项 `httpx.Success(c, httpx.WithData(x))` / 链式 `httpx.New(c).Code(...).Message(...).Send()`，日常使用函数式选项用法。
 
 ## 前端（web/）
 

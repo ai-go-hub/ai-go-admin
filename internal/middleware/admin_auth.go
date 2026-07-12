@@ -7,8 +7,8 @@ import (
 
 	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/token"
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
-	"github.com/ai-go-hub/ai-go-admin/internal/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,10 +32,10 @@ func AdminAuth() gin.HandlerFunc {
 			c.Set(CtxAdminKey, session)
 			c.Next()
 		} else {
-			response.Fail(c,
-				response.WithMessage(msg),
-				response.WithCode(http.StatusUnauthorized),
-				response.WithData(gin.H{"type": FlagNeedLogin}),
+			httpx.Fail(c,
+				httpx.WithMessage(msg),
+				httpx.WithCode(http.StatusUnauthorized),
+				httpx.WithData(gin.H{"type": FlagNeedLogin}),
 			)
 			c.Abort()
 		}

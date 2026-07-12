@@ -3,7 +3,7 @@ package handler
 import (
 	"strconv"
 
-	"github.com/ai-go-hub/ai-go-admin/internal/response"
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -33,80 +33,80 @@ func (h *Handler[T]) RegisterBaseRoutes(group *gin.RouterGroup) {
 func (h *Handler[T]) Create(c *gin.Context) {
 	var entity T
 	if err := c.ShouldBindJSON(&entity); err != nil {
-		response.Fail(c, response.WithMessage("参数错误: "+err.Error()))
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
 		return
 	}
 
 	if err := h.svc.Create(c, &entity); err != nil {
-		response.Fail(c, response.WithMessage("创建失败: "+err.Error()))
+		httpx.Fail(c, httpx.WithMessage("创建失败: "+err.Error()))
 		return
 	}
 
-	response.Success(c)
+	httpx.Success(c)
 }
 
 // List 获取列表
 func (h *Handler[T]) List(c *gin.Context) {
 	entities, err := h.svc.List(c)
 	if err != nil {
-		response.Fail(c, response.WithMessage("查询失败: "+err.Error()))
+		httpx.Fail(c, httpx.WithMessage("查询失败: "+err.Error()))
 		return
 	}
 
-	response.Success(c, response.WithData(entities))
+	httpx.Success(c, httpx.WithData(entities))
 }
 
 // Get 获取单条记录
 func (h *Handler[T]) Get(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		response.Fail(c, response.WithMessage("无效的 ID"))
+		httpx.Fail(c, httpx.WithMessage("无效的 ID"))
 		return
 	}
 
 	entity, err := h.svc.Get(c, uint(id))
 	if err != nil {
-		response.Fail(c, response.WithMessage("记录不存在"))
+		httpx.Fail(c, httpx.WithMessage("记录不存在"))
 		return
 	}
 
-	response.Success(c, response.WithData(entity))
+	httpx.Success(c, httpx.WithData(entity))
 }
 
 // Update 更新记录
 func (h *Handler[T]) Update(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		response.Fail(c, response.WithMessage("无效的 ID"))
+		httpx.Fail(c, httpx.WithMessage("无效的 ID"))
 		return
 	}
 
 	var entity T
 	if err := c.ShouldBindJSON(&entity); err != nil {
-		response.Fail(c, response.WithMessage("参数错误: "+err.Error()))
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
 		return
 	}
 
 	if err := h.svc.Update(c, uint(id), entity); err != nil {
-		response.Fail(c, response.WithMessage("更新失败: "+err.Error()))
+		httpx.Fail(c, httpx.WithMessage("更新失败: "+err.Error()))
 		return
 	}
 
-	response.Success(c)
+	httpx.Success(c)
 }
 
 // Delete 删除记录
 func (h *Handler[T]) Delete(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		response.Fail(c, response.WithMessage("无效的 ID"))
+		httpx.Fail(c, httpx.WithMessage("无效的 ID"))
 		return
 	}
 
 	if err := h.svc.Delete(c, uint(id)); err != nil {
-		response.Fail(c, response.WithMessage("删除失败: "+err.Error()))
+		httpx.Fail(c, httpx.WithMessage("删除失败: "+err.Error()))
 		return
 	}
 
-	response.Success(c)
+	httpx.Success(c)
 }

@@ -2,8 +2,8 @@ package common
 
 import (
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/upload"
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
-	"github.com/ai-go-hub/ai-go-admin/internal/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,14 +25,14 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		response.Fail(c, response.WithMessage("没有文件被上传: "+err.Error()))
+		httpx.Fail(c, httpx.WithMessage("没有文件被上传: "+err.Error()))
 		return
 	}
 
 	// 获取当前登录用户信息，当前仅管理员一种，未登录禁止上传文件
 	admin := middleware.GetAdmin(c)
 	if admin == nil {
-		response.Fail(c, response.WithMessage("请先登录"))
+		httpx.Fail(c, httpx.WithMessage("请先登录"))
 	}
 
 	// 上传用户信息
@@ -41,11 +41,11 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 
 	res, err := h.upload.Upload(c.Request.Context(), file, driver, topic, userId, userType)
 	if err != nil {
-		response.Fail(c, response.WithMessage(err.Error()))
+		httpx.Fail(c, httpx.WithMessage(err.Error()))
 		return
 	}
 
-	response.Success(c, response.WithData(res))
+	httpx.Success(c, httpx.WithData(res))
 }
 
 // RegisterRoutes 注册上传路由
