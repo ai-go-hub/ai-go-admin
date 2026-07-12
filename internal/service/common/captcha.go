@@ -16,11 +16,11 @@ func NewCaptchaService(repo *repoCommon.CaptchaRepository) *CaptchaService {
 }
 
 // Create 创建点选验证码
-func (s *CaptchaService) Create() (*captcha.ClickResult, error) {
+func (s *CaptchaService) Create() (*captcha.Result, error) {
 	return captcha.Create()
 }
 
 // Verify 校验点选验证码
-func (s *CaptchaService) Verify(req captcha.ClickRequest) (bool, error) {
+func (s *CaptchaService) Verify(req captcha.Request) (bool, error) {
 	return captcha.Check(req, false)
 }

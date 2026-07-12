@@ -38,10 +38,10 @@ type Driver interface {
 
 // Result 上传结果
 type Result struct {
-	Url     string // 资源访问地址
-	Size    int64  // 文件大小（字节）
-	Suffix  string // 文件后缀
-	IsImage bool   // 是否为图片
+	Url     string `json:"url"`      // 资源访问地址
+	Size    int64  `json:"size"`     // 文件大小（字节）
+	Suffix  string `json:"suffix"`   // 文件后缀
+	IsImage bool   `json:"is_image"` // 是否为图片
 }
 
 // Service 上传服务
@@ -61,7 +61,7 @@ func (s *Service) Upload(ctx context.Context, header *multipart.FileHeader, driv
 
 	// 校验文件大小
 	if cfg.MaxSize > 0 && header.Size > int64(cfg.MaxSize) {
-		return nil, fmt.Errorf("文件大小 %d 超过最大上传限制 %d", header.Size, cfg.MaxSize)
+		return nil, fmt.Errorf("文件大小 %s 超过最大上传限制 %s", filesystem.FormatBytes(header.Size), filesystem.FormatBytes(int64(cfg.MaxSize)))
 	}
 
 	// 校验后缀白名单
@@ -97,7 +97,7 @@ func (s *Service) Upload(ctx context.Context, header *multipart.FileHeader, driv
 	}
 
 	// 新文件: 实例化驱动并保存
-	d, err := newDriver(driverName)
+	d, err := NewDriver(driverName)
 	if err != nil {
 		return nil, err
 	}
@@ -201,8 +201,8 @@ func Manager() *Service {
 	return instance
 }
 
-// newDriver 根据驱动名称创建上传驱动
-func newDriver(name string) (Driver, error) {
+// NewDriver 根据驱动名称创建上传驱动
+func NewDriver(name string) (Driver, error) {
 	switch name {
 	case "local":
 		return driver.NewLocal(), nil

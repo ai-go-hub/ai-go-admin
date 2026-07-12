@@ -30,7 +30,7 @@ func (h *CaptchaHandler) Create(c *gin.Context) {
 
 // Verify 校验点选验证码，仅用于预验场景，校验成功不会使验证码失效
 func (h *CaptchaHandler) Verify(c *gin.Context) {
-	var req captcha.ClickRequest
+	var req captcha.Request
 	if err := c.ShouldBind(&req); err != nil {
 		response.Fail(c, response.WithMessage("参数错误: "+err.Error()))
 		return

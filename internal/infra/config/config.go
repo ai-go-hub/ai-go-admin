@@ -88,8 +88,8 @@ type CORSConfig struct {
 
 // 上传配置
 type UploadConfig struct {
-	MaxSize     int
-	Filename    string
+	MaxSize     int      `mapstructure:"max_size"`
+	Filename    string   `mapstructure:"filename"`
 	AllowSuffix []string `mapstructure:"allow_suffix"`
 }
 

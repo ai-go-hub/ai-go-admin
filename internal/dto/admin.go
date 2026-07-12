@@ -46,10 +46,10 @@ func NewAdmin(m *model.Admin) (*Admin, error) {
 
 // LoginRequest 管理员登录请求参数
 type LoginRequest struct {
-	Username string               `json:"username" form:"username" binding:"required"`
-	Password string               `json:"password" form:"password" binding:"required"`
-	Remember bool                 `json:"remember" form:"remember"`
-	Captcha  captcha.ClickRequest `json:"captcha" form:"captcha"`
+	Username string          `json:"username" form:"username" binding:"required"`
+	Password string          `json:"password" form:"password" binding:"required"`
+	Remember bool            `json:"remember" form:"remember"`
+	Captcha  captcha.Request `json:"captcha" form:"captcha"`
 }
 
 // LoginResponse 管理员登录响应数据

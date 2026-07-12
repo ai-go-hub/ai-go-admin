@@ -85,13 +85,13 @@ var (
 // Manager 返回全局令牌管理器实例，首次调用时根据配置自动初始化
 func Manager() *Service {
 	once.Do(func() {
-		instance = NewService(newDriver(config.Get().Token.Driver))
+		instance = NewService(NewDriver(config.Get().Token.Driver))
 	})
 	return instance
 }
 
-// newDriver 根据配置创建存储驱动
-func newDriver(name string) Driver {
+// NewDriver 创建存储驱动
+func NewDriver(name string) Driver {
 	switch name {
 	default:
 		return driver.NewDatabase()

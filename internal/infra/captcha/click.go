@@ -63,8 +63,8 @@ func bootstrap() {
 
 // ==================== 数据结构 ====================
 
-// ClickResult 创建验证码的返回结果
-type ClickResult struct {
+// Result 创建验证码的返回结果
+type Result struct {
 	Key         string   `json:"key"`
 	Elements    []string `json:"elements"`
 	ImageWidth  int      `json:"image_width"`
@@ -72,8 +72,8 @@ type ClickResult struct {
 	ImageBase64 string   `json:"image_base64"`
 }
 
-// ClickRequest 用户点击验证请求
-type ClickRequest struct {
+// Request 用户点击验证请求
+type Request struct {
 	Key            string       `json:"key"`
 	Clicks         []ClickPoint `json:"clicks"`
 	RenderedWidth  int          `json:"rendered_width"`
@@ -125,7 +125,7 @@ type iconMeta struct {
 // ==================== 公开方法 ====================
 
 // Create 创建点选验证码
-func Create() (*ClickResult, error) {
+func Create() (*Result, error) {
 	bootstrap()
 
 	bgPaths, err := filesystem.ReadDir(captchaCfg.BackgroundDir)
@@ -186,7 +186,7 @@ func Create() (*ClickResult, error) {
 		return nil, fmt.Errorf("store captcha: %w", err)
 	}
 
-	return &ClickResult{
+	return &Result{
 		Key:         record.Key,
 		Elements:    correctValues,
 		ImageWidth:  bgW,
@@ -196,7 +196,7 @@ func Create() (*ClickResult, error) {
 }
 
 // Check 检查点选验证码，deleteOnSuccess 控制验证成功后是否删除记录
-func Check(req ClickRequest, deleteOnSuccess bool) (bool, error) {
+func Check(req Request, deleteOnSuccess bool) (bool, error) {
 	tx := gorm.G[model.Captcha](database.DB())
 
 	record, err := tx.Where("key = ?", req.Key).First(context.Background())
