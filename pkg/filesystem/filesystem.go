@@ -3,6 +3,7 @@ package filesystem
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -27,6 +28,25 @@ func IsImageExtension(ext string) bool {
 		return true
 	}
 	return false
+}
+
+// FormatBytes 将字节数格式化为易读单位（B/KB/MB/GB/TB/PB）
+func FormatBytes(bytes int64) string {
+	const unit = 1024
+	if bytes < unit {
+		return strconv.FormatInt(bytes, 10) + " B"
+	}
+	units := []string{"KB", "MB", "GB", "TB", "PB", "EB"}
+	div, exp := int64(unit), 0
+	for n := bytes / unit; n >= unit && exp < len(units)-1; n /= unit {
+		div *= unit
+		exp++
+	}
+	// 保留 2 位小数并去掉末尾多余的 0 和小数点
+	s := strconv.FormatFloat(float64(bytes)/float64(div), 'f', 2, 64)
+	s = strings.TrimRight(s, "0")
+	s = strings.TrimRight(s, ".")
+	return s + " " + units[exp]
 }
 
 // ReadDir 递归读取目录下所有文件，返回完整路径列表
