@@ -43,9 +43,9 @@ func (l *Local) Delete(storedFilename string) error {
 	return nil
 }
 
-// Url 返回文件的访问地址，直接使用存储文件名
+// Url 返回文件的访问地址
 func (l *Local) Url(storedFilename string) string {
-	return storedFilename
+	return "/" + root + storedFilename
 }
 
 // Exists 判断文件是否存在
