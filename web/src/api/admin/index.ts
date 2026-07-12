@@ -51,3 +51,19 @@ export function getInit() {
         method: 'GET',
     })
 }
+
+/**
+ * 缓存清理接口
+ */
+export function clearCache(type: string) {
+    return request(
+        {
+            url: '/admin/clear-cache',
+            method: 'POST',
+            data: { type },
+        },
+        {
+            showSuccessMessage: true,
+        }
+    )
+}
