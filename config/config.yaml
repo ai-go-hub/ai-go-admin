@@ -3,7 +3,10 @@ app:
   timezone: Asia/Shanghai
 
 server:
+  # 服务端口
   port: 8080
+  # 可信代理 CIDR/IP 列表
+  trusted_proxies: []
 
 token:
   driver: database

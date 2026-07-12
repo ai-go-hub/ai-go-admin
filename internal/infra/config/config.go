@@ -20,7 +20,8 @@ type App struct {
 
 // 服务配置
 type Server struct {
-	Port int
+	Port           int
+	TrustedProxies []string `mapstructure:"trusted_proxies"`
 }
 
 // 单个数据库连接配置

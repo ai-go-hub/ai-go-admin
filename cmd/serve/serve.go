@@ -45,6 +45,11 @@ func Run(cmd *cobra.Command, args []string) error {
 
 	engine := gin.Default()
 
+	// 配置可信代理
+	if err := engine.SetTrustedProxies(config.Get().Server.TrustedProxies); err != nil {
+		return fmt.Errorf("设置可信代理: %w", err)
+	}
+
 	// 注册跨域中间件
 	engine.Use(middleware.CORS())
 
