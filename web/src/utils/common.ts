@@ -3,7 +3,37 @@ import { getCurrentInstance } from 'vue'
 import { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
 import router from '/@/router/index'
 import { adminBaseRoutePath } from '/@/router/static/adminBase'
+import { useConfig } from '/@/stores/config'
 import { useMenu } from '/@/stores/menu'
+import { getBaseUrl } from '/@/utils/request'
+
+/**
+ * 获取资源完整地址
+ * @param resource 资源相对地址
+ * @param domain 指定域名
+ */
+export const fullURL = (resource: string, domain = '') => {
+    const config = useConfig()
+    if (!domain) {
+        domain = config.site.cdnUrl ? config.site.cdnUrl : getBaseUrl()
+    }
+    if (!resource) {
+        return ''
+    }
+
+    const regUrl = new RegExp(/^http(s)?:\/\//)
+    const regexData = new RegExp(/^data:/i)
+    if (!domain || regUrl.test(resource) || regexData.test(resource)) {
+        return resource
+    }
+
+    let url = domain + resource
+    if (domain === config.site.cdnUrl && config.site.cdnUrlParams) {
+        const separator = url.includes('?') ? '&' : '?'
+        url += separator + config.site.cdnUrlParams
+    }
+    return url
+}
 
 /**
  * 获取 globalProperties 对象
