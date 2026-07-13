@@ -87,6 +87,12 @@ type CORSConfig struct {
 	MaxAge  int `mapstructure:"max_age"`
 }
 
+// CDN 配置
+type CDNConfig struct {
+	URL       string `mapstructure:"url"`
+	URLParams string `mapstructure:"url_params"`
+}
+
 // 上传配置
 type UploadConfig struct {
 	MaxSize     int      `mapstructure:"max_size"`
@@ -111,6 +117,7 @@ type Config struct {
 	Captcha  CaptchaConfig
 	Database DatabaseConfig
 	Upload   UploadConfig
+	CDN      CDNConfig
 }
 
 var (

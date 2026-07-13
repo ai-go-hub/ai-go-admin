@@ -14,6 +14,12 @@ token:
     admin: 72           # 管理员 token 有效期，单位：小时（3 天）
     admin_remember: 720 # 管理员 token 有效期（记住登录），单位：小时（30 天）
 
+cdn:
+  # 内容分发网络 URL，末尾不带 `/`
+  url:
+  # 内容分发网络 URL 参数，将自动拼接到 URL 的结尾（值如 `format/heif`）
+  url_params:
+
 database:
   type: postgres
   prefix:
