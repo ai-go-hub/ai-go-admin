@@ -12,9 +12,11 @@ export interface Lang {
  */
 export interface Site {
     name: string
+    cdnUrl: string
     version: string
     timezone: string
     recordNumber: string
+    cdnUrlParams: string
     initialized: boolean
 }
 

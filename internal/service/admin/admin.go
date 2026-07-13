@@ -105,7 +105,7 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*dt
 
 	// 1. 站点配置
 	configSiteNames := []string{"name", "record_number", "version"}
-	siteConfig := make(map[string]string, len(configSiteNames)+1)
+	siteConfig := make(map[string]string, len(configSiteNames)+3)
 
 	configs, err := gorm.G[model.Config](database.DB()).
 		Where("name IN ?", configSiteNames).
@@ -117,6 +117,8 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*dt
 		siteConfig[cfg.Name] = cfg.Value
 	}
 	siteConfig["timezone"] = config.Get().App.Timezone
+	siteConfig["cdn_url"] = config.Get().CDN.URL
+	siteConfig["cdn_url_params"] = config.Get().CDN.URLParams
 
 	// 2. 当前管理员拥有的权限规则（菜单）列表
 	perm := permission.New()

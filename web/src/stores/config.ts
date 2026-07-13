@@ -22,9 +22,11 @@ export const useConfig = defineStore(
          */
         const site: Site = reactive({
             name: '',
+            cdnUrl: '',
             version: '',
             timezone: '',
             recordNumber: '',
+            cdnUrlParams: '',
             initialized: false,
         })
 
