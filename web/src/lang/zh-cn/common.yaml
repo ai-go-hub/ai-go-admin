@@ -16,3 +16,13 @@ icon: 图标
 search: 搜索
 home: 首页
 reload: 重新加载
+upload: 上传
+screenshotUpload: 截图上传
+releaseToUpload: 松开上传
+copyPasteUploadTip: 可使用 Ctrl+V 粘贴上传剪贴板中的图片或文件
+noImageInClipboard: 剪贴板中没有图片
+noValidFileInPaste: 粘贴内容中没有可上传的文件
+noValidImageInDrop: 拖入内容中没有可上传的图片
+noValidFileInDrop: 拖入内容中没有可上传的文件
+clipboardReadNotSupported: 当前浏览器不支持读取剪贴板
+readClipboardFailed: 读取剪贴板失败

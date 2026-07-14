@@ -16,3 +16,13 @@ icon: Icon
 search: Search
 home: Home
 reload: Reload
+upload: Upload
+screenshotUpload: Screenshot upload
+releaseToUpload: Release to upload
+copyPasteUploadTip: Paste (Ctrl+V) images or files from the clipboard to upload
+noImageInClipboard: No image in clipboard
+noValidFileInPaste: No valid file in paste content
+noValidImageInDrop: No valid image in drop content
+noValidFileInDrop: No valid file in drop content
+clipboardReadNotSupported: Clipboard read is not supported by this browser
+readClipboardFailed: Failed to read clipboard

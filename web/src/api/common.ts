@@ -1,3 +1,4 @@
+import type { AxiosRequestConfig } from 'axios'
 import type { ClickRequest } from '/@/components/clickCaptcha/index'
 import request from '/@/utils/request'
 
@@ -56,7 +57,7 @@ export interface UploadResult {
 /**
  * 文件上传请求，multipart/form-data 表单
  */
-export function upload(params: UploadParams) {
+export function upload(params: UploadParams, config?: AxiosRequestConfig) {
     const form = new FormData()
     form.append('file', params.file)
     if (params.topic) form.append('topic', params.topic)
@@ -66,5 +67,6 @@ export function upload(params: UploadParams) {
         url: '/common/upload',
         method: 'POST',
         data: form,
+        ...(config ?? {}),
     })
 }
