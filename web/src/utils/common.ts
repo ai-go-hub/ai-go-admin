@@ -82,6 +82,30 @@ export async function copy(text: string): Promise<boolean> {
 }
 
 /**
+ * 以 pk 字段从数组中获取对应的索引值
+ * @param arr
+ * @param pk
+ * @param value
+ */
+export const getArrayKey = (arr: any[], pk: string, value: any): any => {
+    for (const key in arr) {
+        if (arr[key][pk] == value) {
+            return key
+        }
+    }
+    return false
+}
+
+/**
+ * 从一个文件路径中获取文件名
+ * @param path 文件路径
+ */
+export const getFileNameFromPath = (path: string) => {
+    const paths = path.split('/')
+    return paths[paths.length - 1]
+}
+
+/**
  * 获取路由 path
  */
 export const getCurrentRoutePath = () => {
