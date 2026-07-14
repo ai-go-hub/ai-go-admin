@@ -217,3 +217,18 @@ export function keysToSnakeCase(obj: any): any {
     }
     return obj
 }
+
+/**
+ * 获取一组资源的完整地址
+ * @param resources 资源相对地址
+ * @param domain 指定域名
+ */
+export const arrayFullURL = (resources: string | string[], domain = '') => {
+    if (typeof resources === 'string') {
+        resources = resources == '' ? [] : resources.split(',')
+    }
+    for (const key in resources) {
+        resources[key] = fullURL(resources[key], domain)
+    }
+    return resources
+}
