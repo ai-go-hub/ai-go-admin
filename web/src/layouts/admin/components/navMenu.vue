@@ -107,13 +107,13 @@
         >
             <template #reference>
                 <div class="admin-info" :class="state.currentNavMenu == 'adminInfo' ? 'hover' : ''">
-                    <el-avatar :size="25" :src="adminInfo.avatar"></el-avatar>
+                    <el-avatar :size="25" :src="fullURL(adminInfo.avatar)"></el-avatar>
                     <div class="admin-name">{{ adminInfo.nickname }}</div>
                 </div>
             </template>
             <div>
                 <div class="admin-info-base">
-                    <el-avatar :size="70" :src="adminInfo.avatar"></el-avatar>
+                    <el-avatar :size="70" :src="fullURL(adminInfo.avatar)"></el-avatar>
                     <div class="admin-info-other">
                         <div class="admin-info-name">{{ adminInfo.nickname }}</div>
                         <div class="admin-info-lasttime">{{ adminInfo.lastLoginAt }}</div>
@@ -148,6 +148,7 @@ import router from '/@/router'
 import { useAdminInfo } from '/@/stores/adminInfo'
 import { useConfig } from '/@/stores/config'
 import { ADMIN_INFO } from '/@/stores/constant/cacheKey'
+import { fullURL } from '/@/utils/common'
 import { Local, Session } from '/@/utils/storage'
 import { hotUpdateState, reloadServer } from '/@/utils/vite'
 
