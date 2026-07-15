@@ -1,4 +1,4 @@
-interface anyObj {
+interface AnyObj {
     [key: string]: any
 }
 

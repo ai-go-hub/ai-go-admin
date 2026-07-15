@@ -145,7 +145,7 @@ const state: {
     key: string
     // 绑定到 el-upload 的属性对象
     attrs: Partial<UploadProps>
-    events: anyObj
+    events: AnyObj
     isDragOver: boolean
     dragCounter: number
     uploadCounter: number
@@ -407,7 +407,7 @@ onMounted(() => {
         for (const name of eventNameMap[key as keyof typeof eventNameMap]) passthroughEvents.add(name)
     }
 
-    let mergedAttrs: anyObj = {}
+    let mergedAttrs: AnyObj = {}
     for (const attrKey in attrs) {
         if (passthroughEvents.has(attrKey)) {
             state.events[attrKey] = attrs[attrKey]
