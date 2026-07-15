@@ -83,7 +83,7 @@ func (p *Permission) GetRules(ctx context.Context, adminId uint) ([]model.AdminR
 		return nil, nil
 	}
 
-	rules, err := gorm.G[model.AdminRule](database.DB()).Where("id IN ? AND status = 1", ruleIDs).Find(ctx)
+	rules, err := gorm.G[model.AdminRule](database.DB()).Where("id IN ? AND status = 1", ruleIDs).Order("weigh desc").Find(ctx)
 	if err != nil {
 		return nil, err
 	}
