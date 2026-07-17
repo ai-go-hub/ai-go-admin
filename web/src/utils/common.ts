@@ -35,6 +35,33 @@ export const fullURL = (resource: string, domain = '') => {
     return url
 }
 
+export function auth(node: string): boolean
+export function auth(node: { name: string; subNodeName?: string }): boolean
+
+/**
+ * 鉴权
+ * 提供 string 将根据当前路由 path 自动拼接和鉴权，还可以提供路由的 name 对象进行鉴权
+ */
+export function auth(node: string | { name: string; subNodeName?: string }) {
+    const menu = useMenu()
+    if (typeof node === 'string') {
+        const path = getCurrentRoutePath()
+        if (menu.authNode.has(path)) {
+            const subNodeName = path + (path == '/' ? '' : '/') + node
+            if (menu.authNode.get(path)!.some((v: string) => v == subNodeName)) {
+                return true
+            }
+        }
+    } else {
+        // 节点列表中没有找到 name
+        if (!node.name || !menu.authNode.has(node.name)) return false
+
+        // 无需继续检查子节点或未找到子节点
+        if (!node.subNodeName || menu.authNode.get(node.name)?.includes(node.subNodeName)) return true
+    }
+    return false
+}
+
 /**
  * 获取 globalProperties 对象
  */
