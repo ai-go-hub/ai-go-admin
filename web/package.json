@@ -4,7 +4,7 @@
     "license": "Apache-2.0",
     "type": "module",
     "scripts": {
-        "dev": "vite --force",
+        "dev": "esno ./src/utils/dev.ts",
         "build": "vite build",
         "lint": "eslint .",
         "lint-fix": "eslint --fix .",
@@ -42,6 +42,7 @@
         "eslint-config-prettier": "10.1.8",
         "eslint-plugin-prettier": "5.5.5",
         "eslint-plugin-vue": "10.9.0",
+        "esno": "4.8.0",
         "globals": "17.5.0",
         "prettier": "3.8.3",
         "sass": "1.99.0",
