@@ -1,7 +1,33 @@
-/* 修复 Chrome 浏览器输入框内选中字符行高异常的问题开始 <<< */
+// ==================== 修复部分浏览器输入框内选中字符行高异常的问题 ====================
 .el-input {
     .el-input__inner {
         line-height: calc(var(--el-input-height, 40px) - 4px);
     }
 }
-/* 修复 Chrome 浏览器输入框内选中字符行高异常的问题结束 >>> */
+
+// ==================== el-dialog 滚动条样式优化 ====================
+.el-overlay-dialog,
+.ag-scroll-style {
+    &::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #eaeaea;
+        border-radius: var(--el-border-radius-base);
+        box-shadow: none;
+        -webkit-box-shadow: none;
+    }
+    &:hover {
+        &::-webkit-scrollbar-thumb:hover {
+            background: #c8c9cc;
+        }
+    }
+}
+@supports not (selector(::-webkit-scrollbar)) {
+    .el-overlay-dialog,
+    .ag-scroll-style {
+        scrollbar-width: thin;
+        scrollbar-color: #c8c9cc #eaeaea;
+    }
+}
