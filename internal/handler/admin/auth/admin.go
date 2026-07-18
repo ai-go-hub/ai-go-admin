@@ -1,0 +1,88 @@
+package auth
+
+import (
+	"github.com/ai-go-hub/ai-go-admin/internal/dto"
+	"github.com/ai-go-hub/ai-go-admin/internal/handler"
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	"github.com/ai-go-hub/ai-go-admin/internal/service"
+	svcAuth "github.com/ai-go-hub/ai-go-admin/internal/service/admin/auth"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
+)
+
+// AuthAdminHandler 管理员账号管理控制器
+type AuthAdminHandler struct {
+	*handler.Handler[model.Admin]
+	svc *svcAuth.AuthAdminService
+}
+
+// NewAuthAdminHandler 创建管理员账号管理控制器实例
+func NewAuthAdminHandler(svc *svcAuth.AuthAdminService) *AuthAdminHandler {
+	return &AuthAdminHandler{
+		Handler: handler.NewHandler(svc, handler.WithOmitFields(handler.OmitFields{
+			// 创建时忽略以下字段不入库
+			Create: []string{"login_failure", "last_login_at", "last_login_ip"},
+		})),
+		svc: svc,
+	}
+}
+
+// Create 覆写: 专用 DTO 接收请求数据（model.Admin.Password 有 json:"-"，无法直接绑定）
+func (h *AuthAdminHandler) Create(c *gin.Context) {
+	var req dto.AdminCreateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
+		return
+	}
+
+	entity := &model.Admin{}
+	if err := copier.Copy(entity, req); err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数转换失败: "+err.Error()))
+		return
+	}
+
+	if err := h.svc.Create(c, entity, service.Options{
+		Omit:   h.Config().Omit.Create,
+		Select: h.Config().Select.Create,
+	}); err != nil {
+		httpx.Fail(c, httpx.WithMessage("创建失败: "+err.Error()))
+		return
+	}
+
+	httpx.Success(c)
+}
+
+// Update 覆写: 用专用 DTO 接收请求数据，且 Password 为空时不更新
+func (h *AuthAdminHandler) Update(c *gin.Context) {
+	pk := c.Param("pk")
+
+	var req dto.AdminUpdateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
+		return
+	}
+
+	entity := model.Admin{}
+	if err := copier.Copy(&entity, req); err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数转换失败: "+err.Error()))
+		return
+	}
+
+	if err := h.svc.Update(c, pk, entity, service.Options{
+		Omit:   h.Config().Omit.Update,
+		Select: h.Config().Select.Update,
+	}); err != nil {
+		httpx.Fail(c, httpx.WithMessage("更新失败: "+err.Error()))
+		return
+	}
+
+	httpx.Success(c)
+}
+
+// RegisterRoutes 注册路由
+func (h *AuthAdminHandler) RegisterRoutes(group *gin.RouterGroup) {
+	// 这种写法可自动挂载重写后的方法
+	handler.RegisterBaseRoutes(h, group)
+}

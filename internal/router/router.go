@@ -3,6 +3,7 @@ package router
 import (
 	// 空白导入触发子目录 init() 自动注册路由
 	_ "github.com/ai-go-hub/ai-go-admin/internal/router/admin"
+	_ "github.com/ai-go-hub/ai-go-admin/internal/router/admin/auth"
 	_ "github.com/ai-go-hub/ai-go-admin/internal/router/common"
 
 	"github.com/ai-go-hub/ai-go-admin/internal/router/registry"
