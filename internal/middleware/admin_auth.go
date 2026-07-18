@@ -2,12 +2,14 @@ package middleware
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/token"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
+	"github.com/ai-go-hub/ai-go-admin/internal/repository"
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
 
 	"github.com/gin-gonic/gin"
@@ -93,7 +95,9 @@ func extractAdmin(c *gin.Context) (*dto.AdminSession, string) {
 
 	// 查询管理员信息
 	adminRepo := repoAdmin.NewAdminRepository()
-	admin, err := adminRepo.Get(c, tk.UserID)
+	admin, err := adminRepo.Get(c, repository.Options{
+		PrimaryKey: strconv.FormatUint(uint64(tk.UserID), 10),
+	})
 	if err != nil {
 		return nil, "请重新登录"
 	}
