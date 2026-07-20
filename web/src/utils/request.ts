@@ -28,12 +28,12 @@ interface InternalRequestConfig extends InternalAxiosRequestConfig {
 
 // ==================== Base URL 辅助函数 ====================
 
-export function getBaseUrl(): string {
+export function getBaseURL(): string {
     return import.meta.env.VITE_AXIOS_BASE_URL as string
 }
 
-export function getBaseUrlPort(): string {
-    return new URL(getBaseUrl()).port
+export function getBaseURLPort(): string {
+    return new URL(getBaseURL()).port
 }
 
 // ==================== Loading ====================
@@ -128,7 +128,7 @@ function removePending(config: InternalAxiosRequestConfig): void {
 // ==================== Axios 实例 ====================
 
 const instance: AxiosInstance = axios.create({
-    baseURL: getBaseUrl(),
+    baseURL: getBaseURL(),
     timeout: 10000,
 })
 

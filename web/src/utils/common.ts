@@ -5,7 +5,7 @@ import router from '/@/router/index'
 import { adminBaseRoutePath } from '/@/router/static/adminBase'
 import { useConfig } from '/@/stores/config'
 import { useMenu } from '/@/stores/menu'
-import { getBaseUrl } from '/@/utils/request'
+import { getBaseURL } from '/@/utils/request'
 
 /**
  * 获取资源完整地址
@@ -15,15 +15,15 @@ import { getBaseUrl } from '/@/utils/request'
 export const fullURL = (resource: string, domain = '') => {
     const config = useConfig()
     if (!domain) {
-        domain = config.site.cdnUrl ? config.site.cdnUrl : getBaseUrl()
+        domain = config.site.cdnUrl ? config.site.cdnUrl : getBaseURL()
     }
     if (!resource) {
         return ''
     }
 
-    const regUrl = new RegExp(/^http(s)?:\/\//)
+    const regURL = new RegExp(/^http(s)?:\/\//)
     const regexData = new RegExp(/^data:/i)
-    if (!domain || regUrl.test(resource) || regexData.test(resource)) {
+    if (!domain || regURL.test(resource) || regexData.test(resource)) {
         return resource
     }
 

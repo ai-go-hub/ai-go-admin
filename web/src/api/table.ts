@@ -6,30 +6,29 @@ import request from '/@/utils/request'
  * 表格相关网络请求无需局限于本类，开发者可于 api/ 创建自定义的接口请求函数，并于需要的地方导入使用即可。
  */
 export class TableManagerAPI {
-    public controllerUrl
-    public actionUrl
+    public actionURL
+    public controllerURL
 
-    constructor(controllerUrl: string) {
-        this.controllerUrl = controllerUrl
-        this.actionUrl = new Map([
-            ['get', controllerUrl + 'get'],
-            ['list', controllerUrl + 'list'],
-            ['create', controllerUrl + 'create'],
-            ['update', controllerUrl + 'update'],
-            ['delete', controllerUrl + 'delete'],
-            ['sort', controllerUrl + 'sort'],
+    constructor(controllerURL: string) {
+        this.controllerURL = controllerURL
+        this.actionURL = new Map([
+            ['get', controllerURL + 'get'],
+            ['list', controllerURL + 'list'],
+            ['create', controllerURL + 'create'],
+            ['update', controllerURL + 'update'],
+            ['delete', controllerURL + 'delete'],
+            ['sort', controllerURL + 'sort'],
         ])
     }
 
     /**
      * 获取行数据
-     * @param params 行主键等
+     * @param pk 主键值
      */
-    get(params: AnyObj) {
+    get(pk: string) {
         return request({
-            url: this.actionUrl.get('get'),
+            url: `${this.actionURL.get('get')}/${pk}`,
             method: 'GET',
-            params,
         })
     }
 
@@ -38,23 +37,23 @@ export class TableManagerAPI {
      * @param filter 数据过滤条件
      */
     list(filter: TableInterface['filter'] = {}) {
-        return request<TableManagerAPIDefaultData>({
-            url: this.actionUrl.get('list'),
-            method: 'GET',
-            params: filter,
+        return request<TableManagerListAPIDefaultData>({
+            url: this.actionURL.get('list'),
+            method: 'POST',
+            data: filter,
         })
     }
 
     /**
      * 表格删除接口的请求方法
-     * @param ids 被删除数据的主键数组
+     * @param pks 被删除数据的主键数组
      */
-    delete(ids: string[]) {
+    delete(pks: string[]) {
         return request(
             {
-                url: this.actionUrl.get('delete'),
+                url: this.actionURL.get('delete'),
                 method: 'POST',
-                data: { ids },
+                data: { pks },
             },
             {
                 showSuccessMessage: true,
@@ -65,12 +64,14 @@ export class TableManagerAPI {
     /**
      * 向指定接口 POST 数据，本方法虽然较为通用，但请不要局限于此，开发者可于 api/ 创建自定义的接口请求函数，并于需要的地方导入使用即可
      * @param action 请求的接口，比如 create、update
+     * @param pk 主键值
      * @param data 要 POST 的数据
      */
-    post(action: string, data: AnyObj) {
+    post(action: string, pk: string, data: AnyObj) {
+        const url = this.actionURL.has(action) ? this.actionURL.get(action) : this.controllerURL + action
         return request(
             {
-                url: this.actionUrl.has(action) ? this.actionUrl.get(action) : this.controllerUrl + action,
+                url: `${url}/${pk}`,
                 method: 'POST',
                 data,
             },
@@ -85,7 +86,7 @@ export class TableManagerAPI {
      */
     sort(data: AnyObj) {
         return request({
-            url: this.actionUrl.get('sort'),
+            url: this.actionURL.get('sort'),
             method: 'POST',
             data,
         })

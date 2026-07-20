@@ -105,14 +105,14 @@ interface Props extends /* @vue-ignore */ Partial<UploadProps> {
     // 存储驱动，透传到上传接口 driver
     driver?: string
     // 返回带域名的完整路径
-    returnFullUrl?: boolean
+    returnFullURL?: boolean
     // 强制使用本地存储驱动
     forceLocal?: boolean
     // 在上传数量达到限制时隐藏图片上传按钮
     hideImagePlusOnOverLimit?: boolean
 }
 interface UploadFileExt extends UploadUserFile {
-    serverUrl?: string
+    serverURL?: string
 }
 interface UploadProgressEvent extends AxiosProgressEvent {
     percent: number
@@ -125,7 +125,7 @@ const props = withDefaults(defineProps<Props>(), {
     modelValue: () => [],
     topic: '',
     driver: '',
-    returnFullUrl: false,
+    returnFullURL: false,
     forceLocal: false,
     hideImagePlusOnOverLimit: false,
 })
@@ -330,9 +330,9 @@ const onElChange = (file: UploadFileExt, files: UploadFiles) => {
         .then((res) => {
             const body = res.data
             if (body.code === 0) {
-                file.serverUrl = body.data.url
+                file.serverURL = body.data.url
                 file.status = 'success'
-                emits('update:modelValue', getAllUrls())
+                emits('update:modelValue', getAllURLs())
                 triggerEvent('success', [body, file, files])
             } else {
                 file.status = 'fail'
@@ -355,19 +355,19 @@ const onElRemove = (file: UploadUserFile, files: UploadFiles) => {
     triggerEvent('remove', [file, files])
     afterFileChange(file, files)
     nextTick(() => {
-        emits('update:modelValue', getAllUrls())
+        emits('update:modelValue', getAllURLs())
     })
 }
 
 const onElPreview = (file: UploadFileExt) => {
     triggerEvent('preview', [file])
-    if (!file || !file.serverUrl) return
+    if (!file || !file.serverURL) return
     if (props.type == 'file' || props.type == 'files') {
-        window.open(fullURL(file.serverUrl))
+        window.open(fullURL(file.serverURL))
         return
     }
     state.preview.show = true
-    state.preview.url = fullURL(file.serverUrl)
+    state.preview.url = fullURL(file.serverURL)
 }
 
 const onElExceed = (files: UploadUserFile[]) => {
@@ -394,7 +394,7 @@ const initSort = () => {
                 if (evt.oldIndex == evt.newIndex) return
                 const { oldIndex, newIndex } = evt
                 ;[state.fileList[oldIndex!], state.fileList[newIndex!]] = [state.fileList[newIndex!], state.fileList[oldIndex!]]
-                emits('update:modelValue', getAllUrls())
+                emits('update:modelValue', getAllURLs())
             },
         })
     })
@@ -452,13 +452,13 @@ const init = (modelValue: string | string[]) => {
     state.fileList = urls.map((url) => ({
         name: getFileNameFromPath(url),
         url: fullURL(url),
-        serverUrl: url,
+        serverURL: url,
     }))
     state.defaultReturnType = typeof modelValue === 'string' || isSingleType ? 'string' : 'array'
 
     // 超出过滤 || 需要返回完整 URL
-    if (enforceLimit() || props.returnFullUrl) {
-        emits('update:modelValue', getAllUrls())
+    if (enforceLimit() || props.returnFullURL) {
+        emits('update:modelValue', getAllURLs())
     }
     state.key = uuid()
 }
@@ -466,10 +466,10 @@ const init = (modelValue: string | string[]) => {
 /**
  * 获取当前所有资源路径的列表
  */
-const getAllUrls = (returnType: ReturnType = state.defaultReturnType) => {
+const getAllURLs = (returnType: ReturnType = state.defaultReturnType) => {
     enforceLimit()
-    let urlList = state.fileList.map((f) => f.serverUrl).filter((u): u is string => !!u)
-    if (props.returnFullUrl) urlList = arrayFullURL(urlList)
+    let urlList = state.fileList.map((f) => f.serverURL).filter((u): u is string => !!u)
+    if (props.returnFullURL) urlList = arrayFullURL(urlList)
     return returnType === 'string' ? urlList.join(',') : urlList
 }
 
@@ -532,7 +532,7 @@ watch(
         if (newVal === undefined || newVal === null) return init('')
 
         const newValArr = arrayFullURL(stringToArray(cloneDeep(newVal)))
-        const oldValArr = arrayFullURL(getAllUrls('array') as string[])
+        const oldValArr = arrayFullURL(getAllURLs('array') as string[])
         if (newValArr.sort().toString() != oldValArr.sort().toString()) {
             init(newVal)
         }
