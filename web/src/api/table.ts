@@ -46,14 +46,14 @@ export class TableManagerAPI {
 
     /**
      * 表格删除接口的请求方法
-     * @param pks 被删除数据的主键数组
+     * @param pks 删除数据的主键数组
      */
     delete(pks: string[]) {
         return request(
             {
                 url: this.actionURL.get('delete'),
                 method: 'POST',
-                data: { pks },
+                data: { pks: pks.map(String) },
             },
             {
                 showSuccessMessage: true,
@@ -71,7 +71,7 @@ export class TableManagerAPI {
         const url = this.actionURL.has(action) ? this.actionURL.get(action) : this.controllerURL + action
         return request(
             {
-                url: `${url}/${pk}`,
+                url: pk ? `${url}/${pk}` : url,
                 method: 'POST',
                 data,
             },
