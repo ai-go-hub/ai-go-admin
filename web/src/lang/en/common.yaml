@@ -1,28 +1,73 @@
-refresh: refresh
-loading: loading
+refresh: Refresh
+loading: Loading
 operationSuccess: Operation successful
 operationFailed: Operation failed
 networkError: Network error
-captchaLoadFailed: Captcha loading failed, please click refresh button
-captchaAreaNotClicked: The correct area is not clicked, please try again!
-verificationSuccess: Verification is successful!
-pleaseClick: Please click
-arrayKey: key
-arrayValue: value
+captchaLoadFailed: Failed to load CAPTCHA. Click refresh to try again.
+captchaAreaNotClicked: Incorrect area selected. Please try again!
+verificationSuccess: Verification successful!
+pleaseClick: Please click in order
+arrayKey: Key
+arrayValue: Value
 add: Add
-pleaseInstallEditor: Please install editor
+pleaseInstallEditor: Please install a rich-text editor first
 pleaseSelectIcon: Please select an icon
 icon: Icon
 search: Search
 home: Home
 reload: Reload
 upload: Upload
-screenshotUpload: Screenshot upload
-releaseToUpload: Release to upload
+screenshotUpload: Upload screenshot
+releaseToUpload: Drop to upload
 copyPasteUploadTip: Paste (Ctrl+V) images or files from the clipboard to upload
 noImageInClipboard: No image in clipboard
-noValidFileInPaste: No valid file in paste content
-noValidImageInDrop: No valid image in drop content
-noValidFileInDrop: No valid file in drop content
+noValidFileInPaste: No uploadable files found in the pasted content
+noValidImageInDrop: No uploadable images found in the dropped content
+noValidFileInDrop: No uploadable files found in the dropped content
 clipboardReadNotSupported: Clipboard read is not supported by this browser
 readClipboardFailed: Failed to read clipboard
+dragSort: Drag to sort
+edit: Edit
+delete: Delete
+cancel: Cancel
+deleteSelectedRecords: Are you sure you want to delete the selected records?
+beyondMovableRange: Cannot move outside the allowed range
+reset: Reset
+to: To
+startDate: Start date
+endDate: End date
+startTime: Start time
+endTime: End time
+open: Open
+close: Close
+editSelection: Edit selected rows
+deleteSelection: Delete selected rows
+openCommonSearch: Open advanced search
+collapse: Collapse
+expand: Expand
+all: All
+submenu: Submenu
+url: URL
+save: Save
+saveAndContinue: Save and edit the next item
+status: Status
+disable: Disable
+enable: Enable
+pleaseEnter: Please enter {field}
+pleaseSelect: Please select {field}
+invalidEntry: Please enter a valid {field}
+accountFormatError: Must be 3-16 characters, start with a letter, and contain only letters, digits, and underscores.
+passwordFormatError: 6-32 chars, no & < > " ' allowed.
+varNameFormatError: Only letters, digits and underscores allowed; cannot start with a digit.
+content: Content
+required: Required
+mobile: Mobile
+account: Account
+password: Password
+varName: Variable name
+richTextRequired: Rich text is required
+email: Email
+date: Date
+number: Number
+integer: Integer
+float: Float
