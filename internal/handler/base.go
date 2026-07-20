@@ -37,7 +37,7 @@ type DeleteRequest struct {
 	PKs []string `json:"pks" binding:"required,min=1"`
 }
 
-// OmitFields 声明各方法的 Omit 黑名单字段，留空代表不忽略任何字段
+// OmitFields 声明对应方法的 Omit 黑名单字段，留空代表不忽略任何字段
 type OmitFields struct {
 	Get    []string
 	List   []string
@@ -45,7 +45,7 @@ type OmitFields struct {
 	Create []string
 }
 
-// SelectFields 声明各方法的 Select 白名单字段，留空代表全部字段
+// SelectFields 声明对应方法的 Select 白名单字段，留空代表全部字段
 type SelectFields struct {
 	Get    []string
 	List   []string
@@ -53,10 +53,17 @@ type SelectFields struct {
 	Create []string
 }
 
+// Adapter 声明对应方法的数据适配器
+type Adapter struct {
+	Get  func(any) (any, error)
+	List func(any) (any, error)
+}
+
 // HandlerConfig 通用控制器配置
 type HandlerConfig struct {
-	Omit   OmitFields
-	Select SelectFields
+	Adapter Adapter
+	Omit    OmitFields
+	Select  SelectFields
 }
 
 // Option 通用控制器选项函数
@@ -70,6 +77,11 @@ func WithOmitFields(f OmitFields) Option {
 // WithSelectFields 设置各动作的 Select 白名单字段
 func WithSelectFields(f SelectFields) Option {
 	return func(c *HandlerConfig) { c.Select = f }
+}
+
+// WithAdapter 设置各动作的数据适配函数，可对数据进行额外加工
+func WithAdapter(adapter Adapter) Option {
+	return func(c *HandlerConfig) { c.Adapter = adapter }
 }
 
 // NewHandler 创建通用控制器实例，支持函数式选项传递配置
@@ -166,10 +178,21 @@ func (h *Handler[T]) List(c *gin.Context) {
 		return
 	}
 
-	httpx.Success(c, httpx.WithData(gin.H{
+	resp := gin.H{
 		"list":  list,
 		"total": total,
-	}))
+	}
+
+	if h.cfg.Adapter.List != nil {
+		adapted, err := h.cfg.Adapter.List(list)
+		if err != nil {
+			httpx.Fail(c, httpx.WithMessage("数据适配器错误: "+err.Error()))
+			return
+		}
+		resp["list"] = adapted
+	}
+
+	httpx.Success(c, httpx.WithData(resp))
 }
 
 // Get 获取单条记录，按主键查询
@@ -184,9 +207,20 @@ func (h *Handler[T]) Get(c *gin.Context) {
 		return
 	}
 
-	httpx.Success(c, httpx.WithData(gin.H{
+	resp := gin.H{
 		"row": entity,
-	}))
+	}
+
+	if h.cfg.Adapter.Get != nil {
+		adapted, err := h.cfg.Adapter.Get(entity)
+		if err != nil {
+			httpx.Fail(c, httpx.WithMessage("数据适配器错误: "+err.Error()))
+			return
+		}
+		resp["row"] = adapted
+	}
+
+	httpx.Success(c, httpx.WithData(resp))
 }
 
 // Delete 批量删除记录
