@@ -32,6 +32,11 @@ type ListRequest struct {
 	Wheres []service.Where `json:"wheres"`
 }
 
+// DeleteRequest 批量删除请求体
+type DeleteRequest struct {
+	PKs []string `json:"pks" binding:"required,min=1"`
+}
+
 // OmitFields 声明各方法的 Omit 黑名单字段，留空代表不忽略任何字段
 type OmitFields struct {
 	Get    []string
@@ -86,10 +91,10 @@ func (h *Handler[T]) Config() HandlerConfig {
 func RegisterBaseRoutes(h IHandler, group *gin.RouterGroup) {
 	group.POST("/list", h.List, middleware.AdminAuth())
 	group.POST("/create", h.Create, middleware.AdminAuth())
+	group.POST("/delete", h.Delete, middleware.AdminAuth())
 
 	group.GET("/get/:pk", h.Get, middleware.AdminAuth())
 	group.POST("/update/:pk", h.Update, middleware.AdminAuth())
-	group.POST("/delete/:pk", h.Delete, middleware.AdminAuth())
 }
 
 // Create 新增记录
@@ -179,12 +184,20 @@ func (h *Handler[T]) Get(c *gin.Context) {
 		return
 	}
 
-	httpx.Success(c, httpx.WithData(entity))
+	httpx.Success(c, httpx.WithData(gin.H{
+		"row": entity,
+	}))
 }
 
-// Delete 删除记录
+// Delete 批量删除记录
 func (h *Handler[T]) Delete(c *gin.Context) {
-	if err := h.svc.Delete(c, c.Param("pk")); err != nil {
+	var req DeleteRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
+		return
+	}
+
+	if err := h.svc.Delete(c, req.PKs); err != nil {
 		httpx.Fail(c, httpx.WithMessage("删除失败: "+err.Error()))
 		return
 	}

@@ -36,7 +36,7 @@ type IService[T any] interface {
 	List(c *gin.Context, opts Options) ([]T, error)
 	Count(c *gin.Context, opts Options) (int64, error)
 	Update(c *gin.Context, pk string, entity T, opts Options) error
-	Delete(c *gin.Context, pk string) error
+	Delete(c *gin.Context, pks []string) error
 	ToRepoOptions(opts Options) repository.Options
 	BuildScopes(opts Options) []func(*gorm.Statement)
 }
@@ -89,9 +89,9 @@ func (s *Service[T]) Update(c *gin.Context, pk string, entity T, opts Options) e
 	return s.repo.Update(c, pk, entity, s.ToRepoOptions(opts))
 }
 
-// Delete 根据主键删除记录
-func (s *Service[T]) Delete(c *gin.Context, pk string) error {
-	return s.repo.Delete(c, pk)
+// Delete 根据主键批量删除记录
+func (s *Service[T]) Delete(c *gin.Context, pks []string) error {
+	return s.repo.Delete(c, pks)
 }
 
 // BuildScopes 统一组装过滤条件、排序、分页 Scope

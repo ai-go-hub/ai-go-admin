@@ -25,7 +25,7 @@ type IRepository[T any] interface {
 	List(c *gin.Context, opts Options) ([]T, error)
 	Count(c *gin.Context, opts Options) (int64, error)
 	Update(c *gin.Context, pk string, entity T, opts Options) error
-	Delete(c *gin.Context, pk string) error
+	Delete(c *gin.Context, pks []string) error
 	PrimaryKeyField() (string, error)       // 获取主键字段
 	FieldExists(field string) (bool, error) // 检查一个字段是否存在
 }
@@ -159,13 +159,13 @@ func (r *Repository[T]) Update(c *gin.Context, pk string, entity T, opts Options
 	return err
 }
 
-// Delete 根据主键删除记录
-func (r *Repository[T]) Delete(c *gin.Context, pk string) error {
+// Delete 根据主键批量删除记录
+func (r *Repository[T]) Delete(c *gin.Context, pks []string) error {
 	pkField, err := r.PrimaryKeyField()
 	if err != nil {
 		return err
 	}
-	_, err = gorm.G[T](r.DB()).Where(pkField+" = ?", pk).Delete(c.Request.Context())
+	_, err = gorm.G[T](r.DB()).Where(pkField+" IN ?", pks).Delete(c.Request.Context())
 	return err
 }
 
