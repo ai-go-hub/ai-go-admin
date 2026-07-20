@@ -40,6 +40,33 @@ body,
     z-index: 2147483599;
 }
 
+// ==================== 表格表单 ====================
+.ag-operate-dialog {
+    overflow: hidden;
+    border-radius: var(--el-border-radius-base);
+    padding-bottom: 52px;
+}
+.ag-operate-dialog .el-dialog__header {
+    border-bottom: 1px solid var(--ag-bg-color);
+    .el-dialog__headerbtn {
+        top: 4px;
+    }
+}
+.ag-operate-dialog .el-dialog__body {
+    height: 58vh;
+}
+.ag-operate-dialog .el-dialog__footer {
+    padding: 10px var(--el-dialog-padding-primary);
+    box-shadow: var(--el-box-shadow);
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+}
+.ag-operate-form {
+    padding-top: 20px;
+}
+
 // ==================== 页面切换动画 ====================
 .slide-right-enter-active,
 .slide-right-leave-active,

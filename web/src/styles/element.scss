@@ -1,11 +1,58 @@
-// ==================== 修复部分浏览器输入框内选中字符行高异常的问题 ====================
+// ==================== element plus 组件样式覆盖 ====================
+.el-menu {
+    user-select: none;
+}
+
+.el-table {
+    --el-table-border-color: var(--ag-border-color);
+}
+
+.el-card {
+    border: none;
+    .el-card__header {
+        border-bottom: 1px solid var(--el-border-color-extra-light);
+    }
+}
+
+.el-divider__text.is-center {
+    transform: translateX(-50%) translateY(-62%);
+}
+
+// ==================== 输入组件 ====================
 .el-input {
     .el-input__inner {
         line-height: calc(var(--el-input-height, 40px) - 4px);
     }
 }
+.el-input-number.is-controls-right {
+    .el-input__wrapper {
+        padding-left: 11px;
+    }
+    .el-input__inner {
+        text-align: left;
+    }
+}
+.el-textarea__inner {
+    padding: 5px 11px;
+}
+.datetime-picker {
+    height: 32px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.ag-input-item-radio,
+.ag-input-item-checkbox {
+    .el-radio-group,
+    .el-checkbox-group {
+        margin-top: -8px;
+        .el-radio,
+        .el-checkbox {
+            margin-top: 8px;
+        }
+    }
+}
 
-// ==================== el-dialog 滚动条样式优化 ====================
+// ==================== 滚动条样式优化 ====================
 .el-overlay-dialog,
 .ag-scroll-style {
     &::-webkit-scrollbar {
