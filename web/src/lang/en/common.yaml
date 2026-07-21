@@ -71,3 +71,7 @@ date: Date
 number: Number
 integer: Integer
 float: Float
+lastLoginAt: Last login at
+updatedAt: Updated at
+createdAt: Created at
+operate: Operate

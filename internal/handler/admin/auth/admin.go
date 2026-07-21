@@ -21,10 +21,12 @@ type AuthAdminHandler struct {
 // NewAuthAdminHandler 创建管理员账号管理控制器实例
 func NewAuthAdminHandler(svc *svcAuth.AuthAdminService) *AuthAdminHandler {
 	return &AuthAdminHandler{
-		Handler: handler.NewHandler(svc, handler.WithOmitFields(handler.OmitFields{
-			// 创建时忽略以下字段不入库
-			Create: []string{"login_failure", "last_login_at", "last_login_ip"},
-		})),
+		Handler: handler.NewHandler(svc,
+			handler.WithOmitFields(handler.OmitFields{
+				// 创建时忽略以下字段不入库
+				Create: []string{"id", "login_failure", "last_login_at", "last_login_ip", "deleted_at"},
+			}),
+		),
 		svc: svc,
 	}
 }

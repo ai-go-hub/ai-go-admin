@@ -66,26 +66,20 @@ type InitResponse struct {
 	Rules      []map[string]any  `json:"rules"`
 }
 
-type AuthAdmin struct {
-	Username string `json:"username"`
-	Nickname string `json:"nickname"`
+// AdminUpdateRequest 更新管理员请求参数
+type AdminUpdateRequest struct {
+	Username string `json:"username" binding:"required"`
+	Nickname string `json:"nickname" binding:"required"`
 	Avatar   string `json:"avatar"`
 	Email    string `json:"email"`
 	Mobile   string `json:"mobile"`
 	Password string `json:"password"`
 	Bio      string `json:"bio"`
-	Status   string `json:"status"`
+	Status   string `json:"status" binding:"required"`
 }
 
 // AdminCreateRequest 创建管理员请求参数
 type AdminCreateRequest struct {
-	AuthAdmin
-	Username string `json:"username" binding:"required"`
+	AdminUpdateRequest
 	Password string `json:"password" binding:"required"`
-}
-
-// AdminUpdateRequest 更新管理员请求参数
-type AdminUpdateRequest struct {
-	AuthAdmin
-	Username string `json:"username" binding:"required"`
 }

@@ -59,7 +59,7 @@ ON CONFLICT DO NOTHING;
 
 -- 初始化管理员
 INSERT INTO "__PREFIX__admins" ("id", "username", "nickname", "avatar", "email", "mobile", "login_failure", "last_login_at", "last_login_ip", "password", "bio", "status", "updated_at", "created_at", "deleted_at") VALUES
-    (1, 'admin', 'Admin', '/static/images/avatar.png', NULL, NULL, 0, NOW(), '::1', '$2a$10$T7nw94qiMClADHg0KezIzukmNvvIxHG.V5uObKOGwPTVq4W2ee7B.', NULL, 'enable', NOW(), NOW(), NULL)
+    (1, 'admin', 'Admin', '/static/images/avatar.png', 'admin@ai-go-hub.com', '18888888888', 0, NOW(), '::1', '$2a$10$T7nw94qiMClADHg0KezIzukmNvvIxHG.V5uObKOGwPTVq4W2ee7B.', NULL, 'enable', NOW(), NOW(), NULL)
 ON CONFLICT DO NOTHING;
 
 -- 初始化管理员与分组映射
