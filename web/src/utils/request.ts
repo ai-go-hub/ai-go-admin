@@ -24,6 +24,8 @@ export interface RequestOptions {
 
 interface InternalRequestConfig extends InternalAxiosRequestConfig {
     requestOptions?: RequestOptions
+    // 由 addPending 生成并缓存的请求唯一标识，供 removePending 复用
+    _requestKey?: string
 }
 
 // ==================== Base URL 辅助函数 ====================
@@ -115,14 +117,15 @@ function addPending(config: InternalRequestConfig): void {
     }
     const controller = new AbortController()
     config.signal = controller.signal
+    config._requestKey = key
     pendingMap.set(key, {
         controller,
         hasLoading: config.requestOptions?.loading ?? false,
     })
 }
 
-function removePending(config: InternalAxiosRequestConfig): void {
-    pendingMap.delete(buildRequestKey(config))
+function removePending(config: InternalRequestConfig): void {
+    pendingMap.delete(config._requestKey ?? buildRequestKey(config))
 }
 
 // ==================== Axios 实例 ====================
@@ -174,7 +177,7 @@ instance.interceptors.response.use(
         const config = response.config as InternalRequestConfig
         const opts = config.requestOptions ?? {}
 
-        removePending(response.config)
+        removePending(config)
         if (opts.loading) hideLoading()
 
         if (response.data.code !== 0) {
@@ -202,7 +205,7 @@ instance.interceptors.response.use(
         const opts = config?.requestOptions ?? {}
 
         if (config) {
-            removePending(error.config)
+            removePending(config)
             if (opts.loading) hideLoading()
         }
 
