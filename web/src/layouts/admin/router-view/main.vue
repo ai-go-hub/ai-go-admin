@@ -15,10 +15,11 @@
 <script setup lang="ts">
 import { nextTick, onBeforeMount, onMounted, onUnmounted, reactive, watch } from 'vue'
 import { useRoute, type RouteLocationNormalized } from 'vue-router'
+import { useGlobalProperties } from '/@/hooks/useGlobalProperties'
 import { useConfig } from '/@/stores/config'
 import { useNavTab } from '/@/stores/navTab'
 import { layoutMainScrollbarRef, layoutMainScrollbarStyle } from '/@/stores/ref'
-import { getGlobalProperties, getMenuDataByRoute } from '/@/utils/common'
+import { getMenuDataByRoute } from '/@/utils/common'
 
 defineOptions({
     name: 'layout/main',
@@ -27,7 +28,7 @@ defineOptions({
 const route = useRoute()
 const config = useConfig()
 const navTab = useNavTab()
-const globalProperties = getGlobalProperties()!
+const globalProperties = useGlobalProperties()!
 
 const state: {
     componentKey: string

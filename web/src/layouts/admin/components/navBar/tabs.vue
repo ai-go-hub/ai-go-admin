@@ -26,11 +26,11 @@ import { useI18n } from 'vue-i18n'
 import { onBeforeRouteUpdate, useRoute, useRouter, type RouteLocationNormalized } from 'vue-router'
 import Contextmenu from '/@/components/contextmenu/index.vue'
 import type { ContextMenuItem, ContextMenuItemClickEmitArg } from '/@/components/contextmenu/interface'
+import { useGlobalProperties } from '/@/hooks/useGlobalProperties'
 import { adminBaseRoutePath } from '/@/router/static/adminBase'
 import { useConfig } from '/@/stores/config'
 import { useMenu } from '/@/stores/menu'
 import { useNavTab } from '/@/stores/navTab'
-import { getGlobalProperties } from '/@/utils/common'
 import horizontalScroll from '/@/utils/horizontalScroll'
 import { getFirstMenu } from '/@/utils/router'
 
@@ -41,7 +41,7 @@ const navTab = useNavTab()
 const router = useRouter()
 const menuStore = useMenu()
 
-const globalProperties = getGlobalProperties()!
+const globalProperties = useGlobalProperties()!
 const tabsRefs = useTemplateRefsList<HTMLDivElement>()
 const contextmenuRef = useTemplateRef('contextmenuRef')
 const tabScrollbarRef = useTemplateRef('tabScrollbarRef')

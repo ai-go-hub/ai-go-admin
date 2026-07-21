@@ -1,5 +1,4 @@
 import { camelCase, snakeCase, trimStart } from 'lodash-es'
-import { getCurrentInstance } from 'vue'
 import { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
 import router from '/@/router/index'
 import { adminBaseRoutePath } from '/@/router/static/adminBase'
@@ -60,22 +59,6 @@ export function auth(node: string | { name: string; subNodeName?: string }) {
         if (!node.subNodeName || menu.authNode.get(node.name)?.includes(node.subNodeName)) return true
     }
     return false
-}
-
-/**
- * 获取 globalProperties 对象
- */
-export const getGlobalProperties = () => {
-    if (!getCurrentInstance()) {
-        throw new Error('getGlobalProperties() can only be used inside setup() or functional components!')
-    }
-    const instance = getCurrentInstance()
-    if (instance) {
-        const { appContext } = instance
-        return appContext.config.globalProperties
-    } else {
-        return null
-    }
 }
 
 /**
