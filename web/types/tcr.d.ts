@@ -6,6 +6,7 @@ type TableCellRenderer =
     | 'color'
     | 'customRender'
     | 'customTemplate'
+    | 'datetime'
     | 'icon'
     | 'image'
     | 'images'

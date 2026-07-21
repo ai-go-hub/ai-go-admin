@@ -64,8 +64,12 @@ declare global {
         /**
          * 单元格渲染器需要的其他任意自定义数据
          * 1. render=tag 时，可单独指定每个不同的值 tag 的 type 属性 { open: 'success', close: 'info', disable: 'danger' }
+         * 2. render=datetime 时，可指定时间日期的格式化模板（dayjs().format 模板，如 { format: 'YYYY-MM-DD HH:mm:ss' }）
          */
-        custom?: any
+        custom?: {
+            format?: string
+            [key: string]: any
+        }
 
         // 默认值（单元格值为 undefined,null,'' 时取默认值，仅使用了 render 时有效）
         default?: any
