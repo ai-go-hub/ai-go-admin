@@ -211,7 +211,7 @@
                             </el-form-item>
 
                             <el-form-item :label="t('layouts.sideMenuDefaultIcon')">
-                                <IconSelector
+                                <IconSelect
                                     @change="onCommitMenuDefaultIcon($event, 'menuDefaultIcon')"
                                     :model-value="configStore.layout.menuDefaultIcon"
                                 />
@@ -369,7 +369,7 @@
 import { nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import IconSelector from '/@/components/agInput/components/iconSelector.vue'
+import IconSelect from '/@/components/agInput/components/iconSelect.vue'
 import { useDark } from '/@/hooks/useDark'
 import DarkSwitch from '/@/layouts/common/components/darkSwitch.vue'
 import { useConfig } from '/@/stores/config'
