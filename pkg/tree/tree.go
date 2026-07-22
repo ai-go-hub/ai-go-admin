@@ -3,8 +3,6 @@ package tree
 import (
 	"strings"
 	"unicode/utf8"
-
-	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 )
 
 // Build 根据 id 与 pid 字段将扁平数据组装为带 children 的树状结构
@@ -24,7 +22,7 @@ func Build(data []map[string]any, idField, pidField, childrenField string) []map
 	for _, item := range data {
 		id := item[idField]
 		pid, hasPid := item[pidField]
-		if !hasPid || util.IsZero(pid) || pid == id {
+		if !hasPid || pid == nil || pid == "" || pid == 0 || pid == id {
 			roots = append(roots, item)
 			continue
 		}
@@ -61,7 +59,7 @@ func Render(data []map[string]any, idField, pidField, titleField string) []map[s
 	for _, item := range data {
 		id := item[idField]
 		pid, hasPid := item[pidField]
-		if !hasPid || util.IsZero(pid) || pid == id {
+		if !hasPid || pid == nil || pid == "" || pid == 0 || pid == id {
 			roots = append(roots, item)
 			continue
 		}

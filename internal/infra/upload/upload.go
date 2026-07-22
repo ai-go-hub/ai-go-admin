@@ -167,7 +167,7 @@ func (s *Service) FormatFilename(tpl, filename, topic string, data []byte) strin
 		"{mon}":   fmt.Sprintf("%02d", int(now.Month())),
 		"{day}":   fmt.Sprintf("%02d", now.Day()),
 		// 文件名称最多保留前 15 个字符（按 rune 截断，兼容中文）
-		"{fileName}": util.TruncateString(sanitize(filesystem.TrimExt(filename)), 15),
+		"{fileName}": util.TruncateStr(sanitize(filesystem.TrimExt(filename)), 15),
 		"{fileSha1}": sha1HexOf(data),
 		"{.suffix}":  "." + filesystem.Extension(filename),
 	}
