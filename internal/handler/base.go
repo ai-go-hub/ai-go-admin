@@ -25,11 +25,11 @@ type Handler[T any] struct {
 
 // ListRequest 列表查询请求体
 type ListRequest struct {
-	Page   int             `json:"page"`
-	Limit  int             `json:"limit"`
-	Sort   string          `json:"sort"`
-	Order  string          `json:"order"`
-	Wheres []service.Where `json:"wheres"`
+	Page   int             `json:"page"`   // 页码
+	Limit  int             `json:"limit"`  // 每页条数
+	Sort   string          `json:"sort"`   // 排序字段
+	Order  string          `json:"order"`  // 排序方式
+	Wheres []service.Where `json:"wheres"` // 查询条件
 }
 
 // DeleteRequest 批量删除请求体

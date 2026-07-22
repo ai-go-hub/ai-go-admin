@@ -70,3 +70,16 @@ export function upload(params: UploadParams, config?: AxiosRequestConfig) {
         ...(config ?? {}),
     })
 }
+
+// ==================== 远程下拉 ====================
+
+/**
+ * 请求远程下拉框数据
+ */
+export function selectList(listURL: string, data: AnyObj = {}) {
+    return request({
+        url: listURL,
+        method: 'POST',
+        data,
+    })
+}

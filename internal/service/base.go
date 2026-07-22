@@ -109,10 +109,8 @@ func (s *Service[T]) BuildScopes(opts Options) []func(*gorm.Statement) {
 	}
 
 	// 构建 Paginate scope
-	if opts.Page > 0 && opts.Limit > 0 {
-		if s := BuildPaginateScope(opts.Page, opts.Limit); s != nil {
-			scopes = append(scopes, s)
-		}
+	if s := BuildPaginateScope(opts.Page, opts.Limit); s != nil {
+		scopes = append(scopes, s)
 	}
 	return scopes
 }
@@ -140,8 +138,8 @@ func BuildPaginateScope(page, limit int) func(*gorm.Statement) {
 	if page < 1 {
 		page = 1
 	}
-	if limit > 200 {
-		limit = 200
+	if limit < 1 {
+		limit = 10
 	}
 	offset := (page - 1) * limit
 	return func(stmt *gorm.Statement) {
