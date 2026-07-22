@@ -40,7 +40,7 @@
                     >
                         <el-tooltip placement="right" effect="light" v-if="!isEmpty(tooltipParams)">
                             <template #content>
-                                <p v-for="(tooltipParam, key) in tooltipParams" :key="key">{{ key }}: {{ item[tooltipParam] }}</p>
+                                <p v-for="(pItem, pKey) in tooltipParams" :key="pKey">{{ pItem }}: {{ item[pKey] }}</p>
                             </template>
                             <div>{{ item[field] }}</div>
                         </el-tooltip>
@@ -77,7 +77,7 @@ interface Props extends /* @vue-ignore */ ElSelectProps {
     remoteSearchFields?: string[]
     modelValue: ValueTypes | null
     pagination?: boolean | PaginationProps
-    tooltipParams?: AnyObj
+    tooltipParams?: Record<string, string>
     labelFormatter?: (optionData: AnyObj, optionKey: string) => string
     // 按下 ESC 键时直接使下拉框脱焦（默认是清理搜索词或关闭下拉面板，并且不会脱焦，造成 dialog 的按下 ESC 关闭失效）
     escBlur?: boolean
