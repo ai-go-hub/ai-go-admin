@@ -5,7 +5,6 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/handler"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
-	"github.com/ai-go-hub/ai-go-admin/internal/service"
 	svcAuth "github.com/ai-go-hub/ai-go-admin/internal/service/admin/auth"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +21,7 @@ type AuthAdminHandler struct {
 func NewAuthAdminHandler(svc *svcAuth.AuthAdminService) *AuthAdminHandler {
 	return &AuthAdminHandler{
 		Handler: handler.NewHandler(svc,
-			handler.WithOmitFields(handler.OmitFields{
+			handler.WithOmitFields(handler.ActionFields{
 				// 创建时忽略以下字段不入库
 				Create: []string{"id", "login_failure", "last_login_at", "last_login_ip", "deleted_at"},
 			}),
@@ -45,10 +44,7 @@ func (h *AuthAdminHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := h.svc.Create(c, entity, service.Options{
-		Omit:   h.Config().Omit.Create,
-		Select: h.Config().Select.Create,
-	}); err != nil {
+	if err := h.svc.Create(c, entity, h.BuildSerOpts(c, "Create", handler.Request{})); err != nil {
 		httpx.Fail(c, httpx.WithMessage("创建失败: "+err.Error()))
 		return
 	}
@@ -72,10 +68,11 @@ func (h *AuthAdminHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if err := h.svc.Update(c, pk, entity, service.Options{
-		Omit:   h.Config().Omit.Update,
-		Select: h.Config().Select.Update,
-	}); err != nil {
+	opts := h.BuildSerOpts(c, "Update", handler.Request{
+		PrimaryKeyValue: pk,
+	})
+
+	if err := h.svc.Update(c, &entity, opts); err != nil {
 		httpx.Fail(c, httpx.WithMessage("更新失败: "+err.Error()))
 		return
 	}

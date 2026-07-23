@@ -18,15 +18,18 @@ type Where struct {
 }
 
 // Options 通用服务操作选项
+// 每个方法所需要的选项都可以在此找到，但并非每个方法都会使用全部的选项
 type Options struct {
-	Omit       []string // 排除出入库字段，会传递给仓储层的 Omit 方法
-	Select     []string // 选择出入库字段，会传递给仓储层的 Select 方法
-	Wheres     []Where  // 查询条件，用于构建 WhereScopes，然后传递给仓储层的 Scopes 方法
-	SortField  string   // 排序字段，用于构建 OrderScope
-	SortOrder  string   // 排序方式
-	Page       int      // 页码，用于构建 PaginateScope
-	Limit      int      // 每页条数
-	PrimaryKey string   // 主键值，可辅助仓储层的 Get 方法获取数据行
+	OmitFields       []string // 排除出入库字段，会传递给仓储层的 Omit 方法
+	SelectFields     []string // 选择出入库字段，会传递给仓储层的 Select 方法
+	Wheres           []Where  // 查询条件，用于构建 WhereScopes，然后传递给仓储层的 Scopes 方法
+	SortField        string   // 排序字段，用于构建 OrderScope
+	SortOrder        string   // 排序方式
+	Page             int      // 页码，用于构建 PaginateScope
+	Limit            int      // 每页条数
+	PrimaryKeyValue  string   // 主键值，目前可供 Get、Update 方法获取数据行
+	PrimaryKeyValues []string // 主键切片，目前可供 Delete 方法批量删除行
+	Extension        any      // 任意自定义扩展参数
 }
 
 // IService 通用服务接口
@@ -35,9 +38,9 @@ type IService[T any] interface {
 	Get(c *gin.Context, opts Options) (*T, error)
 	List(c *gin.Context, opts Options) ([]T, error)
 	Count(c *gin.Context, opts Options) (int64, error)
-	Update(c *gin.Context, pk string, entity T, opts Options) error
-	Delete(c *gin.Context, pks []string) error
-	ToRepoOptions(opts Options) repository.Options
+	Update(c *gin.Context, entity *T, opts Options) error
+	Delete(c *gin.Context, opts Options) error
+	BuildRepoOpts(opts Options) repository.Options
 	BuildScopes(opts Options) []func(*gorm.Statement)
 }
 
@@ -51,51 +54,53 @@ func NewService[T any](repo repository.IRepository[T]) IService[T] {
 	return &Service[T]{repo: repo}
 }
 
-// ToRepoOptions 将业务层选项转换为仓储层选项，内部构建 Scopes 等
-func (s *Service[T]) ToRepoOptions(opts Options) repository.Options {
-	return repository.Options{
-		Omit:       opts.Omit,
-		Select:     opts.Select,
-		Scopes:     s.BuildScopes(opts),
-		PrimaryKey: opts.PrimaryKey,
-	}
-}
-
 // Create 创建记录
 func (s *Service[T]) Create(c *gin.Context, entity *T, opts Options) error {
-	return s.repo.Create(c, entity, s.ToRepoOptions(opts))
+	return s.repo.Create(c, entity, s.BuildRepoOpts(opts))
 }
 
 // Get 查询单条记录
 func (s *Service[T]) Get(c *gin.Context, opts Options) (*T, error) {
-	return s.repo.Get(c, s.ToRepoOptions(opts))
+	return s.repo.Get(c, s.BuildRepoOpts(opts))
 }
 
 // List 查询全部记录
 func (s *Service[T]) List(c *gin.Context, opts Options) ([]T, error) {
-	return s.repo.List(c, s.ToRepoOptions(opts))
+	return s.repo.List(c, s.BuildRepoOpts(opts))
 }
 
 // Count 统计满足过滤条件的记录总数
 func (s *Service[T]) Count(c *gin.Context, opts Options) (int64, error) {
-	// 只传递 Where scopes
+	// 只传递 Where scopes，忽略排序、分页等
 	return s.repo.Count(c, repository.Options{
 		Scopes: BuildWhereScopes(opts.Wheres),
 	})
 }
 
 // Update 根据主键更新记录
-func (s *Service[T]) Update(c *gin.Context, pk string, entity T, opts Options) error {
-	return s.repo.Update(c, pk, entity, s.ToRepoOptions(opts))
+func (s *Service[T]) Update(c *gin.Context, entity *T, opts Options) error {
+	return s.repo.Update(c, entity, s.BuildRepoOpts(opts))
 }
 
 // Delete 根据主键批量删除记录
-func (s *Service[T]) Delete(c *gin.Context, pks []string) error {
-	return s.repo.Delete(c, pks)
+func (s *Service[T]) Delete(c *gin.Context, opts Options) error {
+	return s.repo.Delete(c, s.BuildRepoOpts(opts))
 }
 
-// BuildScopes 统一组装过滤条件、排序、分页 Scope
+// BuildRepoOpts 构建仓储层选项数据
+func (s *Service[T]) BuildRepoOpts(opts Options) repository.Options {
+	return repository.Options{
+		OmitFields:       opts.OmitFields,
+		SelectFields:     opts.SelectFields,
+		Scopes:           s.BuildScopes(opts),
+		PrimaryKeyValue:  opts.PrimaryKeyValue,
+		PrimaryKeyValues: opts.PrimaryKeyValues,
+	}
+}
+
+// BuildScopes 统一组装过滤条件、排序、分页 Scopes
 func (s *Service[T]) BuildScopes(opts Options) []func(*gorm.Statement) {
+	// 构建 Where scopes
 	scopes := BuildWhereScopes(opts.Wheres)
 
 	// 构建 Order scope

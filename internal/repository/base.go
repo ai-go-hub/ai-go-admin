@@ -10,12 +10,14 @@ import (
 	"gorm.io/gorm"
 )
 
-// Options 通用仓库操作选项（各选项可按需使用）
+// Options 通用仓库操作选项
+// 每个方法所需要的选项都可以在此找到，但并非每个方法都会使用全部的选项
 type Options struct {
-	Omit       []string                // 排除出入库字段，将在 Create、Update、List 等方法中应用至 GORM 的 Select 方法
-	Select     []string                // 选择出入库字段，其余同上
-	Scopes     []func(*gorm.Statement) // 将在 List 和 Get 等方法中直接传递给 GORM 的 Scopes 方法，可以自定义 查询、排序、分页 等等
-	PrimaryKey string                  // 主键值，提供则会在 Get 方法中作为 Where 的参数
+	Scopes           []func(*gorm.Statement) // 将在 Get 和 List 等方法中直接传递给 GORM 的 Scopes 方法，可以自定义 查询、排序、分页 等等
+	OmitFields       []string                // 排除出入库字段，将在 Create、Update、List 等方法中应用至 GORM 的 Select 方法
+	SelectFields     []string                // 选择出入库字段，其余同上
+	PrimaryKeyValue  string                  // 主键值，目前可辅助 Get、Update 方法获取数据行
+	PrimaryKeyValues []string                // 主键切片，目前可供 Delete 方法批量删除行
 }
 
 // IRepository 通用仓库接口
@@ -24,8 +26,8 @@ type IRepository[T any] interface {
 	Get(c *gin.Context, opts Options) (*T, error)
 	List(c *gin.Context, opts Options) ([]T, error)
 	Count(c *gin.Context, opts Options) (int64, error)
-	Update(c *gin.Context, pk string, entity T, opts Options) error
-	Delete(c *gin.Context, pks []string) error
+	Update(c *gin.Context, entity *T, opts Options) error
+	Delete(c *gin.Context, opts Options) error
 	PrimaryKeyField() (string, error)       // 获取主键字段
 	FieldExists(field string) (bool, error) // 检查一个字段是否存在
 }
@@ -75,12 +77,21 @@ func (r *Repository[T]) DB() *gorm.DB {
 func (r *Repository[T]) Create(c *gin.Context, entity *T, opts Options) error {
 	var q gorm.CreateInterface[T] = gorm.G[T](r.DB())
 
-	// 入库字段的选择与忽略
-	if len(opts.Select) > 0 {
-		q = q.Select(strings.Join(opts.Select, ","))
+	// 入库字段的选择
+	if len(opts.SelectFields) > 0 {
+		q = q.Select(strings.Join(opts.SelectFields, ","))
 	}
-	if len(opts.Omit) > 0 {
-		q = q.Omit(opts.Omit...)
+
+	// 入库字段的忽略，未设置则忽略主键字段
+	omitFields := opts.OmitFields
+	if len(omitFields) == 0 {
+		pk, _ := r.PrimaryKeyField()
+		if pk != "" {
+			omitFields = append(omitFields, pk)
+		}
+	}
+	if len(omitFields) > 0 {
+		q = q.Omit(omitFields...)
 	}
 
 	return q.Create(c.Request.Context(), entity)
@@ -91,20 +102,20 @@ func (r *Repository[T]) Get(c *gin.Context, opts Options) (*T, error) {
 	q := gorm.G[T](r.DB()).Scopes(opts.Scopes...)
 
 	// 有提供主键
-	if opts.PrimaryKey != "" {
+	if opts.PrimaryKeyValue != "" {
 		pk, err := r.PrimaryKeyField()
 		if err != nil {
 			return nil, err
 		}
-		q = q.Where(pk+" = ?", opts.PrimaryKey)
+		q = q.Where(pk+" = ?", opts.PrimaryKeyValue)
 	}
 
 	// 出库字段的选择与忽略
-	if len(opts.Select) > 0 {
-		q = q.Select(strings.Join(opts.Select, ","))
+	if len(opts.SelectFields) > 0 {
+		q = q.Select(strings.Join(opts.SelectFields, ","))
 	}
-	if len(opts.Omit) > 0 {
-		q = q.Omit(opts.Omit...)
+	if len(opts.OmitFields) > 0 {
+		q = q.Omit(opts.OmitFields...)
 	}
 
 	entity, err := q.First(c.Request.Context())
@@ -119,11 +130,11 @@ func (r *Repository[T]) List(c *gin.Context, opts Options) ([]T, error) {
 	q := gorm.G[T](r.DB()).Scopes(opts.Scopes...)
 
 	// 出库字段的选择与忽略
-	if len(opts.Select) > 0 {
-		q = q.Select(strings.Join(opts.Select, ","))
+	if len(opts.SelectFields) > 0 {
+		q = q.Select(strings.Join(opts.SelectFields, ","))
 	}
-	if len(opts.Omit) > 0 {
-		q = q.Omit(opts.Omit...)
+	if len(opts.OmitFields) > 0 {
+		q = q.Omit(opts.OmitFields...)
 	}
 
 	return q.Find(c.Request.Context())
@@ -139,33 +150,33 @@ func (r *Repository[T]) Count(c *gin.Context, opts Options) (int64, error) {
 }
 
 // Update 根据主键更新记录
-func (r *Repository[T]) Update(c *gin.Context, pk string, entity T, opts Options) error {
+func (r *Repository[T]) Update(c *gin.Context, entity *T, opts Options) error {
 	pkField, err := r.PrimaryKeyField()
 	if err != nil {
 		return err
 	}
 
-	q := gorm.G[T](r.DB()).Where(pkField+" = ?", pk)
+	q := gorm.G[T](r.DB()).Where(pkField+" = ?", opts.PrimaryKeyValue)
 
 	// 入库字段的选择与忽略
-	if len(opts.Select) > 0 {
-		q = q.Select(strings.Join(opts.Select, ","))
+	if len(opts.SelectFields) > 0 {
+		q = q.Select(strings.Join(opts.SelectFields, ","))
 	}
-	if len(opts.Omit) > 0 {
-		q = q.Omit(opts.Omit...)
+	if len(opts.OmitFields) > 0 {
+		q = q.Omit(opts.OmitFields...)
 	}
 
-	_, err = q.Updates(c.Request.Context(), entity)
+	_, err = q.Updates(c.Request.Context(), *entity)
 	return err
 }
 
 // Delete 根据主键批量删除记录
-func (r *Repository[T]) Delete(c *gin.Context, pks []string) error {
+func (r *Repository[T]) Delete(c *gin.Context, opts Options) error {
 	pkField, err := r.PrimaryKeyField()
 	if err != nil {
 		return err
 	}
-	_, err = gorm.G[T](r.DB()).Where(pkField+" IN ?", pks).Delete(c.Request.Context())
+	_, err = gorm.G[T](r.DB()).Where(pkField+" IN ?", opts.PrimaryKeyValues).Delete(c.Request.Context())
 	return err
 }
 

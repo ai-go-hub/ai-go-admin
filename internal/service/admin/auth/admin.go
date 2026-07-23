@@ -53,15 +53,16 @@ func (s *AuthAdminService) Create(c *gin.Context, entity *model.Admin, opts serv
 
 // Update 覆写通用更新方法: 用户名唯一校验 + 密码为空时跳过更新，非空则加密
 // 依赖 GORM struct 更新时会跳过零值字段的特性，因此密码为空不会覆盖旧值
-func (s *AuthAdminService) Update(c *gin.Context, pk string, entity model.Admin, opts service.Options) error {
-	if entity.Username != "" {
-		existing, err := s.repo.FindByUsername(c, entity.Username)
-		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
-		if existing != nil && strconv.FormatUint(uint64(existing.ID), 10) != pk {
-			return errors.New("用户名已存在")
-		}
+func (s *AuthAdminService) Update(c *gin.Context, entity *model.Admin, opts service.Options) error {
+	if entity.Username == "" {
+		return errors.New("用户名不能为空")
+	}
+	userNameExist, err := s.repo.FindByUsername(c, entity.Username)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+	if userNameExist != nil && strconv.FormatUint(uint64(userNameExist.ID), 10) != opts.PrimaryKeyValue {
+		return errors.New("用户名已存在")
 	}
 
 	if entity.Password != "" {
@@ -72,5 +73,5 @@ func (s *AuthAdminService) Update(c *gin.Context, pk string, entity model.Admin,
 		entity.Password = string(hashed)
 	}
 
-	return s.IService.Update(c, pk, entity, opts)
+	return s.IService.Update(c, entity, opts)
 }
