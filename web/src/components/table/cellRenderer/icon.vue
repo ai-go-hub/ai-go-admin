@@ -1,8 +1,10 @@
 <template>
     <div>
         <Icon
-            color="var(--el-text-color-primary)"
+            v-if="props.cellValue"
+            :size="18"
             :name="props.cellValue"
+            color="var(--el-text-color-primary)"
             v-bind="invokeTableContextDataFun(columnConfig.customRenderAttr?.icon, { row, columnConfig, column, cellValue, index })"
         />
     </div>
