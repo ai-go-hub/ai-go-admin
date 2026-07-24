@@ -11,12 +11,12 @@ import (
 // RegisterBaseRoutes 注册通用 CRUD 路由
 // 只使用 GET、POST，不使用 PUT、DELETE 等请求方式（除 GET/POST 外的请求方式，在国内的 CDN/全站加速 等场景兼容性极差）
 func RegisterBaseRoutes(h IHandler, group *gin.RouterGroup) {
-	group.POST("/list", h.List, middleware.AdminAuth())
-	group.POST("/create", h.Create, middleware.AdminAuth())
-	group.POST("/delete", h.Delete, middleware.AdminAuth())
+	group.POST("/list", middleware.AdminAuth(), h.List)
+	group.POST("/create", middleware.AdminAuth(), h.Create)
+	group.POST("/delete", middleware.AdminAuth(), h.Delete)
 
-	group.GET("/get/:pk", h.Get, middleware.AdminAuth())
-	group.POST("/update/:pk", h.Update, middleware.AdminAuth())
+	group.GET("/get/:pk", middleware.AdminAuth(), h.Get)
+	group.POST("/update/:pk", middleware.AdminAuth(), h.Update)
 }
 
 // IHandler 通用控制器接口
