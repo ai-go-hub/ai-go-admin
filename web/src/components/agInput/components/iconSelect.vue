@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="w100">
         <el-popover :placement="placement" trigger="focus" :hide-after="0" :width="state.selectWidth" :visible="state.popoverVisible">
             <div @mouseover.stop="state.iconSelectMouseover = true" @mouseout.stop="state.iconSelectMouseover = false" class="icon-select">
                 <div class="icon-select-box">
