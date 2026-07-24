@@ -93,6 +93,7 @@ const tableManager = useTableManager({
         },
     },
 })
+tableManager.initCtx()
 tableManager.getData()
 </script>
 

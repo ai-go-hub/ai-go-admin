@@ -390,9 +390,11 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
     }
 
     /**
-     * 初始化表格拖动排序
+     * 初始化表格拖动排序，按使用场景和需要手动调用
+     * 1. 需要在 getData（获取表格数据）的回调函数中调用，即表格数据加载完成之前调用无效
+     * 2. 需要在 onMounted 回调函数内调用，即在表格渲染出来之前调用无效
      */
-    const dragSort = () => {
+    const initDragSort = () => {
         const buttonsKey = getArrayKey(table.column, 'render', 'buttons')
         if (buttonsKey === false) return
         const moveButton = getArrayKey(table.column[buttonsKey].buttons!, 'render', 'sort')
@@ -628,10 +630,13 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
     }
 
     /**
-     * 表格初始化
+     * 表格管家的基础上下文初始化，按使用场景和需要手动调用
+     * 1. 记录表格的路由路径
+     * 2. 初始化公共搜索表单和字段数据
+     * 3. 从 URL 读取公共搜索默认值
      */
-    const mount = () => {
-        if (runBefore('mount') === false) return
+    const initCtx = () => {
+        if (runBefore('initCtx') === false) return
 
         // 记录表格的路由路径
         const route = useRoute()
@@ -649,12 +654,7 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
             // 获取公共搜索数据合并至表格筛选条件
             setFilterWheres(getComSearchData(), 'merge')
         }
-
-        // 初始化拖拽排序
-        dragSort()
     }
-
-    mount()
 
     return {
         opts,
@@ -664,12 +664,14 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
         api: opts.api,
         del,
         auth,
+        initCtx,
         getData,
         refresh,
         toggleForm,
         submitForm,
         getEditData,
         handleEvent,
+        initDragSort,
         getSelectionPKs,
         setFilterWheres,
         setComSearchData,

@@ -344,11 +344,13 @@ declare global {
         del: (pks: string[]) => void
         auth: (node: string) => boolean
         refresh: (custom: AnyObj) => void
+        initCtx: () => void
         getData: () => Promise<void> | undefined
         submitForm: (formEl?: FormInstance | null) => void
         toggleForm: (operate = '', operatePKs: string[] = []) => void
         handleEvent: (event: TableEventName, data: AnyObj) => boolean | undefined
         getEditData: (pk: string) => Promise<void> | undefined
+        initDragSort: () => void
         getSelectionPKs: () => string[]
         setComSearchData: (query: AnyObj) => void
         getComSearchData: () => ComSearchData[]
@@ -434,9 +436,9 @@ declare global {
         tableEvent?: ({ event, data }: { event: TableEventName; data: AnyObj }) => boolean | void
 
         /**
-         * 表格初始化前钩子
+         * 表格上下文数据初始化前钩子
          */
-        mount?: () => boolean | void
+        initCtx?: () => boolean | void
 
         // 可自定义其他钩子
         [key: string]: Function | undefined
