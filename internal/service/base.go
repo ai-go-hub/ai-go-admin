@@ -103,14 +103,21 @@ func (s *Service[T]) BuildScopes(opts Options) []func(*gorm.Statement) {
 	// 构建 Where scopes
 	scopes := BuildWhereScopes(opts.Wheres)
 
-	// 构建 Order scope
-	// 排序字段使用 FieldExists 校验，不存在的字段静默不排序
-	if opts.SortField != "" {
-		if exists, _ := s.repo.FieldExists(opts.SortField); exists {
-			if s := BuildOrderScope(opts.SortField, opts.SortOrder); s != nil {
-				scopes = append(scopes, s)
-			}
+	// 主键
+	pkField, _ := s.repo.PrimaryKeyField()
+
+	// 校验用户传入的排序字段是否存在
+	sortField := opts.SortField
+	if sortField != "" {
+		sortFieldExists, err := s.repo.FieldExists(sortField)
+		if !sortFieldExists || err != nil {
+			sortField = ""
 		}
+	}
+
+	// 构建 Order scope（始终包含主键 DESC 托底作为有序保证）
+	if s := BuildOrderScope(sortField, opts.SortOrder, pkField); s != nil {
+		scopes = append(scopes, s)
 	}
 
 	// 构建 Paginate scope
@@ -121,19 +128,34 @@ func (s *Service[T]) BuildScopes(opts Options) []func(*gorm.Statement) {
 }
 
 // BuildOrderScope 构建排序 Scope
-func BuildOrderScope(sortField, sortOrder string) func(*gorm.Statement) {
-	field := strings.TrimSpace(sortField)
-	if field == "" {
+// 用户排序优先，主键 DESC 托底作为有序保证，确保分页结果稳定
+func BuildOrderScope(sortField, sortOrder, pkField string) func(*gorm.Statement) {
+	var clauses []string
+
+	// 用户排序优先
+	if field := strings.TrimSpace(sortField); field != "" {
+		switch strings.ToLower(strings.TrimSpace(sortOrder)) {
+		case "desc":
+			clauses = append(clauses, field+" DESC")
+		default:
+			clauses = append(clauses, field+" ASC")
+		}
+	}
+
+	// 主键托底排序，避免分页结果因排序不稳定而重复或遗漏
+	// 数据库一般不保证排序，即先查到哪行就输出哪行且不保证多次相同查询中的输出顺序
+	if pkField != "" {
+		clauses = append(clauses, pkField+" DESC")
+	}
+
+	if len(clauses) == 0 {
 		return nil
 	}
-	switch strings.ToLower(strings.TrimSpace(sortOrder)) {
-	case "desc":
-		field += " DESC"
-	default:
-		field += " ASC"
-	}
+
 	return func(stmt *gorm.Statement) {
-		stmt.Order(field)
+		for _, c := range clauses {
+			stmt.Order(c)
+		}
 	}
 }
 
