@@ -1,6 +1,9 @@
 package service
 
 import (
+	"errors"
+	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/ai-go-hub/ai-go-admin/internal/repository"
@@ -40,6 +43,7 @@ type IService[T any] interface {
 	Count(c *gin.Context, opts Options) (int64, error)
 	Update(c *gin.Context, entity *T, opts Options) error
 	Delete(c *gin.Context, opts Options) error
+	Sort(c *gin.Context, opts Options, move, target, direction string, weigh int64) error
 	BuildRepoOpts(opts Options) repository.Options
 	BuildScopes(opts Options) []func(*gorm.Statement)
 }
@@ -87,6 +91,132 @@ func (s *Service[T]) Delete(c *gin.Context, opts Options) error {
 	return s.repo.Delete(c, s.BuildRepoOpts(opts))
 }
 
+// Sort 排序，
+// 使用 `增量重排法` 或叫 `区间位移法`（而不是交换法）
+func (s *Service[T]) Sort(c *gin.Context, opts Options, move, target, direction string, weigh int64) error {
+	pkField, err := s.repo.PrimaryKeyField()
+	if err != nil {
+		return err
+	}
+
+	weighField := strings.TrimSpace(opts.SortField)
+	if weighField == "" {
+		return errors.New("缺少排序字段")
+	}
+	if exists, _ := s.repo.FieldExists(weighField); !exists {
+		return errors.New("排序字段错误")
+	}
+
+	move = strings.TrimSpace(move)
+	target = strings.TrimSpace(target)
+	if move == "" || target == "" || move == target {
+		return errors.New("移动行和目标行必填且不能相同")
+	}
+
+	ctx := c.Request.Context()
+	db := s.repo.DB().WithContext(ctx)
+
+	// 波及行权重变化方向
+	// 用户排序方式 asc （权重值小的在前）: 向上拖 → 波及行权重 +1；向下拖 → 波及行权重 -1
+	// 用户排序方式 desc（权重值大的在前）: 向上拖 → 波及行权重 -1；向下拖 → 波及行权重 +1
+	sortOrderDesc := strings.EqualFold(strings.TrimSpace(opts.SortOrder), "desc")
+
+	updateOp := "-"
+	if (sortOrderDesc && direction == "down") || (!sortOrderDesc && direction == "up") {
+		updateOp = "+"
+	}
+
+	// 复用 BuildOrderScope，保证与列表排序规则一致
+	orderScope := s.BuildOrderScope(opts.SortField, opts.SortOrder)
+
+	// 构建过滤条件 scopes（与列表查询共享同一套筛选逻辑）
+	whereScopes := BuildWhereScopes(opts.Wheres)
+
+	// 将 func(*gorm.Statement) scopes 转为传统 API 的 func(*gorm.DB) 格式
+	// 后续需要使用 GORM 传统 API 的 Pluck 方法；不使用它则需要使用反射获取权重字段值等，更为复杂
+	stmtScopes := make([]func(*gorm.DB) *gorm.DB, 0, len(whereScopes)+1)
+	for _, scope := range whereScopes {
+		s := scope
+		stmtScopes = append(stmtScopes, func(tx *gorm.DB) *gorm.DB { s(tx.Statement); return tx })
+	}
+	if orderScope != nil {
+		stmtScopes = append(stmtScopes, func(tx *gorm.DB) *gorm.DB { orderScope(tx.Statement); return tx })
+	}
+
+	// 查询与目标行同权重的所有行主键
+	var weighIDsAny []any
+	if err := db.Model(new(T)).Scopes(stmtScopes...).Where(weighField+" = ?", weigh).Pluck(pkField, &weighIDsAny).Error; err != nil {
+		return err
+	}
+
+	// weighIDs 统一转字符串以便后续比较（避免 uint/int64/string 混杂时的类型不匹配）
+	weighIDs := make([]string, len(weighIDsAny))
+	for i, v := range weighIDsAny {
+		weighIDs[i] = fmt.Sprint(v)
+	}
+	weighRowsCount := len(weighIDs)
+
+	// 事务: 批量位移 + 单行增量重排
+	return db.Transaction(func(tx *gorm.DB) error {
+		gtx := gorm.G[T](tx).Scopes(whereScopes...)
+
+		// 一次 SQL 完成波及行的整体挪位
+		// dec（权重 −）: 波及 weigh < target 的行 → 再减，向下移位
+		// inc（权重 +）: 波及 weigh > target 的行 → 再加，向上移位
+		bulkOp := "<"
+		if updateOp == "+" {
+			bulkOp = ">"
+		}
+
+		if _, err := gtx.Where(weighField+" "+bulkOp+" ?", weigh).Where(pkField+" <> ?", move).
+			Update(ctx, weighField, gorm.Expr(weighField+" "+updateOp+" ?", weighRowsCount)); err != nil {
+			return err
+		}
+
+		// 向下拖动时反转，保证等权重区间内相对顺序不变
+		if direction == "down" {
+			slices.Reverse(weighIDs)
+		}
+
+		exprOffset := func(offset int) int64 {
+			if updateOp == "+" {
+				return weigh + int64(offset)
+			}
+			return weigh - int64(offset)
+		}
+
+		// 遍历等权重行，每匹配到一行时，权重再额外挪 1 位
+		moveComplete := 0
+		for i, rowID := range weighIDs {
+			// 跳过被拖动行本身（等权重区间内互拖时会出现）
+			if rowID == move {
+				continue
+			}
+
+			// 当前行相对目标权重的偏移
+			rowWeigh := exprOffset(i)
+
+			// 命中目标行: 将被拖动行放到此处
+			if rowID == target {
+				if _, err := gtx.Where(pkField+" = ?", move).Update(ctx, weighField, rowWeigh); err != nil {
+					return err
+				}
+				moveComplete = 1
+			}
+
+			// 目标行命中后，剩余等权重行的偏移额外 +1（腾出被拖动行的位置）
+			if moveComplete == 1 {
+				rowWeigh = exprOffset(i + moveComplete)
+			}
+
+			if _, err := gtx.Where(pkField+" = ?", rowID).Update(ctx, weighField, rowWeigh); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
 // BuildRepoOpts 构建仓储层选项数据
 func (s *Service[T]) BuildRepoOpts(opts Options) repository.Options {
 	return repository.Options{
@@ -103,20 +233,8 @@ func (s *Service[T]) BuildScopes(opts Options) []func(*gorm.Statement) {
 	// 构建 Where scopes
 	scopes := BuildWhereScopes(opts.Wheres)
 
-	// 主键
-	pkField, _ := s.repo.PrimaryKeyField()
-
-	// 校验用户传入的排序字段是否存在
-	sortField := opts.SortField
-	if sortField != "" {
-		sortFieldExists, err := s.repo.FieldExists(sortField)
-		if !sortFieldExists || err != nil {
-			sortField = ""
-		}
-	}
-
-	// 构建 Order scope（始终包含主键 DESC 托底作为有序保证）
-	if s := BuildOrderScope(sortField, opts.SortOrder, pkField); s != nil {
+	// 构建 Order scope
+	if s := s.BuildOrderScope(opts.SortField, opts.SortOrder); s != nil {
 		scopes = append(scopes, s)
 	}
 
@@ -129,21 +247,24 @@ func (s *Service[T]) BuildScopes(opts Options) []func(*gorm.Statement) {
 
 // BuildOrderScope 构建排序 Scope
 // 用户排序优先，主键 DESC 托底作为有序保证，确保分页结果稳定
-func BuildOrderScope(sortField, sortOrder, pkField string) func(*gorm.Statement) {
+func (s *Service[T]) BuildOrderScope(sortField, sortOrder string) func(*gorm.Statement) {
 	var clauses []string
 
-	// 用户排序优先
+	// 用户排序优先（校验字段是否存在，不存在的字段静默跳过）
 	if field := strings.TrimSpace(sortField); field != "" {
-		switch strings.ToLower(strings.TrimSpace(sortOrder)) {
-		case "desc":
-			clauses = append(clauses, field+" DESC")
-		default:
-			clauses = append(clauses, field+" ASC")
+		if exists, _ := s.repo.FieldExists(field); exists {
+			switch strings.ToLower(strings.TrimSpace(sortOrder)) {
+			case "desc":
+				clauses = append(clauses, field+" DESC")
+			default:
+				clauses = append(clauses, field+" ASC")
+			}
 		}
 	}
 
 	// 主键托底排序，避免分页结果因排序不稳定而重复或遗漏
 	// 数据库一般不保证排序，即先查到哪行就输出哪行且不保证多次相同查询中的输出顺序
+	pkField, _ := s.repo.PrimaryKeyField()
 	if pkField != "" {
 		clauses = append(clauses, pkField+" DESC")
 	}

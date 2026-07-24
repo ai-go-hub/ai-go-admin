@@ -22,6 +22,7 @@ type Options struct {
 
 // IRepository 通用仓库接口
 type IRepository[T any] interface {
+	DB() *gorm.DB
 	Create(c *gin.Context, entity *T, opts Options) error
 	Get(c *gin.Context, opts Options) (*T, error)
 	List(c *gin.Context, opts Options) ([]T, error)

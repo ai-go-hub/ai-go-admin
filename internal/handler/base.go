@@ -14,6 +14,7 @@ func RegisterBaseRoutes(h IHandler, group *gin.RouterGroup) {
 	group.POST("/list", middleware.AdminAuth(), h.List)
 	group.POST("/create", middleware.AdminAuth(), h.Create)
 	group.POST("/delete", middleware.AdminAuth(), h.Delete)
+	group.POST("/sort", middleware.AdminAuth(), h.Sort)
 
 	group.GET("/get/:pk", middleware.AdminAuth(), h.Get)
 	group.POST("/update/:pk", middleware.AdminAuth(), h.Update)
@@ -26,6 +27,7 @@ type IHandler interface {
 	Create(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
+	Sort(c *gin.Context)
 }
 
 // Handler 通用控制器
@@ -83,6 +85,15 @@ type ListRequest struct {
 // DeleteRequest 批量删除请求体
 type DeleteRequest struct {
 	PrimaryKeyValues []string `json:"pks" binding:"required,min=1"`
+}
+
+// SortRequest 拖动排序请求体
+type SortRequest struct {
+	Request
+	Move      string `json:"move" binding:"required"`                    // 被拖动行主键
+	Target    string `json:"target" binding:"required"`                  // 目标行主键
+	Direction string `json:"direction" binding:"required,oneof=up down"` // 拖动方向
+	Weigh     int64  `json:"weigh"`                                      // 目标行当前权重值
 }
 
 // WithAdapter 设置各动作的数据适配函数，可对数据进行额外加工
@@ -237,6 +248,23 @@ func (h *Handler[T]) Delete(c *gin.Context) {
 		PrimaryKeyValues: req.PrimaryKeyValues,
 	})); err != nil {
 		httpx.Fail(c, httpx.WithMessage("删除失败: "+err.Error()))
+		return
+	}
+
+	httpx.Success(c)
+}
+
+// Sort 拖动排序
+func (h *Handler[T]) Sort(c *gin.Context) {
+	var req SortRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
+		return
+	}
+
+	opts := h.BuildSerOpts(c, "Sort", req.Request)
+	if err := h.svc.Sort(c, opts, req.Move, req.Target, req.Direction, req.Weigh); err != nil {
+		httpx.Fail(c, httpx.WithMessage("调整排序失败: "+err.Error()))
 		return
 	}
 
