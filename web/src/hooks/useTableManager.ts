@@ -1,5 +1,5 @@
 import { dayjs, ElNotification, FormInstance } from 'element-plus'
-import { assign, cloneDeep, isArray, isEmpty, snakeCase } from 'lodash-es'
+import { assign, cloneDeep, defaults, isArray, isEmpty, snakeCase } from 'lodash-es'
 import Sortable from 'sortablejs'
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
@@ -48,6 +48,14 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
     const comSearch: ComSearchInterface = reactive({
         form: {},
         fieldData: new Map(),
+    })
+
+    // 初始化 opts，好处例如: 若 opts.before 未定义，则无法使用 opts.before!.getData 这种语法快速新增钩子
+    opts = defaults(opts, {
+        before: {},
+        after: {},
+        table: {},
+        form: {},
     })
 
     // 合并 opts
@@ -416,19 +424,33 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
             onEnd: (evt: Sortable.SortableEvent) => {
                 table.column[buttonsKey].buttons![moveButton].disabledTip = disabledTip
 
+                const dragSortWeighField = table.dragSortWeighField ? table.dragSortWeighField : 'weigh'
+                if (!table.filter?.sort || table.filter.sort != dragSortWeighField) {
+                    ElNotification({ type: 'error', message: i18n.global.t('common.dragSortWeighFieldError', { field: dragSortWeighField }) })
+                    return
+                }
+
                 // 目标位置不变
                 if (evt.oldIndex == evt.newIndex || typeof evt.newIndex == 'undefined' || typeof evt.oldIndex == 'undefined') return
 
                 // 找到对应行
                 const moveRow = findIndexRow(table.data!, evt.oldIndex) as TableRow
                 const targetRow = findIndexRow(table.data!, evt.newIndex) as TableRow
+                const targetWeigh = targetRow[dragSortWeighField]
+
+                if (targetWeigh === undefined || targetWeigh == null) {
+                    ElNotification({ type: 'error', message: i18n.global.t('common.dragSortTargetWeighError') })
+                    return
+                }
 
                 const eventData = {
-                    move: moveRow[table.pk!],
-                    target: targetRow[table.pk!],
+                    move: String(moveRow[table.pk!]),
+                    target: String(targetRow[table.pk!]),
                     sort: table.filter?.sort,
                     order: table.filter?.order,
+                    wheres: table.filter?.wheres,
                     direction: evt.newIndex > evt.oldIndex ? 'down' : 'up',
+                    weigh: targetWeigh,
                 }
 
                 if (table.dragSortLimitField && moveRow[table.dragSortLimitField] != targetRow[table.dragSortLimitField]) {

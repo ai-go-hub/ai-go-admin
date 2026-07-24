@@ -272,6 +272,8 @@ declare global {
         routePath?: string
         // 拖动排序限位字段，例如拖动行 pid=1，那么拖动目的行 pid 也需要为 1
         dragSortLimitField?: string
+        // 拖动排序权重字段，进行拖拽排序时，必需先以此字段排序，系统将修改此字段的值来完成新顺序落盘，留空则取 `weigh`
+        dragSortWeighField?: string
     }
 
     /**

@@ -32,6 +32,8 @@ delete: Delete
 cancel: Cancel
 deleteSelectedRecords: Are you sure you want to delete the selected records?
 beyondMovableRange: Cannot move outside the allowed range
+dragSortWeighFieldError: Sort by the {field} field before performing operations
+dragSortTargetWeighError: Invalid target weight
 reset: Reset
 to: To
 startDate: Start date

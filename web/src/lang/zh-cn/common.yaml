@@ -32,6 +32,8 @@ delete: 删除
 cancel: 取消
 deleteSelectedRecords: 确定删除选中记录？
 beyondMovableRange: 无法移出允许范围
+dragSortWeighFieldError: 在执行操作前，请先使用 {field} 字段排序
+dragSortTargetWeighError: 目标权重错误
 reset: 重置
 to: 至
 startDate: 开始日期
