@@ -15,6 +15,7 @@ import (
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 	"github.com/ai-go-hub/ai-go-admin/pkg/tree"
+	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -122,7 +123,7 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*dt
 
 	// 2. 当前管理员拥有的权限规则（菜单）列表
 	perm := permission.New()
-	rules, err := perm.GetRules(ctx, adminSession.ID)
+	rules, err := perm.GetRules(ctx, adminSession.ID, util.ToPtr(permission.RuleStatusEnabled))
 	if err != nil {
 		return nil, err
 	}

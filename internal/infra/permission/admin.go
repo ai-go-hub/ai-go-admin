@@ -9,8 +9,15 @@ import (
 
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 
 	"gorm.io/gorm"
+)
+
+// 规则状态常量，与 model.AdminRule.Status 对齐
+const (
+	RuleStatusDisabled uint8 = 0 // 禁用
+	RuleStatusEnabled  uint8 = 1 // 启用
 )
 
 // Permission 权限规则管理器，通过管理员分组和权限规则表进行权限判断
@@ -57,24 +64,24 @@ func (p *Permission) IsSuperAdmin(ctx context.Context, adminId uint) (bool, erro
 	return slices.ContainsFunc(groups, isSuperAdminGroup), nil
 }
 
-// GetRuleIds 根据管理员 ID 获取管理员拥有权限的全部规则 ID（去重）
-func (p *Permission) GetRuleIds(ctx context.Context, adminId uint) ([]uint, error) {
+// GetRuleIds 根据管理员用户 ID 获取管理员的权限规则 ID（去重）
+func (p *Permission) GetRuleIds(ctx context.Context, adminId uint, ruleStatus *uint8) ([]uint, error) {
 	groups, err := p.GetGroups(ctx, adminId)
 	if err != nil {
 		return nil, err
 	}
 
-	return p.ruleIdsFromGroups(ctx, groups)
+	return p.ruleIdsFromGroups(ctx, groups, ruleStatus)
 }
 
-// GetRules 根据管理员 ID 获取管理员拥有的权限规则列表（仅返回启用状态的规则）
-func (p *Permission) GetRules(ctx context.Context, adminId uint) ([]model.AdminRule, error) {
+// GetRules 根据管理员 ID 获取管理员拥有的权限规则列表
+func (p *Permission) GetRules(ctx context.Context, adminId uint, ruleStatus *uint8) ([]model.AdminRule, error) {
 	groups, err := p.GetGroups(ctx, adminId)
 	if err != nil {
 		return nil, err
 	}
 
-	ruleIDs, err := p.ruleIdsFromGroups(ctx, groups)
+	ruleIDs, err := p.ruleIdsFromGroups(ctx, groups, ruleStatus)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +90,11 @@ func (p *Permission) GetRules(ctx context.Context, adminId uint) ([]model.AdminR
 		return nil, nil
 	}
 
-	rules, err := gorm.G[model.AdminRule](database.DB()).Where("id IN ? AND status = 1", ruleIDs).Order("weigh desc").Find(ctx)
+	q := gorm.G[model.AdminRule](database.DB()).Where("id IN ?", ruleIDs)
+	if ruleStatus != nil {
+		q = q.Where("status = ?", *ruleStatus)
+	}
+	rules, err := q.Order("weigh desc").Find(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +118,7 @@ func (p *Permission) Check(ctx context.Context, adminId uint, ruleName string) (
 		return true, nil
 	}
 
-	ruleIDs, err := p.ruleIdsFromGroups(ctx, groups)
+	ruleIDs, err := p.ruleIdsFromGroups(ctx, groups, util.ToPtr(RuleStatusEnabled))
 	if err != nil {
 		return false, err
 	}
@@ -116,7 +127,7 @@ func (p *Permission) Check(ctx context.Context, adminId uint, ruleName string) (
 		return false, nil
 	}
 
-	_, err = gorm.G[model.AdminRule](database.DB()).Where("id IN ? AND name = ? AND status = 1", ruleIDs, ruleName).First(ctx)
+	_, err = gorm.G[model.AdminRule](database.DB()).Where("id IN ? AND name = ? AND status = ?", ruleIDs, ruleName, RuleStatusEnabled).First(ctx)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil
@@ -127,15 +138,16 @@ func (p *Permission) Check(ctx context.Context, adminId uint, ruleName string) (
 	return true, nil
 }
 
-// isSuperAdminGroup 判断分组是否拥有全部权限（Rules 字段值为 "*"）
+// isSuperAdminGroup 判断分组是否拥有全部权限（即超管，Rules 字段值为 "*"）
 func isSuperAdminGroup(group model.AdminGroup) bool {
 	return group.Rules != nil && *group.Rules == "*"
 }
 
-// ruleIdsFromGroups 从分组列表中提取规则 ID，遇到通配符分组则返回全部启用规则的 ID
-func (p *Permission) ruleIdsFromGroups(ctx context.Context, groups []model.AdminGroup) ([]uint, error) {
+// ruleIdsFromGroups 从管理分组列表中提取权限规则 ID，
+// 遇到通配符分组（超管）则返回全部规则 ID
+func (p *Permission) ruleIdsFromGroups(ctx context.Context, groups []model.AdminGroup, ruleStatus *uint8) ([]uint, error) {
 	if slices.ContainsFunc(groups, isSuperAdminGroup) {
-		return p.allRuleIDs(ctx)
+		return p.allRuleIDs(ctx, ruleStatus)
 	}
 
 	ruleIDSet := make(map[uint]struct{})
@@ -166,9 +178,18 @@ func (p *Permission) ruleIdsFromGroups(ctx context.Context, groups []model.Admin
 	return ruleIDs, nil
 }
 
-// allRuleIDs 返回全部启用规则的 ID
-func (p *Permission) allRuleIDs(ctx context.Context) ([]uint, error) {
-	rules, err := gorm.G[model.AdminRule](database.DB()).Select("id").Where("status = 1").Find(ctx)
+// allRuleIDs 返回全部规则 ID，
+// ruleStatus 为 nil 时不按状态过滤
+func (p *Permission) allRuleIDs(ctx context.Context, ruleStatus *uint8) ([]uint, error) {
+	var scopes []func(*gorm.Statement)
+	if ruleStatus != nil {
+		s := *ruleStatus // 先捕获值
+		scopes = append(scopes, func(stmt *gorm.Statement) {
+			stmt.Where("status = ?", s)
+		})
+	}
+
+	rules, err := gorm.G[model.AdminRule](database.DB()).Scopes(scopes...).Select("id").Find(ctx)
 	if err != nil {
 		return nil, err
 	}
