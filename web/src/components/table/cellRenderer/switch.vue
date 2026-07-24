@@ -3,11 +3,11 @@
         <el-switch
             v-if="columnConfig.prop"
             @change="onChange"
-            :model-value="cellValueNew"
             :loading="loading"
-            active-value="1"
-            inactive-value="0"
-            v-bind="invokeTableContextDataFun(columnConfig.customRenderAttr?.switch, { row, columnConfig, column, cellValue: cellValueNew, index })"
+            :model-value="modelValue"
+            :active-value="getDefaultValue('active')"
+            :inactive-value="getDefaultValue('inactive')"
+            v-bind="invokeTableContextDataFun(columnConfig.customRenderAttr?.switch, { row, columnConfig, column, cellValue: modelValue, index })"
         />
     </div>
 </template>
@@ -17,10 +17,20 @@ import { ref } from 'vue'
 import { invokeTableContextDataFun } from '/@/components/table/index'
 import { CellRendererProps } from '/@/components/table/types'
 
-const props = defineProps<CellRendererProps>()
-
 const loading = ref(false)
-const cellValueNew = ref<string | number | boolean>(typeof props.cellValue === 'number' ? props.cellValue.toString() : props.cellValue)
+const props = defineProps<CellRendererProps>()
+const modelValue = ref(props.cellValue)
+const modelValueType = typeof props.cellValue
+
+const getDefaultValue = (type: 'active' | 'inactive') => {
+    if (modelValueType == 'number') {
+        return type == 'active' ? 1 : 0
+    } else if (modelValueType == 'string') {
+        return type == 'active' ? '1' : '0'
+    } else if (modelValueType == 'boolean') {
+        return type == 'active' ? true : false
+    }
+}
 
 const onChange = (value: string | number | boolean) => {
     loading.value = true
@@ -31,7 +41,7 @@ const onChange = (value: string | number | boolean) => {
             [props.columnConfig.prop!]: value,
         })
         .then(() => {
-            cellValueNew.value = value
+            modelValue.value = value
             props.manager.handleEvent('cell-change', { value: value, ...props })
         })
         .finally(() => {
