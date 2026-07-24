@@ -353,7 +353,7 @@
                         </div>
                         <el-popconfirm @confirm="restoreDefault" :title="t('layouts.restoreConfigConfirm')">
                             <template #reference>
-                                <div class="flex-center">
+                                <div class="ag-flex-center">
                                     <el-button class="w90" type="info">{{ t('layouts.restoreDefault') }}</el-button>
                                 </div>
                             </template>
@@ -465,11 +465,6 @@ const restoreDefault = () => {
 <style scoped lang="scss">
 .w90 {
     width: 90%;
-}
-.flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 .layout-config-drawer :deep(.el-input__inner) {
     padding: 0 0 0 6px;

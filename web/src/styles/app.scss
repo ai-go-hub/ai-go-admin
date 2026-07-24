@@ -26,6 +26,20 @@ body,
     background-color: var(--ag-bg-color);
 }
 
+.w100 {
+    width: 100%;
+}
+
+.h100 {
+    height: 100%;
+}
+
+.ag-flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .default-main {
     margin: var(--ag-main-space) var(--ag-main-space) 60px var(--ag-main-space);
 }

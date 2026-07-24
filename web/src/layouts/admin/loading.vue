@@ -4,9 +4,9 @@
             v-loading="true"
             element-loading-background="var(--ag-bg-color-overlay)"
             :element-loading-text="$t('common.loading')"
-            class="default-main ag-main-loading"
+            class="default-main ag-flex-center ag-main-loading"
         ></div>
-        <div v-if="state.showReload" class="loading-footer">
+        <div v-if="state.showReload" class="ag-flex-center">
             <el-button @click="refresh" type="warning">{{ $t('common.reload') }}</el-button>
         </div>
     </div>
@@ -50,13 +50,5 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .ag-main-loading {
     height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.loading-footer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 </style>

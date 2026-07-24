@@ -297,7 +297,4 @@ const getPlaceholder = (placeholder: string | string[] | undefined, key = 0, def
 .w83 {
     width: 83.5% !important;
 }
-.w100 {
-    width: 100%;
-}
 </style>

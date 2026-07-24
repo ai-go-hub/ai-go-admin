@@ -46,7 +46,7 @@
                     :class="'size-' + size"
                 >
                     <template #prepend>
-                        <div class="icon-prepend">
+                        <div class="icon-prepend ag-flex-center">
                             <Icon :size="16" :key="'icon' + state.iconKey" :name="state.prependIcon ? state.prependIcon : state.defaultModelValue" />
                             <div v-if="showIconName" class="name" @click="onCopy(state.prependIcon ? state.prependIcon : state.defaultModelValue)">
                                 {{ state.prependIcon ? state.prependIcon : state.defaultModelValue }}
@@ -248,9 +248,6 @@ onMounted(() => {
     height: 32px;
 }
 .icon-prepend {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     .name {
         padding-left: 5px;
     }
