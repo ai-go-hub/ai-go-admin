@@ -321,12 +321,25 @@ declare global {
     }
 
     /**
+     * 创建表格管家的选项
+     */
+    interface UseTableManagerOptions {
+        api: TableManagerAPI
+        table?: TableInterface
+        form?: FormInterface
+        before?: TableManagerBefore
+        after?: TableManagerAfter
+        auth?: (node: string) => boolean
+    }
+
+    /**
      * 表格管家实例
      */
     interface TableManagerInstance {
         api: TableManagerAPI
         form: FormInterface
         table: TableInterface
+        opts: UseTableManagerOptions
         comSearch: ComSearchInterface
         del: (pks: string[]) => void
         auth: (node: string) => boolean

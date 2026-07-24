@@ -3,19 +3,9 @@ import { assign, cloneDeep, isArray, isEmpty, snakeCase } from 'lodash-es'
 import Sortable from 'sortablejs'
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
-import type { TableManagerAPI } from '/@/api/table'
 import { findIndexRow } from '/@/components/table/index'
 import i18n from '/@/lang/index'
 import { auth as authentication, getArrayKey } from '/@/utils/common'
-
-export interface UseTableManagerOptions {
-    api: TableManagerAPI
-    table?: TableInterface
-    form?: FormInterface
-    before?: TableManagerBefore
-    after?: TableManagerAfter
-    auth?: (node: string) => boolean
-}
 
 /**
  * 表格管家工厂函数
@@ -667,6 +657,7 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
     mount()
 
     return {
+        opts,
         form,
         table,
         comSearch,
