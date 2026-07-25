@@ -288,6 +288,7 @@ const getData = debounce((initValue: ValueTypes = '') => {
         })
     }
 
+    state.remoteParams.selector = true
     state.remoteParams.wheres = wheres
     state.remoteParams.page = state.currentPage
 

@@ -21,7 +21,7 @@ type Where struct {
 }
 
 // Options 通用服务操作选项
-// 每个方法所需要的选项都可以在此找到，但并非每个方法都会使用全部的选项
+// Sort 以外的每个方法所需要的选项都可以在此找到，但并非每个方法都会使用全部的选项
 type Options struct {
 	OmitFields       []string // 排除出入库字段，会传递给仓储层的 Omit 方法
 	SelectFields     []string // 选择出入库字段，会传递给仓储层的 Select 方法
@@ -30,6 +30,7 @@ type Options struct {
 	SortOrder        string   // 排序方式
 	Page             int      // 页码，用于构建 PaginateScope
 	Limit            int      // 每页条数
+	Selector         bool     // 是否为来自选择器的查询
 	PrimaryKeyValue  string   // 主键值，目前可供 Get、Update 方法获取数据行
 	PrimaryKeyValues []string // 主键切片，目前可供 Delete 方法批量删除行
 	Extension        any      // 任意自定义扩展参数
@@ -281,7 +282,6 @@ func (s *Service[T]) BuildOrderScope(sortField, sortOrder string) func(*gorm.Sta
 }
 
 // BuildPaginateScope 构建分页 Scope
-// limit > 200 截为 200
 func BuildPaginateScope(page, limit int) func(*gorm.Statement) {
 	if page < 1 {
 		page = 1
