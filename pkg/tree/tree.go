@@ -59,10 +59,27 @@ func Render(data []map[string]any, idField, pidField, titleField string) []map[s
 	for _, item := range data {
 		id := item[idField]
 		pid, hasPid := item[pidField]
-		if !hasPid || pid == nil || pid == "" || pid == 0 || pid == id {
+
+		isRoot := false
+		if !hasPid {
+			isRoot = true
+		} else {
+			switch val := pid.(type) {
+			case string:
+				isRoot = val == "" || val == "0"
+			case uint:
+				isRoot = val == 0 || val == id
+			case int:
+				if val >= 0 {
+					isRoot = val == 0 || val == id
+				}
+			}
+		}
+		if isRoot {
 			roots = append(roots, item)
 			continue
 		}
+
 		childrenMap[pid] = append(childrenMap[pid], item)
 	}
 

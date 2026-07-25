@@ -88,13 +88,15 @@ func TestRenderUnordered(t *testing.T) {
 	data := []map[string]any{
 		{"id": 1, "pid": 0, "title": "A"},
 		{"id": 2, "pid": 1, "title": "B"},
-		{"id": 5, "pid": 0, "title": "E"},
+		{"id": 5, "pid": "0", "title": "E"},
 		{"id": 6, "pid": 5, "title": "F"},
 		{"id": 7, "pid": 5, "title": "G"},
 		{"id": 8, "pid": 7, "title": "H"},
 		{"id": 9, "pid": 7, "title": "I"},
 		{"id": 3, "pid": 1, "title": "C"},
 		{"id": 4, "pid": 1, "title": "D"},
+		{"id": 10, "pid": "", "title": "J"},
+		{"id": 11, "pid": 10, "title": "K"},
 	}
 
 	got := Render(data, "id", "pid", "title")
@@ -104,11 +106,13 @@ func TestRenderUnordered(t *testing.T) {
 		{"id": 2, "pid": 1, "title": "    ├B"},
 		{"id": 3, "pid": 1, "title": "    ├C"},
 		{"id": 4, "pid": 1, "title": "    └D"},
-		{"id": 5, "pid": 0, "title": "E"},
+		{"id": 5, "pid": "0", "title": "E"},
 		{"id": 6, "pid": 5, "title": "    ├F"},
 		{"id": 7, "pid": 5, "title": "    └G"},
 		{"id": 8, "pid": 7, "title": "         ├H"},
 		{"id": 9, "pid": 7, "title": "         └I"},
+		{"id": 10, "pid": "", "title": "J"},
+		{"id": 11, "pid": 10, "title": "    └K"},
 	}
 
 	if !reflect.DeepEqual(got, want) {
