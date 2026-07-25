@@ -38,8 +38,8 @@ type Handler[T any] struct {
 
 // Adapter 声明对应方法的数据适配器
 type Adapter struct {
-	Get  func(any) (any, error)
-	List func(any) (any, error)
+	Get  func(any, service.Options) (any, error)
+	List func(any, service.Options) (any, error)
 }
 
 // ActionFields 声明对应方法的 Omit / Select 字段列表
@@ -198,7 +198,7 @@ func (h *Handler[T]) List(c *gin.Context) {
 	}
 
 	if h.cfg.Adapter.List != nil {
-		adapted, err := h.cfg.Adapter.List(list)
+		adapted, err := h.cfg.Adapter.List(list, opts)
 		if err != nil {
 			httpx.Fail(c, httpx.WithMessage("数据适配器错误: "+err.Error()))
 			return
@@ -226,7 +226,7 @@ func (h *Handler[T]) Get(c *gin.Context) {
 	}
 
 	if h.cfg.Adapter.Get != nil {
-		adapted, err := h.cfg.Adapter.Get(entity)
+		adapted, err := h.cfg.Adapter.Get(entity, opts)
 		if err != nil {
 			httpx.Fail(c, httpx.WithMessage("数据适配器错误: "+err.Error()))
 			return
