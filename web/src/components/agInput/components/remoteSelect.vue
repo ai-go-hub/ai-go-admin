@@ -35,7 +35,7 @@
                         class="remote-select-option"
                         v-for="item in state.options"
                         :label="item[field]"
-                        :value="item[state.primaryKey].toString()"
+                        :value="getOptionValue(item)"
                         :key="item[state.primaryKey]"
                     >
                         <el-tooltip placement="right" effect="light" v-if="!isEmpty(tooltipParams)">
@@ -57,7 +57,7 @@
 <script lang="ts" setup>
 import type { ElSelect, PaginationProps } from 'element-plus'
 import { debounce, isEmpty } from 'lodash-es'
-import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, reactive, toRaw, useAttrs, useTemplateRef, watch } from 'vue'
+import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, reactive, ref, toRaw, useAttrs, useTemplateRef, watch } from 'vue'
 import { selectList } from '/@/api/common'
 import { useConfig } from '/@/stores/config'
 import { getArrayKey } from '/@/utils/common'
@@ -92,7 +92,7 @@ const props = withDefaults(defineProps<Props>(), {
     remoteSearchFields: () => {
         return []
     },
-    modelValue: '',
+    modelValue: null,
     tooltipParams: () => {
         return {}
     },
@@ -105,17 +105,12 @@ const props = withDefaults(defineProps<Props>(), {
  * 点击清空按钮后的值，同时也是缺省值‌
  */
 const valueOnClear = computed(() => {
-    let valueOnClear = attrs.valueOnClear as string | number | boolean | Function
-    if (valueOnClear === undefined) {
-        valueOnClear = attrs.multiple ? () => [] : () => null
+    let clearVal = attrs.valueOnClear as string | number | boolean | Function
+    if (clearVal === undefined) {
+        clearVal = attrs.multiple ? () => [] : () => null
     }
-    return typeof valueOnClear == 'function' ? valueOnClear() : valueOnClear
+    return typeof clearVal == 'function' ? clearVal() : clearVal
 })
-
-/**
- * 被认为是空值的值列表
- */
-const emptyValues = computed<any>(() => attrs.emptyValues || [null, undefined, ''])
 
 const state: {
     // 主表字段名（不带表别名）
@@ -155,6 +150,33 @@ const emits = defineEmits<{
 }>()
 
 /**
+ * 记录 modelValue 当前应保持的类型（跟随外部传入的类型变化）
+ */
+const valueKind = ref<'string' | 'number' | 'string[]' | 'number[]' | null>(null)
+
+/**
+ * 检测值类型，绑定空值时:0=number,''=string
+ */
+const detectValueKind = (val: ValueTypes | null) => {
+    if (val === null || val === undefined) return
+    if (Array.isArray(val)) {
+        if (val.length === 0) return
+        valueKind.value = typeof val[0] === 'number' ? 'number[]' : 'string[]'
+    } else {
+        valueKind.value = typeof val === 'number' ? 'number' : 'string'
+    }
+}
+const isArrayKind = computed(() => valueKind.value === 'string[]' || valueKind.value === 'number[]')
+const isNumberKind = computed(() => valueKind.value === 'number' || valueKind.value === 'number[]')
+
+/**
+ * 获取选项的绑定值，类型跟随 valueKind
+ */
+const getOptionValue = (item: AnyObj): string | number => {
+    return isNumberKind.value ? Number(item[state.primaryKey]) : String(item[state.primaryKey])
+}
+
+/**
  * 获取分页组件属性
  */
 const getPaginationAttr = (): Partial<PaginationProps> => {
@@ -177,18 +199,18 @@ const getPaginationAttr = (): Partial<PaginationProps> => {
 const onChangeSelect = (val: ValueTypes) => {
     val = updateValue(val)
     if (typeof instance?.vnode.props?.onRow == 'function') {
-        if (typeof val == 'number' || typeof val == 'string') {
-            const dataKey = getArrayKey(state.options, state.primaryKey, '' + val)
-            emits('row', dataKey !== false ? toRaw(state.options[dataKey]) : {})
-        } else {
+        if (isArrayKind.value && Array.isArray(val)) {
             const valueArr = []
             for (const key in val) {
-                const dataKey = getArrayKey(state.options, state.primaryKey, '' + val[key])
+                const dataKey = getArrayKey(state.options, state.primaryKey, val[key])
                 if (dataKey !== false) {
                     valueArr.push(toRaw(state.options[dataKey]))
                 }
             }
             emits('row', valueArr)
+        } else {
+            const dataKey = getArrayKey(state.options, state.primaryKey, val)
+            emits('row', dataKey !== false ? toRaw(state.options[dataKey]) : {})
         }
     }
 }
@@ -257,7 +279,7 @@ const getData = debounce((initValue: ValueTypes = '') => {
     }
 
     // 绑定值初始化
-    if (initValue) {
+    if (!isEmpty(initValue)) {
         state.currentPage = 1
         wheres.push({
             field: props.pk,
@@ -280,6 +302,13 @@ const getData = debounce((initValue: ValueTypes = '') => {
             state.options = opts
             state.total = res.data.data.total ?? 0
             state.optionsValid = state.keywords || (typeof initValue === 'object' ? !isEmpty(initValue) : initValue) ? false : true
+
+            // 首次加载时，若 valueKind 未确定（modelValue 为空），以第一个选项的 pk 类型作为默认值类型
+            if (valueKind.value === null && opts.length > 0) {
+                const firstPK = opts[0][state.primaryKey]
+                const baseKind = typeof firstPK === 'number' ? 'number' : 'string'
+                valueKind.value = attrs.multiple ? (`${baseKind}[]` as 'number[]' | 'string[]') : baseKind
+            }
         })
         .finally(() => {
             state.loading = false
@@ -293,20 +322,15 @@ const onSelectCurrentPageChange = (val: number) => {
 }
 
 const updateValue = (newVal: any) => {
-    if (emptyValues.value.includes(newVal)) {
-        state.value = valueOnClear.value
+    // 按 valueKind 保持类型一致
+    if (isArrayKind.value && Array.isArray(newVal)) {
+        state.value = isNumberKind.value ? newVal.map(Number) : newVal.map(String)
+    } else if (!isArrayKind.value && (typeof newVal === 'string' || typeof newVal === 'number')) {
+        state.value = isNumberKind.value ? Number(newVal) : String(newVal)
     } else {
         state.value = newVal
-
-        // number[] 转 string[] 确保默认值能够选中
-        if (typeof state.value === 'object') {
-            for (const key in state.value) {
-                state.value[key] = '' + state.value[key]
-            }
-        } else if (typeof state.value === 'number') {
-            state.value = '' + state.value
-        }
     }
+
     emits('update:modelValue', state.value)
     return state.value
 }
@@ -319,7 +343,8 @@ onMounted(() => {
     let pkArr = props.pk.split('.')
     state.primaryKey = pkArr[pkArr.length - 1]
 
-    // 初始化值
+    // 初始化类型 & 值
+    detectValueKind(props.modelValue)
     updateValue(props.modelValue)
     getData(state.value)
 
@@ -344,6 +369,9 @@ onUnmounted(() => {
 watch(
     () => props.modelValue,
     (newVal) => {
+        // 跟踪外部传入值的类型变化
+        detectValueKind(newVal)
+
         /**
          * 防止 number 到 string 的类型转换触发默认值多次初始化
          * 相当于忽略数据类型进行比较 [1, 2] == ['1', '2']
