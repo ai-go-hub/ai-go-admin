@@ -1,0 +1,160 @@
+package auth
+
+import (
+	"errors"
+	"strconv"
+
+	"github.com/ai-go-hub/ai-go-admin/internal/dto"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	"github.com/ai-go-hub/ai-go-admin/internal/repository"
+	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
+	"github.com/ai-go-hub/ai-go-admin/internal/service"
+	"github.com/ai-go-hub/ai-go-admin/pkg/util"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+)
+
+// AuthAdminRuleExtension 规则列表扩展参数
+type AuthAdminRuleExtension struct {
+	AdminSession *dto.AdminSession
+}
+
+// AuthAdminRuleService 菜单和权限规则管理服务
+type AuthAdminRuleService struct {
+	service.IService[model.AdminRule]
+	repo *repoAdmin.AdminRuleRepository
+}
+
+// NewAuthAdminRuleService 创建菜单和权限规则管理服务实例
+func NewAuthAdminRuleService(repo *repoAdmin.AdminRuleRepository) *AuthAdminRuleService {
+	return &AuthAdminRuleService{
+		IService: service.NewService(repo),
+		repo:     repo,
+	}
+}
+
+// Create 覆写通用创建方法: 增加服务层校验
+func (s *AuthAdminRuleService) Create(c *gin.Context, entity *model.AdminRule, opts service.Options) error {
+	if err := s.validateRule(c, entity, opts.PrimaryKeyValue); err != nil {
+		return err
+	}
+	return s.IService.Create(c, entity, opts)
+}
+
+// Update 覆写通用更新方法: 增加服务层校验
+func (s *AuthAdminRuleService) Update(c *gin.Context, entity *model.AdminRule, opts service.Options) error {
+	if err := s.validateRule(c, entity, opts.PrimaryKeyValue); err != nil {
+		return err
+	}
+	return s.IService.Update(c, entity, opts)
+}
+
+// List 覆写通用查询全部记录方法: 根据管理员权限过滤
+func (s *AuthAdminRuleService) List(c *gin.Context, opts service.Options) ([]model.AdminRule, error) {
+	// 从控制器传来的 `管理员信息` 扩展数据
+	extension, ok := opts.Extension.(*AuthAdminRuleExtension)
+	if !ok || extension.AdminSession == nil {
+		return nil, errors.New("参数错误，缺少 AdminSession 扩展数据")
+	}
+
+	perm := permission.New()
+	super, err := perm.IsSuperAdmin(c.Request.Context(), extension.AdminSession.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 无翻页，设定无限 limit
+	opts.Limit = 999999
+
+	// 来自选择器则只查 dir、menu，不查 node
+	if opts.Selector {
+		opts.Wheres = append(opts.Wheres, service.Where{
+			Field:    "type",
+			Operator: "IN",
+			Value:    []string{"dir", "menu"},
+		})
+	}
+
+	// 非超管，读取当前管理员拥有的权限规则 IDs
+	if !super {
+		ruleIDs, err := perm.GetRuleIds(c.Request.Context(), extension.AdminSession.ID, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(ruleIDs) == 0 {
+			return nil, nil
+		}
+
+		// 添加 IN IDs 的 where 以确保只读取到当前管理员拥有的权限规则
+		opts.Wheres = append(opts.Wheres, service.Where{
+			Field:    "id",
+			Operator: "IN",
+			Value:    ruleIDs,
+		})
+	}
+
+	rules, err := s.repo.List(c, s.BuildRepoOpts(opts))
+	return rules, err
+}
+
+// Count 覆写通用统计方法: 与 List 使用相同的权限过滤条件
+func (s *AuthAdminRuleService) Count(c *gin.Context, opts service.Options) (int64, error) {
+	extension, ok := opts.Extension.(*AuthAdminRuleExtension)
+	if !ok || extension.AdminSession == nil {
+		return 0, errors.New("参数错误，缺少 AdminSession 扩展数据")
+	}
+
+	perm := permission.New()
+	rules, err := perm.GetRules(c.Request.Context(), extension.AdminSession.ID, nil)
+	if err != nil {
+		return 0, err
+	}
+
+	return int64(len(rules)), nil
+}
+
+// validateRule 校验规则字段、名称与上级规则
+func (s *AuthAdminRuleService) validateRule(c *gin.Context, entity *model.AdminRule, pk string) error {
+	if entity.Type == "menu" && (util.PtrIsZero(entity.Path) || util.PtrIsZero(entity.Component)) {
+		return errors.New("规则类型为菜单时，菜单路由路径和菜单组件路径不能为空")
+	}
+
+	// 名称唯一校验（排除自身）
+	userNameExist, err := s.repo.FindByName(c, entity.Name)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+	if userNameExist != nil && strconv.FormatUint(uint64(userNameExist.ID), 10) != pk {
+		return errors.New("规则名称已存在")
+	}
+
+	// 非空路径唯一校验（排除自身）
+	if util.PtrNotZero(entity.Path) {
+		pathExist, err := s.repo.FindByPath(c, *entity.Path)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+		if pathExist != nil && strconv.FormatUint(uint64(pathExist.ID), 10) != pk {
+			return errors.New("菜单路由路径已存在")
+		}
+	}
+
+	// 上级规则校验: 不能将自身设为自己的上级
+	if util.PtrNotZero(entity.Pid) {
+		strPid := strconv.FormatUint(uint64(*entity.Pid), 10)
+		if pk != "" && strPid == pk {
+			return errors.New("上级规则不能是自身")
+		}
+		if _, err := s.repo.Get(c, repository.Options{PrimaryKeyValue: strPid}); err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return errors.New("上级规则不存在")
+			}
+			return err
+		}
+	}
+
+	return nil
+}

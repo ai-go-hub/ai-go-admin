@@ -30,27 +30,65 @@ func (Admin) TableName() string {
 
 // AdminRule 菜单和权限规则模型
 type AdminRule struct {
-	ID        uint      `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
-	Pid       *uint     `gorm:"comment:上级规则" json:"pid"`
-	Type      string    `gorm:"comment:规则类型:dir=规则目录,menu=菜单项,node=权限节点;type:varchar(50);not null;default:''" json:"type"`
-	Title     string    `gorm:"comment:规则标题;type:varchar(50);not null;default:''" json:"title"`
-	Name      string    `gorm:"comment:规则名称;type:varchar(50);not null;default:''" json:"name"`
-	Path      string    `gorm:"comment:菜单路由路径;type:varchar(255);not null;default:''" json:"path"`
-	Icon      string    `gorm:"comment:菜单图标;type:varchar(50);not null;default:''" json:"icon"`
-	OpenType  string    `gorm:"comment:菜单打开方式:tab=选项卡,link=链接,iframe=Iframe;type:varchar(50);not null;default:''" json:"open_type"`
-	URL       string    `gorm:"comment:菜单URL;type:varchar(255);not null;default:''" json:"url"`
-	Component string    `gorm:"comment:菜单组件路径;type:varchar(255);not null;default:''" json:"component"`
-	Keepalive uint8     `gorm:"comment:缓存:0=关闭,1=开启;not null;default:0" json:"keepalive"`
-	Extend    string    `gorm:"comment:扩展属性:add_route_only=只添加为路由,add_menu_only=只添加为菜单;type:varchar(50);not null;default:''" json:"extend"`
-	Remark    string    `gorm:"comment:备注;type:varchar(255);not null;default:''" json:"remark"`
-	Weigh     int       `gorm:"comment:权重;not null;default:0" json:"weigh"`
-	Status    uint8     `gorm:"comment:状态:0=禁用,1=启用;not null;default:1" json:"status"`
-	UpdatedAt time.Time `gorm:"comment:更新时间" json:"updated_at"`
-	CreatedAt time.Time `gorm:"comment:创建时间" json:"created_at"`
+	ID        uint       `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
+	Pid       *uint      `gorm:"comment:上级规则" json:"pid"`
+	Type      string     `gorm:"comment:规则类型:dir=规则目录,menu=菜单项,node=权限节点;type:varchar(64);not null;default:''" binding:"required,oneof=dir menu node" json:"type"`
+	Title     string     `gorm:"comment:规则标题;type:varchar(64);not null;default:''" binding:"required" json:"title"`
+	Name      string     `gorm:"comment:规则名称;type:varchar(64);not null;default:''" binding:"required" json:"name"`
+	Path      *string    `gorm:"comment:菜单路由路径;type:varchar(255);default:''" json:"path"`
+	Icon      *string    `gorm:"comment:菜单图标;type:varchar(64);default:''" json:"icon"`
+	OpenType  *string    `gorm:"comment:菜单打开方式:tab=选项卡,link=链接,iframe=Iframe;type:varchar(64);default:''" json:"open_type"`
+	URL       *string    `gorm:"comment:菜单URL;type:varchar(255);default:''" json:"url"`
+	Component *string    `gorm:"comment:菜单组件路径;type:varchar(255);default:''" json:"component"`
+	Keepalive *uint8     `gorm:"comment:缓存:0=关闭,1=开启;default:0" json:"keepalive"`
+	Extend    *string    `gorm:"comment:扩展属性:add_route_only=只添加为路由,add_menu_only=只添加为菜单;type:varchar(64);default:''" json:"extend"`
+	Remark    *string    `gorm:"comment:备注;type:varchar(255);default:''" json:"remark"`
+	Weigh     *int       `gorm:"comment:权重;default:0" json:"weigh"`
+	Status    *uint8     `gorm:"comment:状态:0=禁用,1=启用;not null;default:1" binding:"required" json:"status"`
+	UpdatedAt *time.Time `gorm:"comment:更新时间" json:"updated_at"`
+	CreatedAt *time.Time `gorm:"comment:创建时间" json:"created_at"`
 }
 
 func (AdminRule) TableName() string {
 	return "admin_rules"
+}
+
+// AfterCreate 新增后，若 Weigh 未指定则回填为主键 ID
+func (r *AdminRule) AfterCreate(tx *gorm.DB) error {
+	if r.Weigh != nil && *r.Weigh != 0 {
+		return nil
+	}
+	weigh := int(r.ID)
+	r.Weigh = &weigh
+	return tx.Model(r).Update("weigh", r.ID).Error
+}
+
+// ToMap 将 AdminRule 转换为 map
+// 菜单规则使用较频繁，使用硬编码转换性能最高
+func (r *AdminRule) ToMap() map[string]any {
+	pid := uint(0)
+	if r.Pid != nil {
+		pid = *r.Pid
+	}
+	return map[string]any{
+		"id":         r.ID,
+		"pid":        pid,
+		"type":       r.Type,
+		"title":      r.Title,
+		"name":       r.Name,
+		"path":       r.Path,
+		"icon":       r.Icon,
+		"open_type":  r.OpenType,
+		"url":        r.URL,
+		"component":  r.Component,
+		"keepalive":  r.Keepalive,
+		"extend":     r.Extend,
+		"remark":     r.Remark,
+		"weigh":      r.Weigh,
+		"status":     r.Status,
+		"updated_at": r.UpdatedAt,
+		"created_at": r.CreatedAt,
+	}
 }
 
 // AdminGroup 管理员分组模型

@@ -1,0 +1,21 @@
+title: Rule title
+name: Rule name
+pid: Parent rule
+type: Rule type
+typeDir: Directory
+typeMenu: Menu
+typeNode: Permission node
+path: Route path
+url: URL
+component: Component path
+openType: Open type
+openTypeTab: Tab
+openTypeLink: Link
+openTypeIframe: Iframe
+keepalive: Keepalive
+extend: Extend
+extendAddRouteOnly: Route only
+extendAddMenuOnly: Menu only
+extendNone: None
+remark: Remark
+parentRuleSelfError: Parent rule cannot be itself

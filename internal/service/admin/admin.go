@@ -129,30 +129,9 @@ func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*dt
 	}
 
 	// 将菜单规则列表转为树状结构
-	// model.AdminRule 转 map[string]any，此方法调用频率较高，使用性能更高的硬编码
 	ruleData := make([]map[string]any, len(rules))
-	for i, r := range rules {
-		pid := uint(0)
-		if r.Pid != nil {
-			pid = *r.Pid
-		}
-		ruleData[i] = map[string]any{
-			"id":        r.ID,
-			"pid":       pid,
-			"type":      r.Type,
-			"title":     r.Title,
-			"name":      r.Name,
-			"path":      r.Path,
-			"icon":      r.Icon,
-			"open_type": r.OpenType,
-			"url":       r.URL,
-			"component": r.Component,
-			"keepalive": r.Keepalive,
-			"extend":    r.Extend,
-			"remark":    r.Remark,
-			"weigh":     r.Weigh,
-			"status":    r.Status,
-		}
+	for i := range rules {
+		ruleData[i] = rules[i].ToMap()
 	}
 	ruleTree := tree.Build(ruleData, "id", "pid", "children")
 
