@@ -100,9 +100,12 @@ declare global {
         comSearchRemote?: {
             pk?: string
             field?: string
-            params?: AnyObj
             multiple?: boolean
+            pagination?: boolean
+
             remoteURL: string
+            remoteParams?: AnyObj
+            remoteSearchFields?: string[]
         }
     }
 

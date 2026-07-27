@@ -161,13 +161,14 @@
                                         </el-select>
 
                                         <!-- 远程 select -->
-                                        <!-- <agInput
+                                        <RemoteSelect
                                             v-else-if="item.comSearchRender == 'remoteSelect'"
                                             type="remoteSelect"
-                                            v-model="comSearch.form[item.prop]"
-                                            :attr="{ ...item.comSearchRemote, ...item.comSearchInputAttr }"
+                                            v-model="comSearch.form[item.prop!]"
+                                            :remote-url="item.comSearchRemote?.remoteURL!"
                                             :placeholder="getPlaceholder(item.comSearchPlaceholder)"
-                                        /> -->
+                                            v-bind="{ ...item.comSearchRemote, ...item.comSearchInputAttr }"
+                                        />
 
                                         <!-- 开关 -->
                                         <el-select
@@ -221,6 +222,7 @@
 
 <script setup lang="ts">
 import { isArray, isEmpty, isUndefined } from 'lodash-es'
+import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
 
 interface Props {
     manager: TableManagerInstance
