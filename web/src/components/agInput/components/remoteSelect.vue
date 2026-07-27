@@ -56,7 +56,7 @@
 
 <script lang="ts" setup>
 import type { ElSelect, PaginationProps } from 'element-plus'
-import { debounce, isEmpty } from 'lodash-es'
+import { debounce, isEmpty, snakeCase } from 'lodash-es'
 import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, reactive, ref, toRaw, useAttrs, useTemplateRef, watch } from 'vue'
 import { selectList } from '/@/api/common'
 import { useConfig } from '/@/stores/config'
@@ -253,7 +253,7 @@ const onRemoteMethod = (q: string) => {
 const getData = debounce((initValue: ValueTypes = '') => {
     state.loading = true
 
-    const wheres: ComSearchData[] = []
+    const wheres: WhereGroup[] = []
     let remoteSearchFields: string[] = []
 
     if (props.remoteSearchFields.length) {
@@ -269,22 +269,29 @@ const getData = debounce((initValue: ValueTypes = '') => {
 
     // 关键词搜索
     if (state.keywords && remoteSearchFields.length) {
+        const kwGroup: WhereGroup = { or: true, wheres: [] }
         for (const key in remoteSearchFields) {
-            wheres.push({
-                field: remoteSearchFields[key],
+            kwGroup.wheres.push({
+                field: snakeCase(remoteSearchFields[key]),
                 value: state.keywords,
                 operator: 'ILIKE',
             })
         }
+        wheres.push(kwGroup)
     }
 
-    // 绑定值初始化
+    // 绑定值初始化，使用精确匹配
     if (!isEmpty(initValue)) {
         state.currentPage = 1
         wheres.push({
-            field: props.pk,
-            value: initValue,
-            operator: 'eq',
+            wheres: [
+                {
+                    field: snakeCase(props.pk),
+                    value: initValue,
+                    operator: 'eq',
+                },
+            ],
+            or: false,
         })
     }
 

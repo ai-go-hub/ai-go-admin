@@ -66,14 +66,14 @@ type Option func(*HandlerConfig)
 
 // Request 通用控制器请求体
 type Request struct {
-	Page             int             `json:"page"`     // 页码
-	Limit            int             `json:"limit"`    // 每页条数
-	Sort             string          `json:"sort"`     // 排序字段
-	Order            string          `json:"order"`    // 排序方式
-	Wheres           []service.Where `json:"wheres"`   // 查询条件
-	Selector         bool            `json:"selector"` // 是否为来自选择器的查询
-	PrimaryKeyValue  string          `json:"pk"`       // 主键值，前端传递简写 pk 即可
-	PrimaryKeyValues []string        `json:"pks"`      // 主键值切片
+	Page             int                  `json:"page"`     // 页码
+	Limit            int                  `json:"limit"`    // 每页条数
+	Sort             string               `json:"sort"`     // 排序字段
+	Order            string               `json:"order"`    // 排序方式
+	Wheres           []service.WhereGroup `json:"wheres"`   // 查询条件组
+	Selector         bool                 `json:"selector"` // 是否为来自选择器的查询
+	PrimaryKeyValue  string               `json:"pk"`       // 主键值，前端传递简写 pk 即可
+	PrimaryKeyValues []string             `json:"pks"`      // 主键值切片
 }
 
 // ListRequest 列表查询请求体

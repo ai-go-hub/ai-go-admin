@@ -198,12 +198,21 @@ declare global {
 
     /**
      * 公共搜索事件返回的 Data
+     * 同时也是发送给服务端的单条 Where 条件类型定义
      */
     interface ComSearchData {
         field: string
         value: string | string[] | number | number[]
         operator: string
-        render?: string
+    }
+
+    /**
+     * Where 查询条件分组
+     * 服务端对 `字段是否存在、操作符合是否合法` 进行检查，并对 `值` 使用 `预处理语句参数占位符` 拼接
+     */
+    interface WhereGroup {
+        wheres: ComSearchData[]
+        or?: boolean // 组内条件是否使用 OR 连接，值为 false 则使用 AND 连接条件
     }
 
     interface TableManagerListAPIDefaultData<T = any> {
@@ -235,7 +244,7 @@ declare global {
             limit?: number
             sort?: string
             order?: 'desc' | 'asc'
-            wheres?: ComSearchData[]
+            wheres?: WhereGroup[]
             quickSearchKeywords?: string
             [key: string]: any
         }
@@ -355,9 +364,9 @@ declare global {
         initDragSort: () => void
         getSelectionPKs: () => string[]
         setComSearchData: (query: AnyObj) => void
-        getComSearchData: () => ComSearchData[]
-        getQuickSearchData: (keywords: string) => ComSearchData[]
-        setFilterWheres: (search: ComSearchData[], mode: 'cover' | 'merge' = 'merge') => void
+        getComSearchData: () => WhereGroup | false
+        getQuickSearchData: (keywords: string) => WhereGroup | false
+        setFilterWheres: (groups: WhereGroup[]) => void
     }
 
     /**

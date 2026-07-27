@@ -70,10 +70,12 @@ func (s *AuthAdminRuleService) List(c *gin.Context, opts service.Options) ([]mod
 
 	// 来自选择器则只查 dir、menu，不查 node
 	if opts.Selector {
-		opts.Wheres = append(opts.Wheres, service.Where{
-			Field:    "type",
-			Operator: "IN",
-			Value:    []string{"dir", "menu"},
+		opts.Wheres = append(opts.Wheres, service.WhereGroup{
+			Wheres: []service.Where{{
+				Field:    "type",
+				Operator: "IN",
+				Value:    []string{"dir", "menu"},
+			}},
 		})
 	}
 
@@ -89,10 +91,12 @@ func (s *AuthAdminRuleService) List(c *gin.Context, opts service.Options) ([]mod
 		}
 
 		// 添加 IN IDs 的 where 以确保只读取到当前管理员拥有的权限规则
-		opts.Wheres = append(opts.Wheres, service.Where{
-			Field:    "id",
-			Operator: "IN",
-			Value:    ruleIDs,
+		opts.Wheres = append(opts.Wheres, service.WhereGroup{
+			Wheres: []service.Where{{
+				Field:    "id",
+				Operator: "IN",
+				Value:    ruleIDs,
+			}},
 		})
 	}
 

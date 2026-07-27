@@ -15,25 +15,31 @@ import (
 
 // Where 筛选条件
 type Where struct {
-	Field    string
-	Operator string
-	Value    any
+	Field    string `json:"field"`
+	Operator string `json:"operator"`
+	Value    any    `json:"value"`
+}
+
+// WhereGroup 筛选条件分组
+type WhereGroup struct {
+	Wheres []Where `json:"wheres"` // 一组筛选条件
+	Or     bool    `json:"or"`     // 组内条件是否使用 OR 连接，值为 false 则使用 AND 连接条件
 }
 
 // Options 通用服务操作选项
 // Sort 以外的每个方法所需要的选项都可以在此找到，但并非每个方法都会使用全部的选项
 type Options struct {
-	OmitFields       []string // 排除出入库字段，会传递给仓储层的 Omit 方法
-	SelectFields     []string // 选择出入库字段，会传递给仓储层的 Select 方法
-	Wheres           []Where  // 查询条件，用于构建 WhereScopes，然后传递给仓储层的 Scopes 方法
-	SortField        string   // 排序字段，用于构建 OrderScope
-	SortOrder        string   // 排序方式
-	Page             int      // 页码，用于构建 PaginateScope
-	Limit            int      // 每页条数
-	Selector         bool     // 是否为来自选择器的查询
-	PrimaryKeyValue  string   // 主键值，目前可供 Get、Update 方法获取数据行
-	PrimaryKeyValues []string // 主键切片，目前可供 Delete 方法批量删除行
-	Extension        any      // 任意自定义扩展参数
+	OmitFields       []string     // 排除出入库字段，会传递给仓储层的 Omit 方法
+	SelectFields     []string     // 选择出入库字段，会传递给仓储层的 Select 方法
+	Wheres           []WhereGroup // 查询条件组，用于构建 WhereScopes，然后传递给仓储层的 Scopes 方法
+	SortField        string       // 排序字段，用于构建 OrderScope
+	SortOrder        string       // 排序方式
+	Page             int          // 页码，用于构建 PaginateScope
+	Limit            int          // 每页条数
+	Selector         bool         // 是否为来自选择器的查询
+	PrimaryKeyValue  string       // 主键值，目前可供 Get、Update 方法获取数据行
+	PrimaryKeyValues []string     // 主键切片，目前可供 Delete 方法批量删除行
+	Extension        any          // 任意自定义扩展参数
 }
 
 // IService 通用服务接口
@@ -47,6 +53,8 @@ type IService[T any] interface {
 	Sort(c *gin.Context, opts Options, move, target, direction string, weigh int64) error
 	BuildRepoOpts(opts Options) repository.Options
 	BuildScopes(opts Options) []func(*gorm.Statement)
+	BuildWhereScopes(wheres []WhereGroup) []func(*gorm.Statement)
+	BuildWhereExpr(w Where) clause.Expression
 }
 
 // Service 通用服务实现
@@ -78,7 +86,7 @@ func (s *Service[T]) List(c *gin.Context, opts Options) ([]T, error) {
 func (s *Service[T]) Count(c *gin.Context, opts Options) (int64, error) {
 	// 只传递 Where scopes，忽略排序、分页等
 	return s.repo.Count(c, repository.Options{
-		Scopes: BuildWhereScopes(opts.Wheres),
+		Scopes: s.BuildWhereScopes(opts.Wheres),
 	})
 }
 
@@ -131,7 +139,7 @@ func (s *Service[T]) Sort(c *gin.Context, opts Options, move, target, direction 
 	orderScope := s.BuildOrderScope(opts.SortField, opts.SortOrder)
 
 	// 构建过滤条件 scopes（与列表查询共享同一套筛选逻辑）
-	whereScopes := BuildWhereScopes(opts.Wheres)
+	whereScopes := s.BuildWhereScopes(opts.Wheres)
 
 	// 将 func(*gorm.Statement) scopes 转为传统 API 的 func(*gorm.DB) 格式
 	// 后续需要使用 GORM 传统 API 的 Pluck 方法；不使用它则需要使用反射获取权重字段值等，更为复杂
@@ -232,7 +240,7 @@ func (s *Service[T]) BuildRepoOpts(opts Options) repository.Options {
 // BuildScopes 统一组装过滤条件、排序、分页 Scopes
 func (s *Service[T]) BuildScopes(opts Options) []func(*gorm.Statement) {
 	// 构建 Where scopes
-	scopes := BuildWhereScopes(opts.Wheres)
+	scopes := s.BuildWhereScopes(opts.Wheres)
 
 	// 构建 Order scope
 	if s := s.BuildOrderScope(opts.SortField, opts.SortOrder); s != nil {
@@ -296,40 +304,86 @@ func BuildPaginateScope(page, limit int) func(*gorm.Statement) {
 }
 
 // BuildWhereScopes 构建查询条件 scopes
-func BuildWhereScopes(wheres []Where) []func(*gorm.Statement) {
-	if len(wheres) == 0 {
+//
+// 每个 WhereGroup 产出 1 个 scope
+// 组内根据 Group.Or 字段决定 OR / AND 连接；组间恒定 AND
+// 字段在模型中不存在的条件会被静默跳过
+func (s *Service[T]) BuildWhereScopes(groups []WhereGroup) []func(*gorm.Statement) {
+	if len(groups) == 0 {
 		return nil
 	}
-	scopes := make([]func(*gorm.Statement), 0, len(wheres))
-	for _, w := range wheres {
-		op := GetOperatorByAlias(w.Operator)
-		switch op {
-		case "IS NULL", "IS NOT NULL":
-			scopes = append(scopes, func(stmt *gorm.Statement) {
-				stmt.Where(w.Field + " " + op)
-			})
-		case "BETWEEN":
-			scopes = append(scopes, func(stmt *gorm.Statement) {
-				stmt.Where(w.Field+" BETWEEN ? AND ?", w.Value)
-			})
-		case "LIKE", "NOT LIKE", "ILIKE", "NOT ILIKE":
-			v := w.Value
-			if s, ok := v.(string); ok && !strings.Contains(s, "%") {
-				v = "%" + s + "%"
-			}
-			scopes = append(scopes, func(stmt *gorm.Statement) {
-				stmt.Where(w.Field+" "+w.Operator+" ?", v)
-			})
-		default:
-			scopes = append(scopes, func(stmt *gorm.Statement) {
-				stmt.Where(w.Field+" "+op+" ?", w.Value)
-			})
+
+	scopes := make([]func(*gorm.Statement), 0, len(groups))
+	for _, g := range groups {
+		if len(g.Wheres) == 0 {
+			continue
 		}
+
+		exprs := make([]clause.Expression, 0, len(g.Wheres))
+		for _, w := range g.Wheres {
+			if expr := s.BuildWhereExpr(w); expr != nil {
+				exprs = append(exprs, expr)
+			}
+		}
+		if len(exprs) == 0 {
+			continue
+		}
+
+		var wrapped clause.Expression
+		if g.Or {
+			wrapped = clause.OrConditions{Exprs: exprs}
+		} else {
+			wrapped = clause.AndConditions{Exprs: exprs}
+		}
+		scopes = append(scopes, func(stmt *gorm.Statement) {
+			stmt.AddClause(clause.Where{Exprs: []clause.Expression{wrapped}})
+		})
 	}
 	return scopes
 }
 
-// GetOperatorByAlias 符号类运算符别名 → SQL 运算符
+// BuildWhereExpr 将单条 Where 转为 GORM clause.Expression
+func (s *Service[T]) BuildWhereExpr(w Where) clause.Expression {
+	field := strings.TrimSpace(w.Field)
+	if field == "" {
+		return nil
+	}
+	if exists, _ := s.repo.FieldExists(field); !exists {
+		return nil
+	}
+
+	op := GetOperatorByAlias(w.Operator)
+	if op == "" {
+		return nil
+	}
+	switch op {
+	case "IS NULL", "IS NOT NULL":
+		return gorm.Expr(field + " " + op)
+	case "BETWEEN", "NOT BETWEEN":
+		str, ok := w.Value.(string)
+		if !ok {
+			return nil
+		}
+		parts := strings.SplitN(str, ",", 2)
+		if len(parts) != 2 {
+			return nil
+		}
+		return gorm.Expr(field+" "+op+" ? AND ?", strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]))
+	case "LIKE", "NOT LIKE", "ILIKE", "NOT ILIKE":
+		v := w.Value
+		if str, ok := v.(string); ok && !strings.Contains(str, "%") {
+			v = "%" + str + "%"
+		}
+		return gorm.Expr(field+" "+op+" ?", v)
+	case "IN", "NOT IN":
+		return gorm.Expr(field+" "+op+" (?)", w.Value)
+	default:
+		return gorm.Expr(field+" "+op+" ?", w.Value)
+	}
+}
+
+// GetOperatorByAlias 运算符别名 → SQL 运算符白名单
+// 未在白名单内的返回空串，由调用方跳过该条件
 func GetOperatorByAlias(op string) string {
 	switch op {
 	case "eq", "":
@@ -338,13 +392,23 @@ func GetOperatorByAlias(op string) string {
 		return "!="
 	case "gt":
 		return ">"
-	case "gte":
+	case "egt":
 		return ">="
 	case "lt":
 		return "<"
-	case "lte":
+	case "elt":
 		return "<="
+	case "LIKE", "NOT LIKE", "ILIKE", "NOT ILIKE":
+		return op
+	case "IN", "NOT IN":
+		return op
+	case "BETWEEN", "NOT BETWEEN":
+		return op
+	case "NULL":
+		return "IS NULL"
+	case "NOT NULL":
+		return "IS NOT NULL"
 	default:
-		return op // LIKE、IN、NOT IN 等单词运算符直接透传
+		return ""
 	}
 }

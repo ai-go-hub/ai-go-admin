@@ -285,12 +285,16 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
             [
                 'com-search',
                 () => {
-                    // 主动触发公共搜索
-                    // 先读取快捷搜索数据，然后使用公共搜索数据覆盖
+                    // 公共搜索
+                    const groups: WhereGroup[] = []
                     if (table.filter!.quickSearchKeywords) {
-                        setFilterWheres(getQuickSearchData(table.filter!.quickSearchKeywords), 'merge')
+                        const quick = getQuickSearchData(table.filter!.quickSearchKeywords)
+                        if (quick !== false) groups.push(quick)
                     }
-                    setFilterWheres(getComSearchData(), 'merge')
+                    const com = getComSearchData()
+                    if (com !== false) groups.push(com)
+
+                    setFilterWheres(groups)
 
                     // 刷新表格
                     refresh({ event: 'com-search', data: table.filter?.wheres })
@@ -349,10 +353,15 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
                 () => {
                     table.filter!.quickSearchKeywords = data.keywords
 
-                    // 组装查询请求的 filter.wheres
-                    // 先读取公共搜索数据，然后使用快速搜索数据覆盖
-                    setFilterWheres(getComSearchData(), 'merge')
-                    setFilterWheres(getQuickSearchData(data.keywords), 'merge')
+                    const groups: WhereGroup[] = []
+                    const com = getComSearchData()
+                    if (com !== false) groups.push(com)
+                    if (data.keywords) {
+                        const quick = getQuickSearchData(data.keywords)
+                        if (quick !== false) groups.push(quick)
+                    }
+
+                    setFilterWheres(groups)
 
                     refresh({ event: 'quick-search', ...data })
                 },
@@ -468,22 +477,11 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
 
     /**
      * 设置 getData 请求时的过滤条件数据
-     * @param search 公共搜索数据
-     * @param mode 模式:cover=覆盖到已有条件,merge=合并到已有条件
+     * 整体覆盖，调用方如需保留旧条件，请先读 table.filter.wheres 后再拼
+     * @param groups Where 分组数组
      */
-    const setFilterWheres = (search: ComSearchData[], mode: 'cover' | 'merge' = 'merge') => {
-        if (mode == 'cover' || !table.filter?.wheres) {
-            table.filter!.wheres = search
-        } else {
-            const merged = table.filter!.wheres.concat(search)
-            const fieldMap = new Map<string, ComSearchData>()
-
-            merged.forEach((item) => {
-                fieldMap.set(item.field, item)
-            })
-
-            table.filter!.wheres = Array.from(fieldMap.values())
-        }
+    const setFilterWheres = (groups: WhereGroup[]) => {
+        table.filter!.wheres = groups
     }
 
     /**
@@ -583,31 +581,31 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
     /**
      * 获取快速搜索数据
      */
-    const getQuickSearchData = (keywords: string) => {
+    const getQuickSearchData = (keywords: string): WhereGroup | false => {
         const wheres: ComSearchData[] = []
         for (const key in table.column) {
-            if (table.column[key]['quickSearch'] === true && table.column[key]['prop']) {
+            if (keywords && table.column[key]['quickSearch'] === true && table.column[key]['prop']) {
                 wheres.push({
-                    field: table.column[key]['prop'],
+                    field: snakeCase(table.column[key]['prop']),
                     value: keywords,
                     operator: 'ILIKE',
-                    render: table.column[key]['render'],
                 })
             }
         }
-        return wheres
+        if (!wheres.length) return false
+        return { wheres, or: true }
     }
 
     /**
      * 获取公共搜索表单数据
      */
-    const getComSearchData = () => {
+    const getComSearchData = (): WhereGroup | false => {
         // 必需已经完成公共搜索数据的初始化
         if (comSearch.fieldData.size === 0) {
             initComSearch()
         }
 
-        const comSearchData: ComSearchData[] = []
+        const wheres: ComSearchData[] = []
 
         for (const key in comSearch.form) {
             if (!comSearch.fieldData.has(key)) continue
@@ -640,15 +638,15 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
             if (val === null) continue
             if (isArray(val) && !val.length) continue
 
-            comSearchData.push({
-                field: key,
+            wheres.push({
+                field: snakeCase(key),
                 value: val,
                 operator: fieldDataTemp.operator,
-                render: fieldDataTemp.render,
             })
         }
 
-        return comSearchData
+        if (!wheres.length) return false
+        return { wheres, or: false }
     }
 
     /**
@@ -673,8 +671,16 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
             // 根据当前 URL 的 query 初始化公共搜索默认值
             setComSearchData(route.query)
 
-            // 获取公共搜索数据合并至表格筛选条件
-            setFilterWheres(getComSearchData(), 'merge')
+            // 获取公共搜索和快速搜索数据合并至表格筛选条件
+            const groups: WhereGroup[] = []
+            const com = getComSearchData()
+            if (com !== false) groups.push(com)
+            if (table.filter!.quickSearchKeywords) {
+                const quick = getQuickSearchData(table.filter!.quickSearchKeywords)
+                if (quick !== false) groups.push(quick)
+            }
+
+            setFilterWheres(groups)
         }
     }
 
