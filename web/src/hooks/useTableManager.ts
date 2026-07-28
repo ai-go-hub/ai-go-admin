@@ -667,6 +667,7 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
             initComSearch()
         }
 
+        // 公共搜索默认值
         if (table.acceptQuery && !isEmpty(route.query)) {
             // 根据当前 URL 的 query 初始化公共搜索默认值
             setComSearchData(route.query)
@@ -682,6 +683,11 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
 
             setFilterWheres(groups)
         }
+
+        // 默认排序字段名处理
+        if (table.filter?.sort) {
+            table.filter.sort = snakeCase(table.filter.sort)
+        }
     }
 
     return {
@@ -695,6 +701,8 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
         initCtx,
         getData,
         refresh,
+        runAfter,
+        runBefore,
         toggleForm,
         submitForm,
         getEditData,

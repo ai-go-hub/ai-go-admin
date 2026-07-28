@@ -361,6 +361,8 @@ declare global {
         initCtx: () => void
         getData: () => Promise<void> | undefined
         submitForm: (formEl?: FormInstance | null) => void
+        runAfter: (funName: string, args: any = {}) => boolean
+        runBefore: (funName: string, args: any = {}) => boolean
         toggleForm: (operate = '', operatePKs: string[] = []) => void
         handleEvent: (event: TableEventName, data: AnyObj) => boolean | undefined
         getEditData: (pk: string) => Promise<void> | undefined
