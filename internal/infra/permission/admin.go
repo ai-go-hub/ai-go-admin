@@ -147,7 +147,7 @@ func isSuperAdminGroup(group model.AdminGroup) bool {
 // 遇到通配符分组（超管）则返回全部规则 ID
 func (p *Permission) ruleIdsFromGroups(ctx context.Context, groups []model.AdminGroup, ruleStatus *uint8) ([]uint, error) {
 	if slices.ContainsFunc(groups, isSuperAdminGroup) {
-		return p.allRuleIDs(ctx, ruleStatus)
+		return p.AllRuleIDs(ctx, ruleStatus)
 	}
 
 	ruleIDSet := make(map[uint]struct{})
@@ -178,9 +178,9 @@ func (p *Permission) ruleIdsFromGroups(ctx context.Context, groups []model.Admin
 	return ruleIDs, nil
 }
 
-// allRuleIDs 返回全部规则 ID，
+// AllRuleIDs 返回全部规则 ID，
 // ruleStatus 为 nil 时不按状态过滤
-func (p *Permission) allRuleIDs(ctx context.Context, ruleStatus *uint8) ([]uint, error) {
+func (p *Permission) AllRuleIDs(ctx context.Context, ruleStatus *uint8) ([]uint, error) {
 	var scopes []func(*gorm.Statement)
 	if ruleStatus != nil {
 		s := *ruleStatus // 先捕获值
