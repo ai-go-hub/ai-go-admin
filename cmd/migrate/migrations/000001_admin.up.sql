@@ -81,14 +81,14 @@ COMMENT ON COLUMN "__PREFIX__admin_rules"."created_at" IS '创建时间';
 CREATE TABLE IF NOT EXISTS "__PREFIX__admin_groups" (
     "id"          bigserial PRIMARY KEY,
     "pid"         bigint DEFAULT NULL,
-    "name"        varchar(100) NOT NULL DEFAULT '',
+    "name"        varchar(64) NOT NULL DEFAULT '',
     "rules"       text,
     "status"      smallint NOT NULL DEFAULT 1,
-    "updated_at" timestamptz DEFAULT NULL,
-    "created_at" timestamptz DEFAULT NULL
+    "updated_at" timestamptz,
+    "created_at" timestamptz
 );
 
-COMMENT ON TABLE "__PREFIX__admin_groups" IS '管理员分组表';
+COMMENT ON TABLE "__PREFIX__admin_groups" IS '管理员角色组表';
 COMMENT ON COLUMN "__PREFIX__admin_groups"."id" IS 'ID';
 COMMENT ON COLUMN "__PREFIX__admin_groups"."pid" IS '上级分组';
 COMMENT ON COLUMN "__PREFIX__admin_groups"."name" IS '组名';

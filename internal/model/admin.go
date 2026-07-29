@@ -91,19 +91,37 @@ func (r *AdminRule) ToMap() map[string]any {
 	}
 }
 
-// AdminGroup 管理员分组模型
+// AdminGroup 管理员角色组模型
 type AdminGroup struct {
-	ID        uint      `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
-	Pid       *uint     `gorm:"comment:上级分组" json:"pid"`
-	Name      string    `gorm:"comment:组名;type:varchar(100);not null;default:''" json:"name"`
-	Rules     *string   `gorm:"comment:权限规则ID集;type:text" json:"rules"`
-	Status    uint8     `gorm:"comment:状态:0=禁用,1=启用;not null;default:1" json:"status"`
-	UpdatedAt time.Time `gorm:"comment:更新时间" json:"updated_at"`
-	CreatedAt time.Time `gorm:"comment:创建时间" json:"created_at"`
+	ID        uint       `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
+	Pid       *uint      `gorm:"comment:上级分组;default:0" json:"pid"`
+	Name      string     `gorm:"comment:组名;type:varchar(64);not null;default:''" binding:"required" json:"name"`
+	Rules     *string    `gorm:"comment:权限规则ID集;type:text" json:"rules"`
+	Status    *uint8     `gorm:"comment:状态:0=禁用,1=启用;not null;default:1" binding:"required" json:"status"`
+	UpdatedAt *time.Time `gorm:"comment:更新时间" json:"updated_at"`
+	CreatedAt *time.Time `gorm:"comment:创建时间" json:"created_at"`
 }
 
 func (AdminGroup) TableName() string {
 	return "admin_groups"
+}
+
+// ToMap 将 AdminGroup 转换为 map
+// 使用硬编码转换性能最高
+func (g *AdminGroup) ToMap() map[string]any {
+	pid := uint(0)
+	if g.Pid != nil {
+		pid = *g.Pid
+	}
+	return map[string]any{
+		"id":         g.ID,
+		"pid":        pid,
+		"name":       g.Name,
+		"rules":      g.Rules,
+		"status":     g.Status,
+		"updated_at": g.UpdatedAt,
+		"created_at": g.CreatedAt,
+	}
 }
 
 // AdminGroupAccess 管理员分组映射模型

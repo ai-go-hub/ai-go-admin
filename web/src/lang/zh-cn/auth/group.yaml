@@ -1,0 +1,4 @@
+name: 分组名称
+pid: 上级分组
+rules: 权限规则
+parentGroupSelfError: 上级分组不能是自身

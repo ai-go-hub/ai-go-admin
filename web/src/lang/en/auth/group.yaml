@@ -1,0 +1,4 @@
+name: Group name
+pid: Parent group
+rules: Permission rules
+parentGroupSelfError: Parent group cannot be itself
