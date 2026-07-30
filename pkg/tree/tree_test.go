@@ -144,6 +144,22 @@ func TestRenderNested(t *testing.T) {
 	}
 }
 
+func TestRenderOrphanNode(t *testing.T) {
+	data := []map[string]any{
+		{"id": 2, "pid": 1, "title": "a"},
+	}
+
+	got := Render(data, "id", "pid", "title")
+
+	want := []map[string]any{
+		{"id": 2, "pid": 1, "title": "a"},
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("Render() = %v, want %v", got, want)
+	}
+}
+
 func TestBuildEmpty(t *testing.T) {
 	got := Build(nil, "id", "pid", "children")
 	if got == nil {

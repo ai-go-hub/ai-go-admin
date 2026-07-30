@@ -53,9 +53,14 @@ func Render(data []map[string]any, idField, pidField, titleField string) []map[s
 		return make([]map[string]any, 0)
 	}
 
-	childrenMap := make(map[any][]map[string]any)
+	// 构建 id 集合，用于检测孤儿节点
+	idSet := make(map[any]bool, len(data))
+	for _, item := range data {
+		idSet[item[idField]] = true
+	}
 
 	roots := make([]map[string]any, 0)
+	childrenMap := make(map[any][]map[string]any)
 	for _, item := range data {
 		id := item[idField]
 		pid, hasPid := item[pidField]
@@ -75,6 +80,12 @@ func Render(data []map[string]any, idField, pidField, titleField string) []map[s
 				}
 			}
 		}
+
+		// 孤儿节点: 有 pid，但父节点在数据中不存在，视为根节点
+		if !isRoot && !idSet[pid] {
+			isRoot = true
+		}
+
 		if isRoot {
 			roots = append(roots, item)
 			continue
