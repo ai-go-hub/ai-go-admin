@@ -8,7 +8,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
+
+// Preload 预加载关联配置
+type Preload struct {
+	Association string                          // 关联名称
+	Query       func(gorm.PreloadBuilder) error // 可选的自定义查询条件，为 nil 时仅按名称预加载
+}
 
 // Options 通用仓库操作选项
 // 每个方法所需要的选项都可以在此找到，但并非每个方法都会使用全部的选项
@@ -18,6 +25,7 @@ type Options struct {
 	SelectFields     []string                // 选择出入库字段，其余同上
 	PrimaryKeyValue  string                  // 主键值，目前可辅助 Get、Update 方法获取数据行
 	PrimaryKeyValues []string                // 主键切片，目前可供 Delete 方法批量删除行
+	Preloads         []Preload               // 预加载关联，将在 Get、List 中传递给 GORM 的 Preload 方法
 }
 
 // IRepository 通用仓库接口
@@ -31,6 +39,7 @@ type IRepository[T any] interface {
 	Delete(c *gin.Context, opts Options) error
 	PrimaryKeyField() (string, error)       // 获取主键字段
 	FieldExists(field string) (bool, error) // 检查一个字段是否存在
+	Schema() (*schema.Schema, error)        // 获取当前模型的 GORM Schema
 }
 
 // Repository 通用仓库实现
@@ -102,6 +111,11 @@ func (r *Repository[T]) Create(c *gin.Context, entity *T, opts Options) error {
 func (r *Repository[T]) Get(c *gin.Context, opts Options) (*T, error) {
 	q := gorm.G[T](r.DB()).Scopes(opts.Scopes...)
 
+	// 预加载关联
+	for _, p := range opts.Preloads {
+		q = q.Preload(p.Association, p.Query)
+	}
+
 	// 有提供主键
 	if opts.PrimaryKeyValue != "" {
 		pk, err := r.PrimaryKeyField()
@@ -129,6 +143,11 @@ func (r *Repository[T]) Get(c *gin.Context, opts Options) (*T, error) {
 // List 查询全部记录，排序、分页等可通过 opts.Scopes 传入
 func (r *Repository[T]) List(c *gin.Context, opts Options) ([]T, error) {
 	q := gorm.G[T](r.DB()).Scopes(opts.Scopes...)
+
+	// 预加载关联
+	for _, p := range opts.Preloads {
+		q = q.Preload(p.Association, p.Query)
+	}
 
 	// 出库字段的选择与忽略
 	if len(opts.SelectFields) > 0 {
@@ -182,29 +201,38 @@ func (r *Repository[T]) Delete(c *gin.Context, opts Options) error {
 }
 
 // PrimaryKeyField 获取当前模型的主键数据库字段名
-// 复合主键模型返回 GORM 识别的优先主键字段；Statement.Parse 会复用 GORM 的 Schema 缓存
+// 复合主键模型返回 GORM 识别的优先主键字段
 func (r *Repository[T]) PrimaryKeyField() (string, error) {
-	stmt := &gorm.Statement{DB: r.DB()}
-	if err := stmt.Parse(new(T)); err != nil {
+	sch, err := r.Schema()
+	if err != nil {
 		return "", err
 	}
-	if stmt.Schema.PrioritizedPrimaryField == nil {
+	if sch.PrioritizedPrimaryField == nil {
 		return "", errors.New("模型未定义主键")
 	}
-	return stmt.Schema.PrioritizedPrimaryField.DBName, nil
+	return sch.PrioritizedPrimaryField.DBName, nil
 }
 
 // FieldExists 检查当前模型是否包含指定字段
-// 同时支持 Go 字段名和数据库列名；Statement.Parse 会复用 GORM 的 Schema 缓存
+// 同时支持 Go 字段名和数据库列名
 func (r *Repository[T]) FieldExists(field string) (bool, error) {
 	field = strings.TrimSpace(field)
 	if field == "" {
 		return false, nil
 	}
-
-	stmt := &gorm.Statement{DB: r.DB()}
-	if err := stmt.Parse(new(T)); err != nil {
+	sch, err := r.Schema()
+	if err != nil {
 		return false, err
 	}
-	return stmt.Schema.LookUpField(field) != nil, nil
+	return sch.LookUpField(field) != nil, nil
+}
+
+// Schema 获取当前模型解析后的 GORM Schema
+// Statement.Parse 会复用 GORM 的 Schema 缓存
+func (r *Repository[T]) Schema() (*schema.Schema, error) {
+	stmt := &gorm.Statement{DB: r.DB()}
+	if err := stmt.Parse(new(T)); err != nil {
+		return nil, err
+	}
+	return stmt.Schema, nil
 }

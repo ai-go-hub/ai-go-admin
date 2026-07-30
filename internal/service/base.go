@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"gorm.io/gorm/schema"
 )
 
 // Where 筛选条件
@@ -29,17 +30,18 @@ type WhereGroup struct {
 // Options 通用服务操作选项
 // Sort 以外的每个方法所需要的选项都可以在此找到，但并非每个方法都会使用全部的选项
 type Options struct {
-	OmitFields       []string     // 排除出入库字段，会传递给仓储层的 Omit 方法
-	SelectFields     []string     // 选择出入库字段，会传递给仓储层的 Select 方法
-	Wheres           []WhereGroup // 查询条件组，用于构建 WhereScopes，然后传递给仓储层的 Scopes 方法
-	SortField        string       // 排序字段，用于构建 OrderScope
-	SortOrder        string       // 排序方式
-	Page             int          // 页码，用于构建 PaginateScope
-	Limit            int          // 每页条数
-	Selector         bool         // 是否为来自选择器的查询
-	PrimaryKeyValue  string       // 主键值，目前可供 Get、Update 方法获取数据行
-	PrimaryKeyValues []string     // 主键切片，目前可供 Delete 方法批量删除行
-	Extension        any          // 任意自定义扩展参数
+	OmitFields       []string             // 排除出入库字段，会传递给仓储层的 Omit 方法
+	SelectFields     []string             // 选择出入库字段，会传递给仓储层的 Select 方法
+	Wheres           []WhereGroup         // 查询条件组，用于构建 WhereScopes，然后传递给仓储层的 Scopes 方法
+	SortField        string               // 排序字段，用于构建 OrderScope
+	SortOrder        string               // 排序方式
+	Page             int                  // 页码，用于构建 PaginateScope
+	Limit            int                  // 每页条数
+	Selector         bool                 // 是否为来自选择器的查询
+	PrimaryKeyValue  string               // 主键值，目前可供 Get、Update 方法获取数据行
+	PrimaryKeyValues []string             // 主键切片，目前可供 Delete 方法批量删除行
+	Extension        any                  // 任意自定义扩展参数
+	Preloads         []repository.Preload // 预加载关联
 }
 
 // IService 通用服务接口
@@ -55,6 +57,9 @@ type IService[T any] interface {
 	BuildScopes(opts Options) []func(*gorm.Statement)
 	BuildWhereScopes(wheres []WhereGroup) []func(*gorm.Statement)
 	BuildWhereExpr(w Where) clause.Expression
+	BuildRelationWhereExpr(sch *schema.Schema, segments []string, op string, value any) clause.Expression
+	BuildLeafExpr(field, op string, value any) clause.Expression
+	LookUpRelation(sch *schema.Schema, name string) *schema.Relationship
 }
 
 // Service 通用服务实现
@@ -231,6 +236,7 @@ func (s *Service[T]) BuildRepoOpts(opts Options) repository.Options {
 	return repository.Options{
 		OmitFields:       opts.OmitFields,
 		SelectFields:     opts.SelectFields,
+		Preloads:         opts.Preloads,
 		Scopes:           s.BuildScopes(opts),
 		PrimaryKeyValue:  opts.PrimaryKeyValue,
 		PrimaryKeyValues: opts.PrimaryKeyValues,
@@ -348,19 +354,169 @@ func (s *Service[T]) BuildWhereExpr(w Where) clause.Expression {
 	if field == "" {
 		return nil
 	}
-	if exists, _ := s.repo.FieldExists(field); !exists {
-		return nil
-	}
 
+	// 操作符号别名获取 + 白名单检查
 	op := GetOperatorByAlias(w.Operator)
 	if op == "" {
 		return nil
 	}
+
+	// 关联字段名如: group.name，此处按 . 分段，从当前模型 Schema 出发递归下钻（支持嵌套关联）
+	if strings.Contains(field, ".") {
+		sch, err := s.repo.Schema()
+		if err != nil {
+			return nil
+		}
+		// 递归生成嵌套子查询
+		return s.BuildRelationWhereExpr(sch, strings.Split(field, "."), op, w.Value)
+	}
+
+	// 本表字段
+	if exists, _ := s.repo.FieldExists(field); !exists {
+		return nil
+	}
+	return s.BuildLeafExpr(field, op, w.Value)
+}
+
+// BuildRelationWhereExpr 递归生成关联字段的嵌套子查询表达式
+// segments 是按 . 切分后的路径段，如 ["group", "name"] 或 ["admin", "group", "name"]
+func (s *Service[T]) BuildRelationWhereExpr(sch *schema.Schema, segments []string, op string, value any) clause.Expression {
+	if len(segments) < 2 {
+		return nil
+	}
+
+	// 使用双引号包裹标识符
+	quote := func(parts ...string) string {
+		if len(parts) == 0 {
+			return ""
+		}
+		return `"` + strings.Join(parts, `"."`) + `"`
+	}
+
+	// 若 schema 存在名为 DeletedAt 的字段，返回追加到 WHERE 后的软删过滤 SQL 片段
+	// 固定检查名为 DeletedAt 的字段，否则需要使用反射检查字段类型
+	softDelete := func(s *schema.Schema) string {
+		if s == nil {
+			return ""
+		}
+		f := s.LookUpField("DeletedAt")
+		if f == nil {
+			return ""
+		}
+		return " AND " + quote(s.Table, f.DBName) + " IS NULL"
+	}
+
+	head, rest := segments[0], segments[1:]
+	rel := s.LookUpRelation(sch, head)
+	if rel == nil || len(rel.References) == 0 {
+		return nil
+	}
+
+	relTable := rel.FieldSchema.Table
+
+	// 生成关联表侧的 WHERE 子句: 可能是叶子字段，也可能是继续下钻
+	var innerExpr clause.Expression
+	if len(rest) == 1 {
+		leafField := rel.FieldSchema.LookUpField(rest[0])
+		if leafField == nil {
+			return nil
+		}
+		innerExpr = s.BuildLeafExpr(quote(relTable, leafField.DBName), op, value)
+	} else {
+		innerExpr = s.BuildRelationWhereExpr(rel.FieldSchema, rest, op, value)
+	}
+	if innerExpr == nil {
+		return nil
+	}
+
+	// 根据关联类型拼接 IN 子查询
+	ref := rel.References[0]
+	ownerTable := sch.Table
+	relSoftDel := softDelete(rel.FieldSchema)
+
+	switch rel.Type {
+
+	// BelongsTo: 当前表.外键 IN (SELECT 关联表.主键 FROM 关联表 WHERE ...)
+	// ForeignKey 在当前表，PrimaryKey 在关联表
+	case schema.BelongsTo:
+		return gorm.Expr(
+			fmt.Sprintf("%s IN (SELECT %s FROM %s WHERE ?%s)",
+				quote(ownerTable, ref.ForeignKey.DBName),
+				quote(relTable, ref.PrimaryKey.DBName),
+				quote(relTable),
+				relSoftDel,
+			), innerExpr)
+
+	// HasOne/HasMany: 当前表.主键 IN (SELECT 关联表.外键 FROM 关联表 WHERE ...)
+	// PrimaryKey 在当前表，ForeignKey 在关联表
+	case schema.HasOne, schema.HasMany:
+		return gorm.Expr(
+			fmt.Sprintf("%s IN (SELECT %s FROM %s WHERE ?%s)",
+				quote(ownerTable, ref.PrimaryKey.DBName),
+				quote(relTable, ref.ForeignKey.DBName),
+				quote(relTable),
+				relSoftDel,
+			), innerExpr)
+
+	// Many2Many: 通过 JoinTable 中转两层 IN
+	// References[0]: 当前表主键 <-> 中间表外键；References[1]: 关联表主键 <-> 中间表外键
+	case schema.Many2Many:
+		if rel.JoinTable == nil || len(rel.References) < 2 {
+			return nil
+		}
+		joinTable := rel.JoinTable.Table
+		var ownerRef, relRef *schema.Reference
+		for _, r := range rel.References {
+			if r.OwnPrimaryKey {
+				ownerRef = r
+			} else {
+				relRef = r
+			}
+		}
+		if ownerRef == nil || relRef == nil {
+			return nil
+		}
+		joinSoftDel := softDelete(rel.JoinTable)
+		return gorm.Expr(
+			fmt.Sprintf("%s IN (SELECT %s FROM %s WHERE %s IN (SELECT %s FROM %s WHERE ?%s)%s)",
+				quote(ownerTable, ownerRef.PrimaryKey.DBName),
+				quote(joinTable, ownerRef.ForeignKey.DBName),
+				quote(joinTable),
+				quote(joinTable, relRef.ForeignKey.DBName),
+				quote(relTable, relRef.PrimaryKey.DBName),
+				quote(relTable),
+				relSoftDel,
+				joinSoftDel,
+			), innerExpr)
+	}
+
+	return nil
+}
+
+// LookUpRelation 按名称查找关联，兼容 PascalCase 和 snake_case 两种命名风格
+func (s *Service[T]) LookUpRelation(sch *schema.Schema, name string) *schema.Relationship {
+	// 直接精确匹配
+	if r, ok := sch.Relationships.Relations[name]; ok {
+		return r
+	}
+	// 走 GORM 命名策略: 把请求名当作数据库列名，反向匹配 Go 字段名对应的列名
+	namer := s.repo.DB().NamingStrategy
+	target := namer.ColumnName(sch.Table, name)
+	for k, r := range sch.Relationships.Relations {
+		if namer.ColumnName(sch.Table, k) == target {
+			return r
+		}
+	}
+	return nil
+}
+
+// BuildLeafExpr 生成叶子（基础）的字段条件表达式
+func (s *Service[T]) BuildLeafExpr(field, op string, value any) clause.Expression {
 	switch op {
 	case "IS NULL", "IS NOT NULL":
 		return gorm.Expr(field + " " + op)
 	case "BETWEEN", "NOT BETWEEN":
-		str, ok := w.Value.(string)
+		str, ok := value.(string)
 		if !ok {
 			return nil
 		}
@@ -370,15 +526,15 @@ func (s *Service[T]) BuildWhereExpr(w Where) clause.Expression {
 		}
 		return gorm.Expr(field+" "+op+" ? AND ?", strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]))
 	case "LIKE", "NOT LIKE", "ILIKE", "NOT ILIKE":
-		v := w.Value
+		v := value
 		if str, ok := v.(string); ok && !strings.Contains(str, "%") {
 			v = "%" + str + "%"
 		}
 		return gorm.Expr(field+" "+op+" ?", v)
 	case "IN", "NOT IN":
-		return gorm.Expr(field+" "+op+" (?)", w.Value)
+		return gorm.Expr(field+" "+op+" (?)", value)
 	default:
-		return gorm.Expr(field+" "+op+" ?", w.Value)
+		return gorm.Expr(field+" "+op+" ?", value)
 	}
 }
 

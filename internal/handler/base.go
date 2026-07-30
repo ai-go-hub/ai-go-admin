@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
+	"github.com/ai-go-hub/ai-go-admin/internal/repository"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -55,10 +56,11 @@ type ExtensionResolver func(c *gin.Context) any
 
 // HandlerConfig 通用控制器配置
 type HandlerConfig struct {
-	Adapter           Adapter           // 数据适配器
-	OmitFields        ActionFields      // 出入库黑名单字段
-	SelectFields      ActionFields      // 出入库白名单字段
-	ExtensionResolver ExtensionResolver // 任意自定义扩展数据的解析函数
+	Adapter           Adapter              // 数据适配器
+	OmitFields        ActionFields         // 出入库黑名单字段
+	SelectFields      ActionFields         // 出入库白名单字段
+	Preloads          []repository.Preload // 预加载关联配置
+	ExtensionResolver ExtensionResolver    // 任意自定义扩展数据的解析函数
 }
 
 // Option 通用控制器选项函数
@@ -116,6 +118,12 @@ func WithSelectFields(f ActionFields) Option {
 // 解析器返回值会被赋值给 service.Options.Extension
 func WithExtension(resolve ExtensionResolver) Option {
 	return func(c *HandlerConfig) { c.ExtensionResolver = resolve }
+}
+
+// WithPreloads 设置 GORM Preload 预加载关联
+// 每项 Preload 的参数与 GORM Generics API Preload(association, query) 参数同步
+func WithPreloads(p []repository.Preload) Option {
+	return func(c *HandlerConfig) { c.Preloads = p }
 }
 
 // NewHandler 创建通用控制器实例，支持函数式选项传递配置
@@ -285,6 +293,7 @@ func (h *Handler[T]) BuildSerOpts(c *gin.Context, action string, opts Request) s
 		PrimaryKeyValues: opts.PrimaryKeyValues,
 		OmitFields:       GetActionFields(action, h.cfg.OmitFields),
 		SelectFields:     GetActionFields(action, h.cfg.SelectFields),
+		Preloads:         h.cfg.Preloads,
 	}
 
 	// 解析自定义扩展数据
