@@ -60,26 +60,26 @@
                     </el-form-item>
 
                     <template v-if="formItems.type === 'menu'">
-                        <el-form-item :label="t('auth.rule.openType')" prop="openType" class="ag-input-item-radio">
-                            <el-radio-group v-model="formItems.openType">
+                        <el-form-item :label="t('auth.rule.openType')" prop="open_type" class="ag-input-item-radio">
+                            <el-radio-group v-model="formItems.open_type">
                                 <el-radio value="tab" :border="true">{{ t('auth.rule.openTypeTab') }}</el-radio>
                                 <el-radio value="link" :border="true">{{ t('auth.rule.openTypeLink') }}</el-radio>
                                 <el-radio value="iframe" :border="true">{{ t('auth.rule.openTypeIframe') }}</el-radio>
                             </el-radio-group>
                         </el-form-item>
 
-                        <el-form-item v-if="formItems.openType === 'tab'" :label="t('auth.rule.path')" prop="path">
+                        <el-form-item v-if="formItems.open_type === 'tab'" :label="t('auth.rule.path')" prop="path">
                             <el-input v-model="formItems.path" :placeholder="t('common.pleaseEnter', { field: t('auth.rule.path') })"></el-input>
                         </el-form-item>
 
-                        <el-form-item v-if="formItems.openType === 'tab'" :label="t('auth.rule.component')" prop="component">
+                        <el-form-item v-if="formItems.open_type === 'tab'" :label="t('auth.rule.component')" prop="component">
                             <el-input
                                 v-model="formItems.component"
                                 :placeholder="t('common.pleaseEnter', { field: t('auth.rule.component') })"
                             ></el-input>
                         </el-form-item>
 
-                        <el-form-item v-if="['link', 'iframe'].includes(formItems.openType)" :label="t('auth.rule.url')" prop="url">
+                        <el-form-item v-if="['link', 'iframe'].includes(formItems.open_type)" :label="t('auth.rule.url')" prop="url">
                             <el-input v-model="formItems.url" :placeholder="t('common.pleaseEnter', { field: t('auth.rule.url') })"></el-input>
                         </el-form-item>
 

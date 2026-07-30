@@ -46,7 +46,7 @@ const tableManager = useTableManager({
     table: {
         filter: {
             order: 'desc',
-            sort: 'createdAt',
+            sort: 'created_at',
         },
         expandAll: false,
         dblClickNotEditColumn: ['status'],
@@ -54,7 +54,7 @@ const tableManager = useTableManager({
             { type: 'selection', align: 'center', operator: false },
             { label: t('auth.group.name'), prop: 'name', align: 'left', width: 280, operator: 'ILIKE', quickSearch: true },
             { label: 'ID', prop: 'id', align: 'center', operator: 'eq', width: 70 },
-            { label: t('auth.group.rules'), prop: 'rulesTitle', align: 'center', operator: false },
+            { label: t('auth.group.rules'), prop: 'rules_title', align: 'center', operator: false },
             {
                 label: t('common.status'),
                 prop: 'status',
@@ -64,7 +64,7 @@ const tableManager = useTableManager({
             },
             {
                 label: t('common.updatedAt'),
-                prop: 'updatedAt',
+                prop: 'updated_at',
                 align: 'center',
                 render: 'datetime',
                 comSearchRender: 'datetime',
@@ -74,7 +74,7 @@ const tableManager = useTableManager({
             },
             {
                 label: t('common.createdAt'),
-                prop: 'createdAt',
+                prop: 'created_at',
                 align: 'center',
                 render: 'datetime',
                 comSearchRender: 'datetime',

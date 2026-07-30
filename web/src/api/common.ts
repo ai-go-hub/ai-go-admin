@@ -5,11 +5,16 @@ import request from '/@/utils/request'
 // ==================== 点选验证码 ====================
 
 export function getClickCaptcha(apiBaseURL?: string) {
-    return request({
-        url: '/common/captcha/create',
-        method: 'GET',
-        ...(apiBaseURL ? { baseURL: apiBaseURL } : {}),
-    })
+    return request(
+        {
+            url: '/common/captcha/create',
+            method: 'GET',
+            ...(apiBaseURL ? { baseURL: apiBaseURL } : {}),
+        },
+        {
+            convertCase: true,
+        }
+    )
 }
 
 export function checkClickCaptcha(data: ClickRequest, apiBaseURL?: string) {
@@ -21,6 +26,7 @@ export function checkClickCaptcha(data: ClickRequest, apiBaseURL?: string) {
             ...(apiBaseURL ? { baseURL: apiBaseURL } : {}),
         },
         {
+            convertCase: true,
             showErrorMessage: false,
         }
     )

@@ -56,7 +56,7 @@
 
 <script lang="ts" setup>
 import type { ElSelect, PaginationProps } from 'element-plus'
-import { debounce, isEmpty, snakeCase } from 'lodash-es'
+import { debounce, isEmpty } from 'lodash-es'
 import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, reactive, ref, toRaw, useAttrs, useTemplateRef, watch } from 'vue'
 import { selectList } from '/@/api/common'
 import { useConfig } from '/@/stores/config'
@@ -272,7 +272,7 @@ const getData = debounce((initValue: ValueTypes = '') => {
         const kwGroup: WhereGroup = { or: true, wheres: [] }
         for (const key in remoteSearchFields) {
             kwGroup.wheres.push({
-                field: snakeCase(remoteSearchFields[key]),
+                field: remoteSearchFields[key],
                 value: state.keywords,
                 operator: 'ILIKE',
             })
@@ -286,7 +286,7 @@ const getData = debounce((initValue: ValueTypes = '') => {
         wheres.push({
             wheres: [
                 {
-                    field: snakeCase(props.pk),
+                    field: props.pk,
                     value: initValue,
                     operator: 'eq',
                 },

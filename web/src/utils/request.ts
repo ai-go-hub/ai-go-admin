@@ -18,7 +18,7 @@ export interface RequestOptions {
     showErrorMessage?: boolean
     // 是否显示网络错误提示（HTTP 4xx/5xx 等），默认 true
     showNetworkErrorMessage?: boolean
-    // 是否做数据 key 的命名方式转换（请求 camelCase → snake_case，响应 snake_case → camelCase），默认 true
+    // 是否做数据 key 的命名方式转换（请求 camelCase → snake_case，响应 snake_case → camelCase），默认 false
     convertCase?: boolean
 }
 
@@ -149,7 +149,7 @@ instance.interceptors.request.use(
 
         // 将请求数据的 key 从 camelCase 转为 snake_case
         // 不转换 FormData 和 URLSearchParams，因为它们本质上是类数组或二进制容器，转换可能丢失数据
-        if (opts.convertCase !== false) {
+        if (opts.convertCase === true) {
             if (
                 config.data &&
                 typeof config.data === 'object' &&
@@ -192,7 +192,7 @@ instance.interceptors.response.use(
         }
 
         // 将响应数据的 key 从 snake_case 转为 camelCase
-        if (opts.convertCase !== false && response.data?.data) {
+        if (opts.convertCase === true && response.data?.data) {
             response.data.data = keysToCamelCase(response.data.data)
         }
 

@@ -138,7 +138,7 @@ const tableManager = useTableManager({
             { label: t('auth.rule.component'), prop: 'component', align: 'center', operator: 'LIKE', show: false },
             {
                 label: t('auth.rule.openType'),
-                prop: 'openType',
+                prop: 'open_type',
                 align: 'center',
                 dict: {
                     tab: t('auth.rule.openTypeTab'),
@@ -151,7 +151,7 @@ const tableManager = useTableManager({
             { label: t('common.weigh'), prop: 'weigh', align: 'center', sortable: 'custom', operator: 'eq', width: 90 },
             {
                 label: t('common.updatedAt'),
-                prop: 'updatedAt',
+                prop: 'updated_at',
                 align: 'center',
                 render: 'datetime',
                 comSearchRender: 'datetime',
@@ -162,7 +162,7 @@ const tableManager = useTableManager({
             },
             {
                 label: t('common.createdAt'),
-                prop: 'createdAt',
+                prop: 'created_at',
                 align: 'center',
                 render: 'datetime',
                 comSearchRender: 'datetime',
@@ -191,7 +191,7 @@ const tableManager = useTableManager({
     form: {
         defaultItems: {
             type: 'menu',
-            openType: 'tab',
+            open_type: 'tab',
             keepalive: 1,
             status: 1,
             icon: defaultIcon,

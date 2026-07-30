@@ -36,7 +36,7 @@ const tableManager = useTableManager({
             { label: t('common.mobile'), prop: 'mobile', align: 'center', operator: 'LIKE' },
             {
                 label: t('common.lastLoginAt'),
-                prop: 'lastLoginAt',
+                prop: 'last_login_at',
                 align: 'center',
                 render: 'datetime',
                 comSearchRender: 'datetime',
@@ -46,7 +46,7 @@ const tableManager = useTableManager({
             },
             {
                 label: t('common.updatedAt'),
-                prop: 'updatedAt',
+                prop: 'updated_at',
                 align: 'center',
                 render: 'datetime',
                 comSearchRender: 'datetime',
@@ -56,7 +56,7 @@ const tableManager = useTableManager({
             },
             {
                 label: t('common.createdAt'),
-                prop: 'createdAt',
+                prop: 'created_at',
                 align: 'center',
                 render: 'datetime',
                 comSearchRender: 'datetime',

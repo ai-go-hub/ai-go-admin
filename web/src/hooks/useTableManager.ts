@@ -1,5 +1,5 @@
 import { dayjs, ElNotification, FormInstance } from 'element-plus'
-import { assign, cloneDeep, defaults, isArray, isEmpty, snakeCase } from 'lodash-es'
+import { assign, cloneDeep, defaults, isArray, isEmpty } from 'lodash-es'
 import Sortable from 'sortablejs'
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
@@ -256,7 +256,7 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
                         delete table.filter!.sort
                         delete table.filter!.order
                     } else {
-                        table.filter!.sort = snakeCase(data.prop)
+                        table.filter!.sort = data.prop
                         table.filter!.order = data.order
                     }
                     refresh({ event: 'sort-change', ...data })
@@ -586,7 +586,7 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
         for (const key in table.column) {
             if (keywords && table.column[key]['quickSearch'] === true && table.column[key]['prop']) {
                 wheres.push({
-                    field: snakeCase(table.column[key]['prop']),
+                    field: table.column[key]['prop'],
                     value: keywords,
                     operator: 'ILIKE',
                 })
@@ -639,7 +639,7 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
             if (isArray(val) && !val.length) continue
 
             wheres.push({
-                field: snakeCase(key),
+                field: key,
                 value: val,
                 operator: fieldDataTemp.operator,
             })
@@ -682,11 +682,6 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
             }
 
             setFilterWheres(groups)
-        }
-
-        // 默认排序字段名处理
-        if (table.filter?.sort) {
-            table.filter.sort = snakeCase(table.filter.sort)
         }
     }
 

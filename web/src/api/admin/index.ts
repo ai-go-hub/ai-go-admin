@@ -15,11 +15,16 @@ export interface AdminLoginParams {
  * 管理员登录请求
  */
 export function login(data: AdminLoginParams) {
-    return request({
-        url: '/admin/login',
-        method: 'POST',
-        data,
-    })
+    return request(
+        {
+            url: '/admin/login',
+            method: 'POST',
+            data,
+        },
+        {
+            convertCase: true,
+        }
+    )
 }
 
 /**
@@ -46,10 +51,15 @@ export function getLoginConfig() {
  * 后台初始化请求
  */
 export function getInit() {
-    return request({
-        url: '/admin/init',
-        method: 'GET',
-    })
+    return request(
+        {
+            url: '/admin/init',
+            method: 'GET',
+        },
+        {
+            convertCase: true,
+        }
+    )
 }
 
 /**

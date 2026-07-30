@@ -69,7 +69,6 @@
 
 <script setup lang="ts">
 import type { ElTable, Sort, TableColumnCtx } from 'element-plus'
-import { camelCase } from 'lodash-es'
 import type { Component } from 'vue'
 import { computed, nextTick, useTemplateRef } from 'vue'
 import { getCellValue } from '/@/components/table/index'
@@ -138,7 +137,7 @@ const pageSizes = computed(() => {
 const defaultSort = computed(() => {
     if (props.manager.table.filter?.sort) {
         return {
-            prop: camelCase(props.manager.table.filter?.sort),
+            prop: props.manager.table.filter?.sort,
             order: props.manager.table.filter?.order == 'desc' ? 'descending' : 'ascending',
         } as Sort
     }
