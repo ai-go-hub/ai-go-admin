@@ -50,3 +50,26 @@ func (r *AdminRepository) IncrementLoginFailure(c *gin.Context, id uint) error {
 		Update(c.Request.Context(), "login_failure", gorm.Expr("login_failure + ?", 1))
 	return err
 }
+
+// DeleteGroupAccesses 删除管理员的所有分组关联
+func (r *AdminRepository) DeleteGroupAccesses(c *gin.Context, uid uint) error {
+	_, err := gorm.G[model.AdminGroupAccess](r.DB()).Where("uid = ?", uid).Delete(c.Request.Context())
+	return err
+}
+
+// ReplaceGroupAccesses 替换管理员的分组关联: 先删后插
+func (r *AdminRepository) ReplaceGroupAccesses(c *gin.Context, uid uint, accesses []model.AdminGroupAccess) error {
+	if err := r.DeleteGroupAccesses(c, uid); err != nil {
+		return err
+	}
+
+	if len(accesses) == 0 {
+		return nil
+	}
+
+	for i := range accesses {
+		accesses[i].UID = uid
+	}
+	// 泛型 Create 只接受单条 *T，批量插入用传统 API
+	return r.DB().WithContext(c.Request.Context()).Create(&accesses).Error
+}

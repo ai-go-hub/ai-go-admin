@@ -68,14 +68,15 @@ type InitResponse struct {
 
 // AdminUpdateRequest 更新管理员请求参数
 type AdminUpdateRequest struct {
-	Username string `json:"username" binding:"required"`
-	Nickname string `json:"nickname" binding:"required"`
-	Avatar   string `json:"avatar"`
-	Email    string `json:"email"`
-	Mobile   string `json:"mobile"`
-	Password string `json:"password"`
-	Bio      string `json:"bio"`
-	Status   string `json:"status" binding:"required"`
+	Username           string                   `json:"username" binding:"required"`
+	Nickname           string                   `json:"nickname" binding:"required"`
+	Avatar             string                   `json:"avatar"`
+	Email              string                   `json:"email"`
+	Mobile             string                   `json:"mobile"`
+	Password           string                   `json:"password"`
+	Bio                string                   `json:"bio"`
+	Status             string                   `json:"status" binding:"required"`
+	AdminGroupAccesses []model.AdminGroupAccess `json:"admin_group_accesses"`
 }
 
 // AdminCreateRequest 创建管理员请求参数

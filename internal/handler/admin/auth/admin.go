@@ -4,7 +4,9 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/handler"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
+	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	"github.com/ai-go-hub/ai-go-admin/internal/repository"
 	svcAuth "github.com/ai-go-hub/ai-go-admin/internal/service/admin/auth"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +26,15 @@ func NewAuthAdminHandler(svc *svcAuth.AuthAdminService) *AuthAdminHandler {
 			handler.WithOmitFields(handler.ActionFields{
 				// 创建时忽略以下字段不入库
 				Create: []string{"id", "login_failure", "last_login_at", "last_login_ip", "deleted_at"},
+			}),
+			handler.WithPreloads([]repository.Preload{
+				{Association: "AdminGroupAccesses.Group"},
+			}),
+			handler.WithExtension(func(c *gin.Context) any {
+				return &svcAuth.AuthAdminExtension{
+					// 避免 HTTP 层的中间件侵入到服务层，此处显式传递为扩展参数
+					AdminSession: middleware.GetAdmin(c),
+				}
 			}),
 		),
 		svc: svc,

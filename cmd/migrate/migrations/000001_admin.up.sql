@@ -100,9 +100,9 @@ COMMENT ON COLUMN "__PREFIX__admin_groups"."created_at" IS '创建时间';
 -- ===== admin_group_access 管理员分组映射表 =====
 CREATE TABLE IF NOT EXISTS "__PREFIX__admin_group_access" (
     "uid"      bigint NOT NULL,
-    "group_id" bigint NOT NULL
+    "group_id" bigint NOT NULL,
+    PRIMARY KEY ("uid", "group_id")
 );
-CREATE INDEX IF NOT EXISTS "__PREFIX__idx_admin_group_access_uid" ON "__PREFIX__admin_group_access" ("uid");
 CREATE INDEX IF NOT EXISTS "__PREFIX__idx_admin_group_access_group_id" ON "__PREFIX__admin_group_access" ("group_id");
 
 COMMENT ON TABLE "__PREFIX__admin_group_access" IS '管理员分组映射表';

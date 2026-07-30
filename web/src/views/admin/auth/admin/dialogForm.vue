@@ -44,6 +44,17 @@
                         ></el-input>
                     </el-form-item>
 
+                    <el-form-item :label="t('auth.admin.groups')" prop="group_ids">
+                        <RemoteSelect
+                            v-model="formItems.group_ids"
+                            field="name"
+                            remote-url="/admin/auth/group/list"
+                            :placeholder="t('common.pleaseSelect', { field: t('auth.admin.groups') })"
+                            :pagination="false"
+                            multiple
+                        />
+                    </el-form-item>
+
                     <el-form-item :label="t('auth.admin.avatar')">
                         <AgUpload type="image" v-model="formItems.avatar" />
                     </el-form-item>
@@ -114,6 +125,7 @@ import { regularPassword, buildValidatorRule } from '/@/utils/validate'
 import type { FormItemRule } from 'element-plus'
 import { useConfig } from '/@/stores/config'
 import AgUpload from '/@/components/agInput/components/agUpload.vue'
+import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
 
 interface Props {
     manager: TableManagerInstance
@@ -130,6 +142,7 @@ const { t } = useI18n()
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
     username: [buildValidatorRule({ name: 'required', title: t('auth.admin.username') }), buildValidatorRule({ name: 'account' })],
     nickname: [buildValidatorRule({ name: 'required', title: t('auth.admin.nickname') })],
+    group_ids: [buildValidatorRule({ name: 'required', title: t('auth.admin.groups') })],
     email: [buildValidatorRule({ name: 'email', message: t('common.invalidEntry', { field: t('common.email') }) })],
     mobile: [buildValidatorRule({ name: 'mobile', message: t('common.invalidEntry', { field: t('common.mobile') }) })],
     password: [

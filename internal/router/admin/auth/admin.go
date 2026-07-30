@@ -12,7 +12,8 @@ import (
 func init() {
 	registry.Register(func(r *gin.Engine) {
 		repo := repoAdmin.NewAdminRepository()
-		svc := svcAuth.NewAuthAdminService(repo)
+		groupRepo := repoAdmin.NewAdminGroupRepository()
+		svc := svcAuth.NewAuthAdminService(repo, groupRepo)
 		h := handlerAuth.NewAuthAdminHandler(svc)
 
 		group := r.Group("/admin/auth/admin")

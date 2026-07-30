@@ -29,6 +29,14 @@ func (r *AdminGroupRepository) FindByName(c *gin.Context, name string) (*model.A
 	return &group, nil
 }
 
+// FindByIDs 根据 ID 列表批量查询分组
+func (r *AdminGroupRepository) FindByIDs(c *gin.Context, ids []uint) ([]model.AdminGroup, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	return gorm.G[model.AdminGroup](r.DB()).Where("id IN ?", ids).Find(c.Request.Context())
+}
+
 // FindAll 查询全部分组（不带过滤条件），用于内存中构建父子关系
 func (r *AdminGroupRepository) FindAll(c *gin.Context) ([]model.AdminGroup, error) {
 	return gorm.G[model.AdminGroup](r.DB()).Find(c.Request.Context())
