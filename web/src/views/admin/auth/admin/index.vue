@@ -28,7 +28,7 @@ const tableManager = useTableManager({
     table: {
         column: [
             { type: 'selection', align: 'center', operator: false },
-            { label: 'ID', prop: 'id', align: 'center', operator: 'eq', width: 70 },
+            { label: 'ID', prop: 'id', align: 'center', operator: 'BETWEEN', width: 70 },
             { label: t('auth.admin.username'), prop: 'username', align: 'center', operator: 'ILIKE', quickSearch: true },
             { label: t('auth.admin.nickname'), prop: 'nickname', align: 'center', operator: 'ILIKE', quickSearch: true },
 

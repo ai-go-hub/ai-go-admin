@@ -53,7 +53,7 @@ const tableManager = useTableManager({
         column: [
             { type: 'selection', align: 'center', operator: false },
             { label: t('auth.group.name'), prop: 'name', align: 'left', width: 280, operator: 'ILIKE', quickSearch: true },
-            { label: 'ID', prop: 'id', align: 'center', operator: 'eq', width: 70 },
+            { label: 'ID', prop: 'id', align: 'center', operator: 'BETWEEN', width: 70 },
             { label: t('auth.group.rules'), prop: 'rules_title', align: 'center', operator: false },
             {
                 label: t('common.status'),

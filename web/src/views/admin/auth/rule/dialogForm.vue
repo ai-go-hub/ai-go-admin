@@ -36,6 +36,12 @@
                             :remote-search-fields="['title', 'name', 'path']"
                             :placeholder="t('common.pleaseSelect', { field: t('auth.rule.pid') })"
                             :pagination="false"
+                            :empty-values="[null, 0]"
+                            :value-on-clear="0"
+                            :remote-params="{
+                                sort: 'weigh',
+                                order: 'desc',
+                            }"
                         />
                     </el-form-item>
 
@@ -55,8 +61,8 @@
                         <el-input v-model="formItems.name" :placeholder="t('common.pleaseEnter', { field: t('auth.rule.name') })"></el-input>
                     </el-form-item>
 
-                    <el-form-item v-if="formItems.type !== 'node'" :label="t('common.icon')" prop="icon">
-                        <IconSelect v-model="formItems.icon" />
+                    <el-form-item v-if="formItems.type === 'dir'" :label="t('auth.rule.dirPath')" prop="path">
+                        <el-input v-model="formItems.path" :placeholder="t('common.pleaseEnter', { field: t('auth.rule.dirPath') })"></el-input>
                     </el-form-item>
 
                     <template v-if="formItems.type === 'menu'">
@@ -79,6 +85,13 @@
                             ></el-input>
                         </el-form-item>
 
+                        <el-form-item v-if="formItems.open_type === 'tab'" :label="t('auth.rule.extend')" prop="extend">
+                            <el-select v-model="formItems.extend" :placeholder="t('common.pleaseSelect', { field: t('auth.rule.extend') })" clearable>
+                                <el-option :label="t('auth.rule.extendAddRouteOnly')" value="add_route_only" />
+                                <el-option :label="t('auth.rule.extendAddMenuOnly')" value="add_menu_only" />
+                            </el-select>
+                        </el-form-item>
+
                         <el-form-item v-if="['link', 'iframe'].includes(formItems.open_type)" :label="t('auth.rule.url')" prop="url">
                             <el-input v-model="formItems.url" :placeholder="t('common.pleaseEnter', { field: t('auth.rule.url') })"></el-input>
                         </el-form-item>
@@ -88,11 +101,8 @@
                         </el-form-item>
                     </template>
 
-                    <el-form-item :label="t('auth.rule.extend')" prop="extend">
-                        <el-select v-model="formItems.extend" :placeholder="t('common.pleaseSelect', { field: t('auth.rule.extend') })" clearable>
-                            <el-option :label="t('auth.rule.extendAddRouteOnly')" value="add_route_only" />
-                            <el-option :label="t('auth.rule.extendAddMenuOnly')" value="add_menu_only" />
-                        </el-select>
+                    <el-form-item v-if="formItems.type !== 'node'" :label="t('common.icon')" prop="icon">
+                        <IconSelect v-model="formItems.icon" />
                     </el-form-item>
 
                     <el-form-item :label="t('common.weigh')" prop="weigh">

@@ -56,6 +56,25 @@ func (r *AdminRuleRepository) DistinctPidsByIDs(c *gin.Context, ids []uint) ([]u
 	return pids, nil
 }
 
+// ChildIDsByPids 根据 pids 查直接子级 id 集合
+func (r *AdminRuleRepository) ChildIDsByPids(c *gin.Context, pids []uint) ([]uint, error) {
+	if len(pids) == 0 {
+		return nil, nil
+	}
+	children, err := gorm.G[model.AdminRule](r.DB()).
+		Where("pid IN ?", pids).
+		Select("id").
+		Find(c.Request.Context())
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]uint, 0, len(children))
+	for _, rule := range children {
+		ids = append(ids, rule.ID)
+	}
+	return ids, nil
+}
+
 // TitleMapByIDs 返回 ids 中指定 types 的规则的 id -> title 映射
 func (r *AdminRuleRepository) TitleMapByIDs(c *gin.Context, ids []uint, types ...string) (map[uint]string, error) {
 	if len(ids) == 0 {

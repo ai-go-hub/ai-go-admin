@@ -117,9 +117,9 @@ const tableManager = useTableManager({
         dblClickNotEditColumn: ['keepalive', 'status'],
         column: [
             { type: 'selection', align: 'center', operator: false },
-            { label: t('auth.rule.title'), prop: 'title', align: 'left', width: 260, operator: 'LIKE', quickSearch: true },
-            { label: 'ID', prop: 'id', align: 'center', operator: 'eq', width: 70 },
-            { label: t('auth.rule.name'), prop: 'name', align: 'center', operator: 'LIKE', quickSearch: true },
+            { label: t('auth.rule.title'), prop: 'title', align: 'left', width: 260, operator: 'ILIKE', quickSearch: true },
+            { label: 'ID', prop: 'id', align: 'center', operator: 'BETWEEN', width: 70 },
+            { label: t('auth.rule.name'), prop: 'name', align: 'center', operator: 'ILIKE', quickSearch: true },
             {
                 label: t('auth.rule.type'),
                 prop: 'type',
@@ -134,8 +134,8 @@ const tableManager = useTableManager({
                 width: 100,
             },
             { label: t('common.icon'), prop: 'icon', align: 'center', render: 'icon', operator: false, width: 70 },
-            { label: t('auth.rule.path'), prop: 'path', align: 'center', operator: 'LIKE', show: false, quickSearch: true },
-            { label: t('auth.rule.component'), prop: 'component', align: 'center', operator: 'LIKE', show: false },
+            { label: t('auth.rule.path'), prop: 'path', align: 'center', operator: 'ILIKE', show: false, quickSearch: true },
+            { label: t('auth.rule.component'), prop: 'component', align: 'center', operator: 'ILIKE', show: false },
             {
                 label: t('auth.rule.openType'),
                 prop: 'open_type',
@@ -147,8 +147,9 @@ const tableManager = useTableManager({
                 },
                 width: 100,
                 show: false,
+                comSearchRender: 'select',
             },
-            { label: t('common.weigh'), prop: 'weigh', align: 'center', sortable: 'custom', operator: 'eq', width: 90 },
+            { label: t('common.weigh'), prop: 'weigh', align: 'center', sortable: 'custom', operator: 'BETWEEN', width: 90 },
             {
                 label: t('common.updatedAt'),
                 prop: 'updated_at',

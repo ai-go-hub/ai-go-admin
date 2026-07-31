@@ -6,6 +6,7 @@ typeDir: 规则目录
 typeMenu: 菜单项
 typeNode: 权限节点
 path: 菜单路由路径
+dirPath: 目录路径
 url: 菜单URL
 component: 菜单组件路径
 openType: 菜单打开方式
@@ -13,7 +14,7 @@ openTypeTab: 选项卡
 openTypeLink: 链接
 openTypeIframe: Iframe
 keepalive: 菜单组件缓存
-extend: 扩展属性
+extend: 菜单扩展属性
 extendAddRouteOnly: 只添加为路由
 extendAddMenuOnly: 只添加为菜单
 remark: 备注

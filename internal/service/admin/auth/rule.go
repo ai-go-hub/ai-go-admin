@@ -51,6 +51,40 @@ func (s *AuthAdminRuleService) Update(c *gin.Context, entity *model.AdminRule, o
 	return s.IService.Update(c, entity, opts)
 }
 
+// Delete 覆写通用删除方法: 校验被删规则没有游离的子级
+func (s *AuthAdminRuleService) Delete(c *gin.Context, opts service.Options) error {
+	if len(opts.PrimaryKeyValues) == 0 {
+		return errors.New("请选择要删除的记录")
+	}
+
+	// 把待删主键转为 uint 集合（与数据库 pid 字段类型一致，避免类型转换开销）
+	pks := make([]uint, 0, len(opts.PrimaryKeyValues))
+	pkSet := make(map[uint]struct{}, len(opts.PrimaryKeyValues))
+	for _, pk := range opts.PrimaryKeyValues {
+		id, err := strconv.ParseUint(pk, 10, 32)
+		if err != nil {
+			return errors.New("主键值错误")
+		}
+		pks = append(pks, uint(id))
+		pkSet[uint(id)] = struct{}{}
+	}
+
+	// 查询 pid 的直接子级 id
+	childIDs, err := s.repo.ChildIDsByPids(c, pks)
+	if err != nil {
+		return err
+	}
+
+	// 遍历子级，若子级自身不在待删集合内则视为游离节点
+	for _, id := range childIDs {
+		if _, ok := pkSet[id]; !ok {
+			return errors.New("请先删除子级规则，或使用批量删除")
+		}
+	}
+
+	return s.IService.Delete(c, opts)
+}
+
 // List 覆写通用查询全部记录方法: 根据管理员权限过滤
 func (s *AuthAdminRuleService) List(c *gin.Context, opts service.Options) ([]model.AdminRule, error) {
 	// 从控制器传来的 `管理员信息` 扩展数据
@@ -106,6 +140,10 @@ func (s *AuthAdminRuleService) List(c *gin.Context, opts service.Options) ([]mod
 
 // Count 覆写通用统计方法: 与 List 使用相同的权限过滤条件
 func (s *AuthAdminRuleService) Count(c *gin.Context, opts service.Options) (int64, error) {
+	if opts.Selector {
+		return 0, nil
+	}
+
 	extension, ok := opts.Extension.(*AuthAdminRuleExtension)
 	if !ok || extension.AdminSession == nil {
 		return 0, errors.New("参数错误，缺少 AdminSession 扩展数据")
@@ -122,7 +160,7 @@ func (s *AuthAdminRuleService) Count(c *gin.Context, opts service.Options) (int6
 
 // validateRule 校验规则字段、名称与上级规则
 func (s *AuthAdminRuleService) validateRule(c *gin.Context, entity *model.AdminRule, pk string) error {
-	if entity.Type == "menu" && (util.PtrIsZero(entity.Path) || util.PtrIsZero(entity.Component)) {
+	if entity.Type == "menu" && util.FromPtr(entity.OpenType) == "tab" && (util.PtrIsZero(entity.Path) || util.PtrIsZero(entity.Component)) {
 		return errors.New("规则类型为菜单时，菜单路由路径和菜单组件路径不能为空")
 	}
 
