@@ -281,14 +281,14 @@ const getData = debounce((initValue: ValueTypes = '') => {
     }
 
     // 绑定值初始化，使用精确匹配
-    if (!isEmpty(initValue)) {
+    if (!isEmpty(initValue) && initValue !== 0 && initValue !== '0') {
         state.currentPage = 1
         wheres.push({
             wheres: [
                 {
                     field: props.pk,
                     value: initValue,
-                    operator: 'eq',
+                    operator: 'IN',
                 },
             ],
             or: false,
