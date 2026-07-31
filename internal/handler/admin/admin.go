@@ -1,9 +1,12 @@
 package admin
 
 import (
+	"net/http"
+
 	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/handler"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
@@ -80,6 +83,16 @@ func (h *AdminHandler) Logout(c *gin.Context) {
 // 当前后端无可清理的缓存（暂无 Redis/进程内运行时缓存层等）
 // 此接口作为契约占位，待后续引入缓存层时在此补充清理逻辑
 func (h *AdminHandler) ClearCache(c *gin.Context) {
+
+	admin := middleware.GetAdmin(c)
+	perm := permission.New()
+	super, err := perm.IsSuperAdmin(c, admin.ID)
+
+	if err != nil || !super {
+		httpx.Fail(c, httpx.WithCode(http.StatusForbidden), httpx.WithMessage("无权限"))
+		return
+	}
+
 	httpx.Success(c)
 }
 
