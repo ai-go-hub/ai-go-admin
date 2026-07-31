@@ -2,7 +2,6 @@ package permission
 
 import (
 	"context"
-	"errors"
 	"slices"
 	"strconv"
 	"strings"
@@ -103,9 +102,17 @@ func (p *Permission) GetRules(ctx context.Context, adminId uint, ruleStatus *uin
 }
 
 // Check 检查管理员是否拥有指定名称的权限规则
-func (p *Permission) Check(ctx context.Context, adminId uint, ruleName string) (bool, error) {
-	if ruleName == "" {
+// ruleNames 为待检查的权限节点名称列表，op 取值 "OR" 或 "AND"（默认），
+// OR 表示任意一个命中即返回 true，AND 表示必须全部命中才返回 true
+func (p *Permission) Check(ctx context.Context, adminId uint, ruleNames []string, op string) (bool, error) {
+	if len(ruleNames) == 0 {
 		return false, nil
+	}
+
+	// 将 op 转小写后，只能是 or 或 and
+	op = strings.ToLower(op)
+	if op != "or" {
+		op = "and"
 	}
 
 	groups, err := p.GetGroups(ctx, adminId)
@@ -127,15 +134,17 @@ func (p *Permission) Check(ctx context.Context, adminId uint, ruleName string) (
 		return false, nil
 	}
 
-	_, err = gorm.G[model.AdminRule](database.DB()).Where("id IN ? AND name = ? AND status = ?", ruleIDs, ruleName, RuleStatusEnabled).First(ctx)
+	rules, err := gorm.G[model.AdminRule](database.DB()).
+		Where("id IN ? AND name IN ? AND status = ?", ruleIDs, ruleNames, RuleStatusEnabled).
+		Find(ctx)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil
-		}
 		return false, err
 	}
 
-	return true, nil
+	if op == "or" {
+		return len(rules) > 0, nil
+	}
+	return len(rules) == len(ruleNames), nil
 }
 
 // isSuperAdminGroup 判断分组是否拥有全部权限（即超管，Rules 字段值为 "*"）
