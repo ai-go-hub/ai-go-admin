@@ -26,7 +26,7 @@ func AdminPermission() gin.HandlerFunc {
 		if fullPath == "" {
 			fullPath = c.Request.URL.Path
 		}
-		checkPath := buildCheckPath(fullPath)
+		checkPath := permission.BuildCheckPath(fullPath)
 
 		// 构建验权参数
 		op := "AND"
@@ -51,24 +51,4 @@ func AdminPermission() gin.HandlerFunc {
 
 		c.Next()
 	}
-}
-
-// buildCheckPath 从 fullPath 获取用于匹配权限节点名称的路径
-func buildCheckPath(fullPath string) string {
-	// 去掉前缀
-	path := strings.TrimPrefix(fullPath, "/admin/")
-
-	// 去掉 params
-	parts := strings.Split(path, "/")
-	filtered := make([]string, 0, len(parts))
-	for _, p := range parts {
-		// 从搜索到的第一个 params 开始，后续的路径全部忽略
-		if strings.HasPrefix(p, ":") {
-			break
-		}
-		if p != "" {
-			filtered = append(filtered, p)
-		}
-	}
-	return strings.Join(filtered, "/")
 }

@@ -242,3 +242,27 @@ export const arrayFullURL = (resources: string | string[], domain = '') => {
     }
     return resources
 }
+
+interface ElTreeData {
+    label: string
+    children?: ElTreeData[]
+}
+
+/**
+ * 将数据构建为 ElTree 的 data {label:'', children: []}
+ * @param data
+ */
+export const buildJsonToElTreeData = (data: any): ElTreeData[] => {
+    if (typeof data == 'object') {
+        const childrens = []
+        for (const key in data) {
+            childrens.push({
+                label: key + ': ' + data[key],
+                children: buildJsonToElTreeData(data[key]),
+            })
+        }
+        return childrens
+    } else {
+        return []
+    }
+}

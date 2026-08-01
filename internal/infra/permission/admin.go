@@ -210,3 +210,20 @@ func (p *Permission) AllRuleIDs(ctx context.Context, ruleStatus *uint8) ([]uint,
 
 	return ids, nil
 }
+
+// BuildCheckPath 从 fullPath 获取权限节点名称
+// 去掉 "/admin/" 前缀，去掉 params（以 ":" 开头的路径段），然后以 "/" 连接剩余部分
+func BuildCheckPath(fullPath string) string {
+	path := strings.TrimPrefix(fullPath, "/admin/")
+	parts := strings.Split(path, "/")
+	filtered := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if strings.HasPrefix(p, ":") {
+			break
+		}
+		if p != "" {
+			filtered = append(filtered, p)
+		}
+	}
+	return strings.Join(filtered, "/")
+}

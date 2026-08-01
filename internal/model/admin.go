@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"time"
 
 	"gorm.io/gorm"
@@ -134,4 +135,58 @@ type AdminGroupAccess struct {
 
 func (AdminGroupAccess) TableName() string {
 	return "admin_group_access"
+}
+
+// AdminLog 管理员日志模型
+type AdminLog struct {
+	ID        uint       `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
+	AdminID   uint       `gorm:"comment:管理员ID;not null;default:0" json:"admin_id"`
+	Username  string     `gorm:"comment:管理员用户名;type:varchar(64);not null;default:''" json:"username"`
+	URL       string     `gorm:"comment:操作URL;type:varchar(1500);not null;default:''" json:"url"`
+	Title     string     `gorm:"comment:日志标题;type:varchar(64);not null;default:''" json:"title"`
+	Data      *string    `gorm:"comment:请求数据;type:text" json:"data"`
+	IP        string     `gorm:"comment:IP;type:varchar(64);not null;default:''" json:"ip"`
+	UserAgent string     `gorm:"comment:User Agent;type:varchar(255);not null;default:''" json:"user_agent"`
+	CreatedAt *time.Time `gorm:"comment:创建时间" json:"created_at"`
+}
+
+func (AdminLog) TableName() string {
+	return "admin_logs"
+}
+
+// BeforeCreate GORM 插入前钩子: 脱敏敏感字段，登录日志自动填充用户名
+// 日志是异步写入的，这里可以多做些附加处理，让日志中间件保持简洁
+func (l *AdminLog) BeforeCreate(tx *gorm.DB) error {
+	if l.Data == nil || *l.Data == "" {
+		return nil
+	}
+
+	var data map[string]any
+	if err := json.Unmarshal([]byte(*l.Data), &data); err != nil {
+		return nil
+	}
+
+	// 脱敏敏感字段
+	for _, field := range []string{"password", "salt", "token"} {
+		if _, ok := data[field]; ok {
+			data[field] = "******"
+		}
+	}
+
+	// 登录日志：从请求体中提取 username 填充到 Username 字段
+	if l.URL == "/admin/login" {
+		if username, ok := data["username"]; ok {
+			if usernameStr, ok := username.(string); ok {
+				l.Username = usernameStr
+			}
+		}
+	}
+
+	masked, err := json.Marshal(data)
+	if err != nil {
+		return nil
+	}
+	maskedStr := string(masked)
+	l.Data = &maskedStr
+	return nil
 }

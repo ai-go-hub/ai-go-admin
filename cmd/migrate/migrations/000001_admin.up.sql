@@ -108,3 +108,29 @@ CREATE INDEX IF NOT EXISTS "__PREFIX__idx_admin_group_access_group_id" ON "__PRE
 COMMENT ON TABLE "__PREFIX__admin_group_access" IS '管理员分组映射表';
 COMMENT ON COLUMN "__PREFIX__admin_group_access"."uid" IS '管理员ID';
 COMMENT ON COLUMN "__PREFIX__admin_group_access"."group_id" IS '分组ID';
+
+-- ===== admin_logs 管理员日志表 =====
+CREATE TABLE IF NOT EXISTS "__PREFIX__admin_logs" (
+    "id"          bigserial PRIMARY KEY,
+    "admin_id"    bigint NOT NULL DEFAULT 0,
+    "username"    varchar(64) NOT NULL DEFAULT '',
+    "url"         varchar(1500) NOT NULL DEFAULT '',
+    "title"       varchar(64) NOT NULL DEFAULT '',
+    "data"        text,
+    "ip"          varchar(64) NOT NULL DEFAULT '',
+    "user_agent"  varchar(255) NOT NULL DEFAULT '',
+    "created_at"  timestamptz
+);
+
+CREATE INDEX IF NOT EXISTS "__PREFIX__idx_admin_logs_admin_id" ON "__PREFIX__admin_logs" ("admin_id");
+
+COMMENT ON TABLE "__PREFIX__admin_logs" IS '管理员日志表';
+COMMENT ON COLUMN "__PREFIX__admin_logs"."id" IS 'ID';
+COMMENT ON COLUMN "__PREFIX__admin_logs"."admin_id" IS '管理员ID';
+COMMENT ON COLUMN "__PREFIX__admin_logs"."username" IS '管理员用户名';
+COMMENT ON COLUMN "__PREFIX__admin_logs"."url" IS '操作URL';
+COMMENT ON COLUMN "__PREFIX__admin_logs"."title" IS '日志标题';
+COMMENT ON COLUMN "__PREFIX__admin_logs"."data" IS '请求数据';
+COMMENT ON COLUMN "__PREFIX__admin_logs"."ip" IS 'IP';
+COMMENT ON COLUMN "__PREFIX__admin_logs"."user_agent" IS 'User Agent';
+COMMENT ON COLUMN "__PREFIX__admin_logs"."created_at" IS '创建时间';

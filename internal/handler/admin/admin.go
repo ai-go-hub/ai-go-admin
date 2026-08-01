@@ -51,7 +51,9 @@ func (h *AdminHandler) Login(c *gin.Context) {
 		return
 	}
 
-	result, err := h.svc.Login(c.Request.Context(), &req, c.ClientIP())
+	c.Set(middleware.CtxAdminLogTitleKey, "登录")
+
+	result, err := h.svc.Login(c.Request.Context(), &req, httpx.ClientIP(c))
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage(err.Error()))
 		return
@@ -70,6 +72,8 @@ func (h *AdminHandler) Logout(c *gin.Context) {
 		return
 	}
 
+	c.Set(middleware.CtxAdminLogTitleKey, "注销")
+
 	if err := h.svc.Logout(c.Request.Context(), middleware.GetToken(c)); err != nil {
 		httpx.Fail(c)
 		return
@@ -83,6 +87,8 @@ func (h *AdminHandler) Logout(c *gin.Context) {
 // 当前后端无可清理的缓存（暂无 Redis/进程内运行时缓存层等）
 // 此接口作为契约占位，待后续引入缓存层时在此补充清理逻辑
 func (h *AdminHandler) ClearCache(c *gin.Context) {
+
+	c.Set(middleware.CtxAdminLogTitleKey, "清理缓存")
 
 	admin := middleware.GetAdmin(c)
 	perm := permission.New()
