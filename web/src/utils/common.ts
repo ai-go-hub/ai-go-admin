@@ -1,3 +1,4 @@
+import { FormInstance } from 'element-plus'
 import { camelCase, snakeCase, trimStart } from 'lodash-es'
 import { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
 import router from '/@/router/index'
@@ -246,6 +247,14 @@ export const arrayFullURL = (resources: string | string[], domain = '') => {
 interface ElTreeData {
     label: string
     children?: ElTreeData[]
+}
+
+/**
+ * el-form 表单重置
+ * @param formEl
+ */
+export const resetForm = (formEl?: FormInstance | null) => {
+    typeof formEl?.resetFields == 'function' && formEl.resetFields()
 }
 
 /**
