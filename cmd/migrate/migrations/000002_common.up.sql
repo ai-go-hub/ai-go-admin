@@ -66,17 +66,17 @@ COMMENT ON COLUMN "__PREFIX__configs"."weigh" IS '权重';
 -- ===== attachments 附件表 =====
 CREATE TABLE IF NOT EXISTS "__PREFIX__attachments" (
     "id"             bigserial PRIMARY KEY,
-    "topic"          varchar(20) NOT NULL DEFAULT '',
+    "topic"          varchar(64) NOT NULL DEFAULT '',
     "user_id"        bigint NOT NULL DEFAULT 0,
-    "user_type"      varchar(50) NOT NULL DEFAULT '',
+    "user_type"      varchar(64) NOT NULL DEFAULT '',
     "url"            varchar(255) NOT NULL DEFAULT '',
-    "name"           varchar(120) NOT NULL DEFAULT '',
+    "name"           varchar(255) NOT NULL DEFAULT '',
     "size"           bigint NOT NULL DEFAULT 0,
-    "mimetype"       varchar(100) NOT NULL DEFAULT '',
+    "mimetype"       varchar(64) NOT NULL DEFAULT '',
     "quote"          bigint NOT NULL DEFAULT 0,
-    "driver"         varchar(50) NOT NULL DEFAULT '',
-    "sha1"           varchar(40) NOT NULL DEFAULT '',
-    "create_at"      timestamptz DEFAULT NULL,
+    "driver"         varchar(64) NOT NULL DEFAULT '',
+    "sha1"           varchar(64) NOT NULL DEFAULT '',
+    "created_at"     timestamptz DEFAULT NULL,
     "last_upload_at" timestamptz DEFAULT NULL
 );
 CREATE UNIQUE INDEX IF NOT EXISTS "__PREFIX__idx_attachments_sha1" ON "__PREFIX__attachments" ("sha1");
@@ -92,5 +92,5 @@ COMMENT ON COLUMN "__PREFIX__attachments"."mimetype" IS 'MIME类型';
 COMMENT ON COLUMN "__PREFIX__attachments"."quote" IS '上传（引用）次数';
 COMMENT ON COLUMN "__PREFIX__attachments"."driver" IS '存储驱动';
 COMMENT ON COLUMN "__PREFIX__attachments"."sha1" IS 'SHA1编码';
-COMMENT ON COLUMN "__PREFIX__attachments"."create_at" IS '创建时间';
+COMMENT ON COLUMN "__PREFIX__attachments"."created_at" IS '创建时间';
 COMMENT ON COLUMN "__PREFIX__attachments"."last_upload_at" IS '最后上传时间';

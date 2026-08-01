@@ -1,0 +1,14 @@
+topic: 主题分类
+userID: 上传用户ID
+userType: 上传用户类型
+url: 存储路径
+name: 原始名称
+size: 大小
+mimetype: MIME类型
+quote: 引用次数
+driver: 存储驱动
+sha1: SHA1
+lastUploadAt: 最后上传时间
+preview: 预览
+minByte: 最小字节
+maxByte: 最大字节

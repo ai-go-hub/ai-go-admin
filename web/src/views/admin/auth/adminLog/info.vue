@@ -26,7 +26,7 @@
                         {{ manager.form.extend!.info.user_agent }}
                     </el-descriptions-item>
                     <el-descriptions-item :width="120" :span="2" :label="t('common.createdAt')">
-                        {{ dayjs(manager.form.extend!.info.create_at).format('YYYY-MM-DD HH:mm:ss') }}
+                        {{ dayjs(manager.form.extend!.info.created_at).format('YYYY-MM-DD HH:mm:ss') }}
                     </el-descriptions-item>
                     <el-descriptions-item :width="120" :span="2" :label="t('auth.adminLog.data')">
                         <el-tree class="table-el-tree" :data="manager.form.extend!.info.data" :props="{ label: 'label', children: 'children' }" />

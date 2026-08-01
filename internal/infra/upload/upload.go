@@ -118,7 +118,7 @@ func (s *Service) Upload(ctx context.Context, header *multipart.FileHeader, driv
 		Quote:        1,
 		Driver:       driverName,
 		Sha1:         sha1Hex,
-		CreateAt:     now,
+		CreatedAt:    now,
 		LastUploadAt: now,
 	}
 	if err := s.repo.Save(ctx, att); err != nil {

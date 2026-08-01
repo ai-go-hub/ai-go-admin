@@ -1,0 +1,14 @@
+topic: Topic
+userID: User ID
+userType: User Type
+url: Storage Path
+name: Original Name
+size: Size
+mimetype: MIME Type
+quote: Reference Count
+driver: Storage Driver
+sha1: SHA1
+lastUploadAt: Last Upload At
+preview: Preview
+minByte: Minimum Byte
+maxByte: Maximum Byte
