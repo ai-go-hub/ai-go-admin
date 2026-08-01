@@ -51,7 +51,7 @@ func (h *AdminHandler) Login(c *gin.Context) {
 		return
 	}
 
-	result, err := h.svc.Login(c, &req)
+	result, err := h.svc.Login(c.Request.Context(), &req, c.ClientIP())
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage(err.Error()))
 		return
@@ -70,7 +70,7 @@ func (h *AdminHandler) Logout(c *gin.Context) {
 		return
 	}
 
-	if err := h.svc.Logout(c, middleware.GetToken(c)); err != nil {
+	if err := h.svc.Logout(c.Request.Context(), middleware.GetToken(c)); err != nil {
 		httpx.Fail(c)
 		return
 	}
@@ -98,7 +98,7 @@ func (h *AdminHandler) ClearCache(c *gin.Context) {
 
 // Init 后台数据初始化接口
 func (h *AdminHandler) Init(c *gin.Context) {
-	result, err := h.svc.Init(c, middleware.GetAdmin(c))
+	result, err := h.svc.Init(c.Request.Context(), middleware.GetAdmin(c))
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("初始化失败: "+err.Error()))
 		return

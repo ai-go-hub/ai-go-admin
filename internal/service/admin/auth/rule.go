@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"strconv"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -36,23 +36,23 @@ func NewAuthAdminRuleService(repo *repoAdmin.AdminRuleRepository) *AuthAdminRule
 }
 
 // Create 覆写通用创建方法: 增加服务层校验
-func (s *AuthAdminRuleService) Create(c *gin.Context, entity *model.AdminRule, opts service.Options) error {
-	if err := s.validateRule(c, entity, opts.PrimaryKeyValue); err != nil {
+func (s *AuthAdminRuleService) Create(ctx context.Context, entity *model.AdminRule, opts service.Options) error {
+	if err := s.validateRule(ctx, entity, opts.PrimaryKeyValue); err != nil {
 		return err
 	}
-	return s.IService.Create(c, entity, opts)
+	return s.IService.Create(ctx, entity, opts)
 }
 
 // Update 覆写通用更新方法: 增加服务层校验
-func (s *AuthAdminRuleService) Update(c *gin.Context, entity *model.AdminRule, opts service.Options) error {
-	if err := s.validateRule(c, entity, opts.PrimaryKeyValue); err != nil {
+func (s *AuthAdminRuleService) Update(ctx context.Context, entity *model.AdminRule, opts service.Options) error {
+	if err := s.validateRule(ctx, entity, opts.PrimaryKeyValue); err != nil {
 		return err
 	}
-	return s.IService.Update(c, entity, opts)
+	return s.IService.Update(ctx, entity, opts)
 }
 
 // Delete 覆写通用删除方法: 校验被删规则没有游离的子级
-func (s *AuthAdminRuleService) Delete(c *gin.Context, opts service.Options) error {
+func (s *AuthAdminRuleService) Delete(ctx context.Context, opts service.Options) error {
 	if len(opts.PrimaryKeyValues) == 0 {
 		return errors.New("请选择要删除的记录")
 	}
@@ -70,7 +70,7 @@ func (s *AuthAdminRuleService) Delete(c *gin.Context, opts service.Options) erro
 	}
 
 	// 查询 pid 的直接子级 id
-	childIDs, err := s.repo.ChildIDsByPids(c, pks)
+	childIDs, err := s.repo.ChildIDsByPids(ctx, pks)
 	if err != nil {
 		return err
 	}
@@ -82,11 +82,11 @@ func (s *AuthAdminRuleService) Delete(c *gin.Context, opts service.Options) erro
 		}
 	}
 
-	return s.IService.Delete(c, opts)
+	return s.IService.Delete(ctx, opts)
 }
 
 // List 覆写通用查询全部记录方法: 根据管理员权限过滤
-func (s *AuthAdminRuleService) List(c *gin.Context, opts service.Options) ([]model.AdminRule, error) {
+func (s *AuthAdminRuleService) List(ctx context.Context, opts service.Options) ([]model.AdminRule, error) {
 	// 从控制器传来的 `管理员信息` 扩展数据
 	extension, ok := opts.Extension.(*AuthAdminRuleExtension)
 	if !ok || extension.AdminSession == nil {
@@ -94,7 +94,7 @@ func (s *AuthAdminRuleService) List(c *gin.Context, opts service.Options) ([]mod
 	}
 
 	perm := permission.New()
-	super, err := perm.IsSuperAdmin(c.Request.Context(), extension.AdminSession.ID)
+	super, err := perm.IsSuperAdmin(ctx, extension.AdminSession.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (s *AuthAdminRuleService) List(c *gin.Context, opts service.Options) ([]mod
 
 	// 非超管，读取当前管理员拥有的权限规则 IDs
 	if !super {
-		ruleIDs, err := perm.GetRuleIds(c.Request.Context(), extension.AdminSession.ID, nil)
+		ruleIDs, err := perm.GetRuleIds(ctx, extension.AdminSession.ID, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -134,12 +134,12 @@ func (s *AuthAdminRuleService) List(c *gin.Context, opts service.Options) ([]mod
 		})
 	}
 
-	rules, err := s.repo.List(c, s.BuildRepoOpts(opts))
+	rules, err := s.repo.List(ctx, s.BuildRepoOpts(opts))
 	return rules, err
 }
 
 // Count 覆写通用统计方法: 与 List 使用相同的权限过滤条件
-func (s *AuthAdminRuleService) Count(c *gin.Context, opts service.Options) (int64, error) {
+func (s *AuthAdminRuleService) Count(ctx context.Context, opts service.Options) (int64, error) {
 	if opts.Selector {
 		return 0, nil
 	}
@@ -150,7 +150,7 @@ func (s *AuthAdminRuleService) Count(c *gin.Context, opts service.Options) (int6
 	}
 
 	perm := permission.New()
-	rules, err := perm.GetRules(c.Request.Context(), extension.AdminSession.ID, nil)
+	rules, err := perm.GetRules(ctx, extension.AdminSession.ID, nil)
 	if err != nil {
 		return 0, err
 	}
@@ -159,13 +159,13 @@ func (s *AuthAdminRuleService) Count(c *gin.Context, opts service.Options) (int6
 }
 
 // validateRule 校验规则字段、名称与上级规则
-func (s *AuthAdminRuleService) validateRule(c *gin.Context, entity *model.AdminRule, pk string) error {
+func (s *AuthAdminRuleService) validateRule(ctx context.Context, entity *model.AdminRule, pk string) error {
 	if entity.Type == "menu" && util.FromPtr(entity.OpenType) == "tab" && (util.PtrIsZero(entity.Path) || util.PtrIsZero(entity.Component)) {
 		return errors.New("规则类型为菜单时，菜单路由路径和菜单组件路径不能为空")
 	}
 
 	// 名称唯一校验（排除自身）
-	userNameExist, err := s.repo.FindByName(c, entity.Name)
+	userNameExist, err := s.repo.FindByName(ctx, entity.Name)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
@@ -175,7 +175,7 @@ func (s *AuthAdminRuleService) validateRule(c *gin.Context, entity *model.AdminR
 
 	// 非空路径唯一校验（排除自身）
 	if util.PtrNotZero(entity.Path) {
-		pathExist, err := s.repo.FindByPath(c, *entity.Path)
+		pathExist, err := s.repo.FindByPath(ctx, *entity.Path)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
@@ -190,7 +190,7 @@ func (s *AuthAdminRuleService) validateRule(c *gin.Context, entity *model.AdminR
 		if pk != "" && strPid == pk {
 			return errors.New("上级规则不能是自身")
 		}
-		if _, err := s.repo.Get(c, repository.Options{PrimaryKeyValue: strPid}); err != nil {
+		if _, err := s.repo.Get(ctx, repository.Options{PrimaryKeyValue: strPid}); err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return errors.New("上级规则不存在")
 			}

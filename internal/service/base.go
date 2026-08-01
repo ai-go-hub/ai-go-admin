@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"slices"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/ai-go-hub/ai-go-admin/internal/repository"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -46,13 +46,13 @@ type Options struct {
 
 // IService 通用服务接口
 type IService[T any] interface {
-	Create(c *gin.Context, entity *T, opts Options) error
-	Get(c *gin.Context, opts Options) (*T, error)
-	List(c *gin.Context, opts Options) ([]T, error)
-	Count(c *gin.Context, opts Options) (int64, error)
-	Update(c *gin.Context, entity *T, opts Options) error
-	Delete(c *gin.Context, opts Options) error
-	Sort(c *gin.Context, opts Options, move, target, direction string, weigh int64) error
+	Create(ctx context.Context, entity *T, opts Options) error
+	Get(ctx context.Context, opts Options) (*T, error)
+	List(ctx context.Context, opts Options) ([]T, error)
+	Count(ctx context.Context, opts Options) (int64, error)
+	Update(ctx context.Context, entity *T, opts Options) error
+	Delete(ctx context.Context, opts Options) error
+	Sort(ctx context.Context, opts Options, move, target, direction string, weigh int64) error
 	BuildRepoOpts(opts Options) repository.Options
 	BuildScopes(opts Options) []func(*gorm.Statement)
 	BuildWhereScopes(wheres []WhereGroup) []func(*gorm.Statement)
@@ -73,41 +73,41 @@ func NewService[T any](repo repository.IRepository[T]) IService[T] {
 }
 
 // Create 创建记录
-func (s *Service[T]) Create(c *gin.Context, entity *T, opts Options) error {
-	return s.repo.Create(c, entity, s.BuildRepoOpts(opts))
+func (s *Service[T]) Create(ctx context.Context, entity *T, opts Options) error {
+	return s.repo.Create(ctx, entity, s.BuildRepoOpts(opts))
 }
 
 // Get 查询单条记录
-func (s *Service[T]) Get(c *gin.Context, opts Options) (*T, error) {
-	return s.repo.Get(c, s.BuildRepoOpts(opts))
+func (s *Service[T]) Get(ctx context.Context, opts Options) (*T, error) {
+	return s.repo.Get(ctx, s.BuildRepoOpts(opts))
 }
 
 // List 查询全部记录
-func (s *Service[T]) List(c *gin.Context, opts Options) ([]T, error) {
-	return s.repo.List(c, s.BuildRepoOpts(opts))
+func (s *Service[T]) List(ctx context.Context, opts Options) ([]T, error) {
+	return s.repo.List(ctx, s.BuildRepoOpts(opts))
 }
 
 // Count 统计满足过滤条件的记录总数
-func (s *Service[T]) Count(c *gin.Context, opts Options) (int64, error) {
+func (s *Service[T]) Count(ctx context.Context, opts Options) (int64, error) {
 	// 只传递 Where scopes，忽略排序、分页等
-	return s.repo.Count(c, repository.Options{
+	return s.repo.Count(ctx, repository.Options{
 		Scopes: s.BuildWhereScopes(opts.Wheres),
 	})
 }
 
 // Update 根据主键更新记录
-func (s *Service[T]) Update(c *gin.Context, entity *T, opts Options) error {
-	return s.repo.Update(c, entity, s.BuildRepoOpts(opts))
+func (s *Service[T]) Update(ctx context.Context, entity *T, opts Options) error {
+	return s.repo.Update(ctx, entity, s.BuildRepoOpts(opts))
 }
 
 // Delete 根据主键批量删除记录
-func (s *Service[T]) Delete(c *gin.Context, opts Options) error {
-	return s.repo.Delete(c, s.BuildRepoOpts(opts))
+func (s *Service[T]) Delete(ctx context.Context, opts Options) error {
+	return s.repo.Delete(ctx, s.BuildRepoOpts(opts))
 }
 
 // Sort 排序，
 // 使用 `增量重排法` 或叫 `区间位移法`（而不是交换法）
-func (s *Service[T]) Sort(c *gin.Context, opts Options, move, target, direction string, weigh int64) error {
+func (s *Service[T]) Sort(ctx context.Context, opts Options, move, target, direction string, weigh int64) error {
 	pkField, err := s.repo.PrimaryKeyField()
 	if err != nil {
 		return err
@@ -127,7 +127,6 @@ func (s *Service[T]) Sort(c *gin.Context, opts Options, move, target, direction 
 		return errors.New("移动行和目标行必填且不能相同")
 	}
 
-	ctx := c.Request.Context()
 	db := s.repo.DB().WithContext(ctx)
 
 	// 波及行权重变化方向

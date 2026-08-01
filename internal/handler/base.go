@@ -149,7 +149,7 @@ func (h *Handler[T]) Create(c *gin.Context) {
 	}
 
 	opts := h.BuildSerOpts(c, "Create", Request{})
-	if err := h.svc.Create(c, &entity, opts); err != nil {
+	if err := h.svc.Create(c.Request.Context(), &entity, opts); err != nil {
 		httpx.Fail(c, httpx.WithMessage("创建失败: "+err.Error()))
 		return
 	}
@@ -171,7 +171,7 @@ func (h *Handler[T]) Update(c *gin.Context) {
 		PrimaryKeyValue: pk,
 	})
 
-	if err := h.svc.Update(c, &entity, opts); err != nil {
+	if err := h.svc.Update(c.Request.Context(), &entity, opts); err != nil {
 		httpx.Fail(c, httpx.WithMessage("更新失败: "+err.Error()))
 		return
 	}
@@ -188,13 +188,13 @@ func (h *Handler[T]) List(c *gin.Context) {
 	}
 
 	opts := h.BuildSerOpts(c, "List", req.Request)
-	list, err := h.svc.List(c, opts)
+	list, err := h.svc.List(c.Request.Context(), opts)
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("查询失败: "+err.Error()))
 		return
 	}
 
-	total, err := h.svc.Count(c, opts)
+	total, err := h.svc.Count(c.Request.Context(), opts)
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("总数查询失败: "+err.Error()))
 		return
@@ -223,7 +223,7 @@ func (h *Handler[T]) Get(c *gin.Context) {
 		PrimaryKeyValue: c.Param("pk"),
 	})
 
-	entity, err := h.svc.Get(c, opts)
+	entity, err := h.svc.Get(c.Request.Context(), opts)
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("记录不存在"))
 		return
@@ -253,7 +253,7 @@ func (h *Handler[T]) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.svc.Delete(c, h.BuildSerOpts(c, "Delete", Request{
+	if err := h.svc.Delete(c.Request.Context(), h.BuildSerOpts(c, "Delete", Request{
 		PrimaryKeyValues: req.PrimaryKeyValues,
 	})); err != nil {
 		httpx.Fail(c, httpx.WithMessage("删除失败: "+err.Error()))
@@ -272,7 +272,7 @@ func (h *Handler[T]) Sort(c *gin.Context) {
 	}
 
 	opts := h.BuildSerOpts(c, "Sort", req.Request)
-	if err := h.svc.Sort(c, opts, req.Move, req.Target, req.Direction, req.Weigh); err != nil {
+	if err := h.svc.Sort(c.Request.Context(), opts, req.Move, req.Target, req.Direction, req.Weigh); err != nil {
 		httpx.Fail(c, httpx.WithMessage("调整排序失败: "+err.Error()))
 		return
 	}

@@ -1,12 +1,12 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	"strings"
 
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -31,12 +31,12 @@ type Options struct {
 // IRepository 通用仓库接口
 type IRepository[T any] interface {
 	DB() *gorm.DB
-	Create(c *gin.Context, entity *T, opts Options) error
-	Get(c *gin.Context, opts Options) (*T, error)
-	List(c *gin.Context, opts Options) ([]T, error)
-	Count(c *gin.Context, opts Options) (int64, error)
-	Update(c *gin.Context, entity *T, opts Options) error
-	Delete(c *gin.Context, opts Options) error
+	Create(ctx context.Context, entity *T, opts Options) error
+	Get(ctx context.Context, opts Options) (*T, error)
+	List(ctx context.Context, opts Options) ([]T, error)
+	Count(ctx context.Context, opts Options) (int64, error)
+	Update(ctx context.Context, entity *T, opts Options) error
+	Delete(ctx context.Context, opts Options) error
 	PrimaryKeyField() (string, error)       // 获取主键字段
 	FieldExists(field string) (bool, error) // 检查一个字段是否存在
 	Schema() (*schema.Schema, error)        // 获取当前模型的 GORM Schema
@@ -84,7 +84,7 @@ func (r *Repository[T]) DB() *gorm.DB {
 }
 
 // Create 创建记录
-func (r *Repository[T]) Create(c *gin.Context, entity *T, opts Options) error {
+func (r *Repository[T]) Create(ctx context.Context, entity *T, opts Options) error {
 	var q gorm.CreateInterface[T] = gorm.G[T](r.DB())
 
 	// 入库字段的选择
@@ -104,11 +104,11 @@ func (r *Repository[T]) Create(c *gin.Context, entity *T, opts Options) error {
 		q = q.Omit(omitFields...)
 	}
 
-	return q.Create(c.Request.Context(), entity)
+	return q.Create(ctx, entity)
 }
 
 // Get 查询单条记录
-func (r *Repository[T]) Get(c *gin.Context, opts Options) (*T, error) {
+func (r *Repository[T]) Get(ctx context.Context, opts Options) (*T, error) {
 	q := gorm.G[T](r.DB()).Scopes(opts.Scopes...)
 
 	// 预加载关联
@@ -133,7 +133,7 @@ func (r *Repository[T]) Get(c *gin.Context, opts Options) (*T, error) {
 		q = q.Omit(opts.OmitFields...)
 	}
 
-	entity, err := q.First(c.Request.Context())
+	entity, err := q.First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (r *Repository[T]) Get(c *gin.Context, opts Options) (*T, error) {
 }
 
 // List 查询全部记录，排序、分页等可通过 opts.Scopes 传入
-func (r *Repository[T]) List(c *gin.Context, opts Options) ([]T, error) {
+func (r *Repository[T]) List(ctx context.Context, opts Options) ([]T, error) {
 	q := gorm.G[T](r.DB()).Scopes(opts.Scopes...)
 
 	// 预加载关联
@@ -157,20 +157,20 @@ func (r *Repository[T]) List(c *gin.Context, opts Options) ([]T, error) {
 		q = q.Omit(opts.OmitFields...)
 	}
 
-	return q.Find(c.Request.Context())
+	return q.Find(ctx)
 }
 
 // Count 统计记录总数
-func (r *Repository[T]) Count(c *gin.Context, opts Options) (int64, error) {
+func (r *Repository[T]) Count(ctx context.Context, opts Options) (int64, error) {
 	pkField, err := r.PrimaryKeyField()
 	if err != nil {
 		return 0, err
 	}
-	return gorm.G[T](r.DB()).Scopes(opts.Scopes...).Count(c.Request.Context(), pkField)
+	return gorm.G[T](r.DB()).Scopes(opts.Scopes...).Count(ctx, pkField)
 }
 
 // Update 根据主键更新记录
-func (r *Repository[T]) Update(c *gin.Context, entity *T, opts Options) error {
+func (r *Repository[T]) Update(ctx context.Context, entity *T, opts Options) error {
 	pkField, err := r.PrimaryKeyField()
 	if err != nil {
 		return err
@@ -186,17 +186,17 @@ func (r *Repository[T]) Update(c *gin.Context, entity *T, opts Options) error {
 		q = q.Omit(opts.OmitFields...)
 	}
 
-	_, err = q.Updates(c.Request.Context(), *entity)
+	_, err = q.Updates(ctx, *entity)
 	return err
 }
 
 // Delete 根据主键批量删除记录
-func (r *Repository[T]) Delete(c *gin.Context, opts Options) error {
+func (r *Repository[T]) Delete(ctx context.Context, opts Options) error {
 	pkField, err := r.PrimaryKeyField()
 	if err != nil {
 		return err
 	}
-	_, err = gorm.G[T](r.DB()).Where(pkField+" IN ?", opts.PrimaryKeyValues).Delete(c.Request.Context())
+	_, err = gorm.G[T](r.DB()).Where(pkField+" IN ?", opts.PrimaryKeyValues).Delete(ctx)
 	return err
 }
 

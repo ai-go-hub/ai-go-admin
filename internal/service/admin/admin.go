@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -17,7 +18,6 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/pkg/tree"
 	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -38,7 +38,7 @@ func NewAdminService(repo *repoAdmin.AdminRepository) *AdminService {
 }
 
 // Login 管理员登录
-func (s *AdminService) Login(c *gin.Context, req *dto.LoginRequest) (*dto.LoginResponse, error) {
+func (s *AdminService) Login(ctx context.Context, req *dto.LoginRequest, clientIP string) (*dto.LoginResponse, error) {
 	if config.Get().Captcha.Switches.AdminLogin {
 		if ok, err := captcha.Check(req.Captcha, true); !ok {
 			return nil, fmt.Errorf("验证码错误：%w", err)
@@ -46,7 +46,7 @@ func (s *AdminService) Login(c *gin.Context, req *dto.LoginRequest) (*dto.LoginR
 	}
 
 	// 根据用户名查询管理员
-	admin, err := s.repo.FindByUsername(c, req.Username)
+	admin, err := s.repo.FindByUsername(ctx, req.Username)
 	if err != nil {
 		return nil, errors.New("用户名或密码错误")
 	}
@@ -59,12 +59,12 @@ func (s *AdminService) Login(c *gin.Context, req *dto.LoginRequest) (*dto.LoginR
 	// 验证密码
 	if err := bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(req.Password)); err != nil {
 		// 增加登录失败次数
-		_ = s.repo.IncrementLoginFailure(c, admin.ID)
+		_ = s.repo.IncrementLoginFailure(ctx, admin.ID)
 		return nil, errors.New("用户名或密码错误")
 	}
 
 	// 更新登录信息
-	_ = s.repo.UpdateLoginInfo(c, admin.ID, c.ClientIP())
+	_ = s.repo.UpdateLoginInfo(ctx, admin.ID, clientIP)
 
 	// 使用 UUID v7 生成令牌
 	tokenStr := uuid.Must(uuid.NewV7()).String()
@@ -84,7 +84,7 @@ func (s *AdminService) Login(c *gin.Context, req *dto.LoginRequest) (*dto.LoginR
 		CreatedAt: time.Now(),
 		ExpiredAt: expiredAt,
 	}
-	if err := token.Manager().Create(c.Request.Context(), tk); err != nil {
+	if err := token.Manager().Create(ctx, tk); err != nil {
 		return nil, errors.New("保存令牌失败")
 	}
 
@@ -96,14 +96,12 @@ func (s *AdminService) Login(c *gin.Context, req *dto.LoginRequest) (*dto.LoginR
 }
 
 // Logout 注销当前管理员令牌
-func (s *AdminService) Logout(c *gin.Context, tokenStr string) error {
-	return token.Manager().Delete(c.Request.Context(), tokenStr)
+func (s *AdminService) Logout(ctx context.Context, tokenStr string) error {
+	return token.Manager().Delete(ctx, tokenStr)
 }
 
 // Init 后台初始化数据聚合
-func (s *AdminService) Init(c *gin.Context, adminSession *dto.AdminSession) (*dto.InitResponse, error) {
-	ctx := c.Request.Context()
-
+func (s *AdminService) Init(ctx context.Context, adminSession *dto.AdminSession) (*dto.InitResponse, error) {
 	// 1. 站点配置
 	configSiteNames := []string{"name", "record_number", "version"}
 	siteConfig := make(map[string]string, len(configSiteNames)+3)

@@ -1,10 +1,11 @@
 package admin
 
 import (
+	"context"
+
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	"github.com/ai-go-hub/ai-go-admin/internal/repository"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -21,8 +22,8 @@ func NewAdminRuleRepository() *AdminRuleRepository {
 }
 
 // FindByName 根据规则名称查询
-func (r *AdminRuleRepository) FindByName(c *gin.Context, name string) (*model.AdminRule, error) {
-	rule, err := gorm.G[model.AdminRule](r.DB()).Where("name = ?", name).First(c.Request.Context())
+func (r *AdminRuleRepository) FindByName(ctx context.Context, name string) (*model.AdminRule, error) {
+	rule, err := gorm.G[model.AdminRule](r.DB()).Where("name = ?", name).First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -30,8 +31,8 @@ func (r *AdminRuleRepository) FindByName(c *gin.Context, name string) (*model.Ad
 }
 
 // FindByPath 根据菜单路由路径查询
-func (r *AdminRuleRepository) FindByPath(c *gin.Context, path string) (*model.AdminRule, error) {
-	rule, err := gorm.G[model.AdminRule](r.DB()).Where("path = ?", path).First(c.Request.Context())
+func (r *AdminRuleRepository) FindByPath(ctx context.Context, path string) (*model.AdminRule, error) {
+	rule, err := gorm.G[model.AdminRule](r.DB()).Where("path = ?", path).First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -40,12 +41,12 @@ func (r *AdminRuleRepository) FindByPath(c *gin.Context, path string) (*model.Ad
 
 // DistinctPidsByIDs 返回 ids 的所有 pid 的去重列表
 // 用于父子关系剥离等场景，NULL 的 pid 会被过滤
-func (r *AdminRuleRepository) DistinctPidsByIDs(c *gin.Context, ids []uint) ([]uint, error) {
+func (r *AdminRuleRepository) DistinctPidsByIDs(ctx context.Context, ids []uint) ([]uint, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}
 	var pids []uint
-	err := r.DB().WithContext(c.Request.Context()).
+	err := r.DB().WithContext(ctx).
 		Model(&model.AdminRule{}).
 		Where("id IN ? AND pid IS NOT NULL", ids).
 		Distinct().
@@ -57,14 +58,14 @@ func (r *AdminRuleRepository) DistinctPidsByIDs(c *gin.Context, ids []uint) ([]u
 }
 
 // ChildIDsByPids 根据 pids 查直接子级 id 集合
-func (r *AdminRuleRepository) ChildIDsByPids(c *gin.Context, pids []uint) ([]uint, error) {
+func (r *AdminRuleRepository) ChildIDsByPids(ctx context.Context, pids []uint) ([]uint, error) {
 	if len(pids) == 0 {
 		return nil, nil
 	}
 	children, err := gorm.G[model.AdminRule](r.DB()).
 		Where("pid IN ?", pids).
 		Select("id").
-		Find(c.Request.Context())
+		Find(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +77,7 @@ func (r *AdminRuleRepository) ChildIDsByPids(c *gin.Context, pids []uint) ([]uin
 }
 
 // TitleMapByIDs 返回 ids 中指定 types 的规则的 id -> title 映射
-func (r *AdminRuleRepository) TitleMapByIDs(c *gin.Context, ids []uint, types ...string) (map[uint]string, error) {
+func (r *AdminRuleRepository) TitleMapByIDs(ctx context.Context, ids []uint, types ...string) (map[uint]string, error) {
 	if len(ids) == 0 {
 		return map[uint]string{}, nil
 	}
@@ -84,7 +85,7 @@ func (r *AdminRuleRepository) TitleMapByIDs(c *gin.Context, ids []uint, types ..
 	if len(types) > 0 {
 		q = q.Where("type IN ?", types)
 	}
-	rules, err := q.Find(c.Request.Context())
+	rules, err := q.Find(ctx)
 	if err != nil {
 		return nil, err
 	}

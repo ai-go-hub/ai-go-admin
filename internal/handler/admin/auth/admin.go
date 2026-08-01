@@ -55,7 +55,7 @@ func (h *AuthAdminHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := h.svc.Create(c, entity, h.BuildSerOpts(c, "Create", handler.Request{})); err != nil {
+	if err := h.svc.Create(c.Request.Context(), entity, h.BuildSerOpts(c, "Create", handler.Request{})); err != nil {
 		httpx.Fail(c, httpx.WithMessage("创建失败: "+err.Error()))
 		return
 	}
@@ -83,7 +83,7 @@ func (h *AuthAdminHandler) Update(c *gin.Context) {
 		PrimaryKeyValue: pk,
 	})
 
-	if err := h.svc.Update(c, &entity, opts); err != nil {
+	if err := h.svc.Update(c.Request.Context(), &entity, opts); err != nil {
 		httpx.Fail(c, httpx.WithMessage("更新失败: "+err.Error()))
 		return
 	}

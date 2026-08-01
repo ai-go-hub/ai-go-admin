@@ -41,20 +41,20 @@ func (h *AuthAdminGroupHandler) List(c *gin.Context) {
 	}
 
 	opts := h.BuildSerOpts(c, "List", req.Request)
-	groups, err := h.svc.List(c, opts)
+	groups, err := h.svc.List(c.Request.Context(), opts)
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("查询失败: "+err.Error()))
 		return
 	}
 
-	total, err := h.svc.Count(c, opts)
+	total, err := h.svc.Count(c.Request.Context(), opts)
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("总数查询失败: "+err.Error()))
 		return
 	}
 
 	// 批量构建每个分组的 rules 摘要文本（例如: 控制台等 60 项）
-	titles, err := h.svc.BuildRulesTitles(c, groups)
+	titles, err := h.svc.BuildRulesTitles(c.Request.Context(), groups)
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("规则标题查询失败: "+err.Error()))
 		return
@@ -87,13 +87,13 @@ func (h *AuthAdminGroupHandler) Get(c *gin.Context) {
 		PrimaryKeyValue: c.Param("pk"),
 	})
 
-	entity, err := h.svc.Get(c, opts)
+	entity, err := h.svc.Get(c.Request.Context(), opts)
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("记录不存在"))
 		return
 	}
 
-	stripped, err := h.svc.StripParentRuleIDs(c, entity)
+	stripped, err := h.svc.StripParentRuleIDs(c.Request.Context(), entity)
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("规则数据处理失败: "+err.Error()))
 		return
