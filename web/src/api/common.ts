@@ -1,5 +1,6 @@
 import type { AxiosRequestConfig } from 'axios'
 import type { ClickRequest } from '/@/components/clickCaptcha/index'
+import { uuid } from '/@/utils/random'
 import request from '/@/utils/request'
 
 // ==================== 点选验证码 ====================
@@ -74,6 +75,26 @@ export function upload(params: UploadParams, config?: AxiosRequestConfig) {
         method: 'POST',
         data: form,
         ...(config ?? {}),
+    })
+}
+
+// ==================== 省份地区 ====================
+
+/**
+ * 获取省份地区数据
+ */
+export function getArea(values: number[] = []) {
+    const params: { province?: number; city?: number; uuid: string } = { uuid: uuid() }
+    if (values[0]) {
+        params.province = values[0]
+    }
+    if (values[1]) {
+        params.city = values[1]
+    }
+    return request({
+        url: '/common/area',
+        method: 'GET',
+        params,
     })
 }
 
