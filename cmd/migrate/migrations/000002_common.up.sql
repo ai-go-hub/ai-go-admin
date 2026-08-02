@@ -94,3 +94,22 @@ COMMENT ON COLUMN "__PREFIX__attachments"."driver" IS '存储驱动';
 COMMENT ON COLUMN "__PREFIX__attachments"."sha1" IS 'SHA1编码';
 COMMENT ON COLUMN "__PREFIX__attachments"."created_at" IS '创建时间';
 COMMENT ON COLUMN "__PREFIX__attachments"."last_upload_at" IS '最后上传时间';
+
+-- ===== areas 省份地区表 =====
+CREATE TABLE IF NOT EXISTS "__PREFIX__areas" (
+    "id"    bigserial PRIMARY KEY,
+    "pid"   bigint NOT NULL DEFAULT 0,
+    "name"  varchar(64) NOT NULL DEFAULT '',
+    "level" smallint NOT NULL DEFAULT 0,
+    "code"  varchar(32) NOT NULL DEFAULT '',
+    "zip"   varchar(32) NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS "__PREFIX__idx_areas_pid" ON "__PREFIX__areas" ("pid");
+CREATE INDEX IF NOT EXISTS "__PREFIX__idx_areas_level" ON "__PREFIX__areas" ("level");
+COMMENT ON TABLE "__PREFIX__areas" IS '省份地区数据表';
+COMMENT ON COLUMN "__PREFIX__areas"."id" IS 'ID';
+COMMENT ON COLUMN "__PREFIX__areas"."pid" IS '上级ID';
+COMMENT ON COLUMN "__PREFIX__areas"."name" IS '名称';
+COMMENT ON COLUMN "__PREFIX__areas"."level" IS '等级';
+COMMENT ON COLUMN "__PREFIX__areas"."code" IS '行政区划代码';
+COMMENT ON COLUMN "__PREFIX__areas"."zip" IS '邮编';

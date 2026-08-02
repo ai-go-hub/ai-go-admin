@@ -73,3 +73,18 @@ type Attachment struct {
 func (Attachment) TableName() string {
 	return "attachments"
 }
+
+// Area 省份地区模型
+type Area struct {
+	ID    uint   `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
+	Pid   uint   `gorm:"comment:上级ID;not null;default:0;index" json:"pid"`
+	Name  string `gorm:"comment:名称;type:varchar(64);not null;default:''" json:"name"`
+	Level uint8  `gorm:"comment:等级;not null;default:0;index" json:"level"`
+	Code  string `gorm:"comment:行政区划代码;type:varchar(32);not null;default:''" json:"code"`
+	Zip   string `gorm:"comment:邮编;type:varchar(32);not null;default:''" json:"zip"`
+}
+
+// TableName 指定 Area 模型表名
+func (Area) TableName() string {
+	return "areas"
+}

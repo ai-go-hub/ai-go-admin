@@ -5,8 +5,11 @@ import (
 	"hash/fnv"
 	"math"
 	"net/http"
+	"strconv"
 	"strings"
 
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
+	repoCommon "github.com/ai-go-hub/ai-go-admin/internal/repository/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,6 +33,7 @@ func NewUtilHandler() *UtilHandler {
 
 // RegisterRoutes 注册工具路由
 func (h *UtilHandler) RegisterRoutes(group *gin.RouterGroup) {
+	group.GET("/area", Area)
 	group.GET("/file-svg", FileSvg)
 }
 
@@ -58,6 +62,31 @@ func buildSuffixSvg(suffix, background string) string {
             <path style="fill:%s;" d="M416,416c0,8.8-7.2,16-16,16H48c-8.8,0-16-7.2-16-16V256c0-8.8,7.2-16,16-16h352c8.8,0,16,7.2,16,16 V416z"/>
             <g><text><tspan x="220" y="380" font-size="124" font-family="Verdana, Helvetica, Arial, sans-serif" fill="white" text-anchor="middle">%s</tspan></text></g>
         </svg>`, background, suffix)
+}
+
+// Area 获取省份地区数据
+func Area(c *gin.Context) {
+	city := c.DefaultQuery("city", "")
+	province := c.DefaultQuery("province", "")
+
+	pid := 0
+	level := 1
+	if province != "" {
+		pid, _ = strconv.Atoi(province)
+		level = 2
+		if city != "" {
+			pid, _ = strconv.Atoi(city)
+			level = 3
+		}
+	}
+
+	areas, err := repoCommon.NewAreaRepository().FindByPidAndLevel(c.Request.Context(), pid, level)
+	if err != nil {
+		httpx.Fail(c, httpx.WithMessage("地区数据查询失败"))
+		return
+	}
+
+	httpx.Success(c, httpx.WithData(areas))
 }
 
 // hsvToRGB 将 HSV 颜色转换为 RGB 整数值
