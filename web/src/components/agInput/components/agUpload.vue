@@ -99,7 +99,7 @@ defineOptions({
 
 interface Props extends /* @vue-ignore */ Partial<UploadProps> {
     type: 'image' | 'images' | 'file' | 'files'
-    modelValue: string | string[]
+    modelValue: string | string[] | null
     // 业务分类，透传到上传接口 topic
     topic?: string
     // 存储驱动，透传到上传接口 driver
@@ -131,7 +131,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emits = defineEmits<{
-    (e: 'update:modelValue', value: string | string[]): void
+    (e: 'update:modelValue', value: string | string[] | null): void
 }>()
 
 const { t } = useI18n()
@@ -445,8 +445,9 @@ const enforceLimit = () => {
     return false
 }
 
-const init = (modelValue: string | string[]) => {
-    const urls = stringToArray(modelValue as string)
+const init = (modelValue: string | string[] | null) => {
+    const val = modelValue ?? ''
+    const urls = stringToArray(val)
     const isSingleType = props.type == 'file' || props.type == 'image'
 
     state.fileList = urls.map((url) => ({
