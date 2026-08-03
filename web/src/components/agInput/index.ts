@@ -30,6 +30,35 @@ export const inputTypes = [
 ]
 
 /**
+ * 输入框的绑定值类型
+ * 组件输出值的类型，可能支持输出多种类型，此处列出的是推荐类型
+ */
+export const inputModelValueTypes = {
+    string: [
+        'text',
+        'string',
+        'password',
+        'radio',
+        'textarea',
+        'datetime',
+        'date',
+        'time',
+        'year',
+        'select',
+        'areaSelect',
+        'iconSelect',
+        'editor',
+        'image',
+        'images',
+        'file',
+        'files',
+        'color',
+    ],
+    number: ['number', 'switch', 'remoteSelect'],
+    array: ['checkbox', 'array', 'selects', 'remoteSelects'],
+}
+
+/**
  * 绑定值类型
  */
 export type ModelValueTypes = string | number | boolean | object
