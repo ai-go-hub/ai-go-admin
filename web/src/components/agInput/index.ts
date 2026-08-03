@@ -59,6 +59,11 @@ export const inputModelValueTypes = {
 }
 
 /**
+ * 必需提供字典的输入组件类型
+ */
+export const dictRequiredTypes = ['radio', 'checkbox', 'select', 'selects']
+
+/**
  * 绑定值类型
  */
 export type ModelValueTypes = string | number | boolean | object
