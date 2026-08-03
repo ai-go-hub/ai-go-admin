@@ -36,8 +36,8 @@ export class TableManagerAPI {
      * 表格数据列表接口的请求方法
      * @param filter 数据过滤条件
      */
-    list(filter: TableInterface['filter'] = {}) {
-        return request<TableManagerListAPIDefaultData>({
+    list<T = TableManagerListAPIDefaultData>(filter: TableInterface['filter'] = {}) {
+        return request<T>({
             url: this.actionURL.get('list'),
             method: 'POST',
             data: filter,
