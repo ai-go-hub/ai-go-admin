@@ -97,7 +97,7 @@ export default defineComponent({
             return () => {
                 const valueComputed = computed(() => {
                     if (props.type == 'radio') {
-                        if (props.modelValue === undefined) return ''
+                        if (props.modelValue === undefined || props.modelValue === null) return ''
                         return '' + props.modelValue
                     } else {
                         let modelValueArr: AnyObj = []
@@ -146,7 +146,7 @@ export default defineComponent({
             return () => {
                 const valueComputed = computed(() => {
                     if (props.type == 'select') {
-                        if (props.modelValue === undefined) return ''
+                        if (props.modelValue === undefined || props.modelValue === null) return ''
                         return '' + props.modelValue
                     } else {
                         let modelValueArr: AnyObj = []

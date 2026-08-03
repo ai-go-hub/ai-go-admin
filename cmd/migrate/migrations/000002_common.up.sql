@@ -34,17 +34,16 @@ COMMENT ON COLUMN "__PREFIX__captchas"."expired_at" IS '过期时间';
 -- ===== config 系统配置表 =====
 CREATE TABLE IF NOT EXISTS "__PREFIX__configs" (
     "id"           bigserial PRIMARY KEY,
-    "name"         varchar(50) NOT NULL DEFAULT '',
-    "group"        varchar(50) NOT NULL DEFAULT '',
-    "title"        varchar(50) NOT NULL DEFAULT '',
-    "tip"          varchar(100) NOT NULL DEFAULT '',
-    "type"         varchar(50) NOT NULL DEFAULT '',
-    "value"        text,
-    "content"      text,
-    "rule"         varchar(100) NOT NULL DEFAULT '',
-    "extend"       varchar(255) NOT NULL DEFAULT '',
-    "input_extend" varchar(255) NOT NULL DEFAULT '',
-    "allow_del"    smallint NOT NULL DEFAULT 0,
+    "name"         varchar(64) NOT NULL DEFAULT '',
+    "group"        varchar(64) NOT NULL DEFAULT '',
+    "title"        varchar(64) NOT NULL DEFAULT '',
+    "type"         varchar(64) NOT NULL DEFAULT '',
+    "tip"          varchar(128) DEFAULT NULL,
+    "value"        text DEFAULT NULL,
+    "dict"         text DEFAULT NULL,
+    "rule"         varchar(128) DEFAULT NULL,
+    "input_extend" varchar(255) DEFAULT NULL,
+    "allow_del"    smallint NOT NULL DEFAULT 1,
     "weigh"        bigint NOT NULL DEFAULT 0
 );
 CREATE UNIQUE INDEX IF NOT EXISTS "__PREFIX__idx_configs_name" ON "__PREFIX__configs" ("name");
@@ -53,12 +52,11 @@ COMMENT ON COLUMN "__PREFIX__configs"."id" IS 'ID';
 COMMENT ON COLUMN "__PREFIX__configs"."name" IS '变量名';
 COMMENT ON COLUMN "__PREFIX__configs"."group" IS '分组';
 COMMENT ON COLUMN "__PREFIX__configs"."title" IS '变量标题';
-COMMENT ON COLUMN "__PREFIX__configs"."tip" IS '变量描述';
+COMMENT ON COLUMN "__PREFIX__configs"."tip" IS '变量输入提示';
 COMMENT ON COLUMN "__PREFIX__configs"."type" IS '变量输入组件类型';
 COMMENT ON COLUMN "__PREFIX__configs"."value" IS '变量值';
-COMMENT ON COLUMN "__PREFIX__configs"."content" IS '字典数据';
+COMMENT ON COLUMN "__PREFIX__configs"."dict" IS '字典数据';
 COMMENT ON COLUMN "__PREFIX__configs"."rule" IS '验证规则';
-COMMENT ON COLUMN "__PREFIX__configs"."extend" IS '扩展属性';
 COMMENT ON COLUMN "__PREFIX__configs"."input_extend" IS '输入框扩展属性';
 COMMENT ON COLUMN "__PREFIX__configs"."allow_del" IS '允许删除:0=否,1=是';
 COMMENT ON COLUMN "__PREFIX__configs"."weigh" IS '权重';

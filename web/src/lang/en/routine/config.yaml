@@ -1,0 +1,21 @@
+variableGroup: Variable Group
+variableName: Variable Name
+variableTitle: Variable Title
+variableType: Variable Type
+dictionaryData: Dictionary Data
+tip: Tip
+validationRules: Validation Rules
+inputExtend: Input Extend
+addConfigurationItem: Add Configuration Item
+quickConfigurationEntry: Quick Configuration Entry
+testMailSending: Test Mail Sending
+pleaseEnterCorrectMailConfig: Please enter the correct mail configuration
+pleaseEnterRecipientEmail: Please enter the recipient email address
+sendOut: Send
+sending: Sending...
+pleaseEnterCorrectEmail: Please enter the correct email address
+deleteConfigurationConfirm: Are you sure to delete the configuration item?
+configurationUpdated: Configuration updated successfully
+configurationAdded: Added successfully
+areYouSureToDelete: Are you sure to delete the configuration item?
+strAttrTip: 'One per line, no quotes. Example: class=test-item'

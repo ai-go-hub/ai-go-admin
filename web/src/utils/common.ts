@@ -1,5 +1,5 @@
 import { FormInstance } from 'element-plus'
-import { camelCase, snakeCase, trimStart } from 'lodash-es'
+import { camelCase, set, snakeCase, trimStart } from 'lodash-es'
 import { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
 import router from '/@/router/index'
 import { adminBaseRoutePath } from '/@/router/static/adminBase'
@@ -274,4 +274,36 @@ export const buildJsonToElTreeData = (data: any): ElTreeData[] => {
     } else {
         return []
     }
+}
+
+/**
+ * 将字符串属性列表转为对象
+ * 一行一个 key=value 键值对，支持 bool、数字自动转换，支持点号嵌套
+ */
+export const parseStrAttr = (attr: string): Record<string, any> => {
+    const result: Record<string, any> = {}
+    if (!attr) return result
+
+    const lines = attr.replace(/\r\n/g, '\n').trim().split('\n')
+    for (const line of lines) {
+        const trimmed = line.trim()
+        if (!trimmed) continue
+
+        const eqIdx = trimmed.indexOf('=')
+        if (eqIdx <= 0) continue
+
+        const key = trimmed.slice(0, eqIdx).trim()
+        let value: any = trimmed.slice(eqIdx + 1).trim()
+
+        if (value === 'false') value = false
+        else if (value === 'true') value = true
+        else if (value !== '' && !isNaN(Number(value))) value = parseFloat(value)
+
+        if (key.includes('.')) {
+            set(result, key, value)
+            continue
+        }
+        result[key] = value
+    }
+    return result
 }

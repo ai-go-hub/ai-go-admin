@@ -113,7 +113,7 @@ func (s *AdminService) Init(ctx context.Context, adminSession *dto.AdminSession)
 		return nil, err
 	}
 	for _, cfg := range configs {
-		siteConfig[cfg.Name] = cfg.Value
+		siteConfig[cfg.Name] = util.FromPtr(cfg.Value)
 	}
 	siteConfig["timezone"] = config.Get().App.Timezone
 	siteConfig["cdn_url"] = config.Get().CDN.URL

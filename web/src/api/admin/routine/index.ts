@@ -40,3 +40,20 @@ export function getAdminLog(data: AnyObj) {
         data,
     })
 }
+
+/**
+ * 发送测试邮件
+ */
+export function sendTestMail(data: AnyObj, mail: string) {
+    return request(
+        {
+            url: '/admin/routine/config/send-test-mail',
+            method: 'post',
+            data: { ...data, test_mail: mail },
+            timeout: 0,
+        },
+        {
+            showSuccessMessage: true,
+        }
+    )
+}
