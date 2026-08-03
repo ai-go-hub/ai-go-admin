@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="w100">
         <el-row :gutter="10">
             <el-col :span="10" class="ag-array-key">{{ state.keyTitle }}</el-col>
             <el-col :span="10" class="ag-array-value">{{ state.valueTitle }}</el-col>
