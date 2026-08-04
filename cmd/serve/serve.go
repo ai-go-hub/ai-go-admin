@@ -56,9 +56,6 @@ func Run(cmd *cobra.Command, args []string) error {
 	// 注册数据库中间件
 	engine.Use(database.Middleware())
 
-	// 注册管理员操作日志中间件
-	engine.Use(middleware.AdminLog())
-
 	// 注册路由
 	router.Setup(engine)
 

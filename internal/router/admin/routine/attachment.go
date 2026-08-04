@@ -10,12 +10,12 @@ import (
 )
 
 func init() {
-	registry.Register(func(r *gin.Engine) {
+	registry.RegisterAdmin(func(group *gin.RouterGroup) {
 		repo := repoCommon.NewAttachmentRepository()
 		svc := svcRoutine.NewAttachmentService(repo)
 		h := handlerRoutine.NewAttachmentHandler(svc)
 
-		group := r.Group("/admin/routine/attachment")
-		h.RegisterRoutes(group)
+		subGroup := group.Group("/routine/attachment")
+		h.RegisterRoutes(subGroup)
 	})
 }

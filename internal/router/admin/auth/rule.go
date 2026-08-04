@@ -10,12 +10,12 @@ import (
 )
 
 func init() {
-	registry.Register(func(r *gin.Engine) {
+	registry.RegisterAdmin(func(group *gin.RouterGroup) {
 		repo := repoAdmin.NewAdminRuleRepository()
 		svc := svcAuth.NewAuthAdminRuleService(repo)
 		h := handlerAuth.NewAuthAdminRuleHandler(svc)
 
-		group := r.Group("/admin/auth/rule")
-		h.RegisterRoutes(group)
+		subGroup := group.Group("/auth/rule")
+		h.RegisterRoutes(subGroup)
 	})
 }

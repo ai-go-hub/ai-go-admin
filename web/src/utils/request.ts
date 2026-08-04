@@ -2,6 +2,7 @@ import type { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } fr
 import axios from 'axios'
 import { ElLoading, ElMessage } from 'element-plus'
 import i18n from '/@/lang'
+import { adminBaseRoutePath } from '/@/router/static/adminBase'
 import { useAdminInfo } from '/@/stores/adminInfo'
 import { keysToCamelCase, keysToSnakeCase } from '/@/utils/common'
 
@@ -20,6 +21,8 @@ export interface RequestOptions {
     showNetworkErrorMessage?: boolean
     // 是否做数据 key 的命名方式转换（请求 camelCase → snake_case，响应 snake_case → camelCase），默认 false
     convertCase?: boolean
+    // 是否替换自定义后台入口路径前缀，默认 true
+    replaceCustomAdminPath?: boolean
 }
 
 interface InternalRequestConfig extends InternalAxiosRequestConfig {
@@ -145,6 +148,11 @@ instance.interceptors.request.use(
         const adminInfo = useAdminInfo()
         if (adminInfo.token) {
             config.headers.set('Authorization', `Bearer ${adminInfo.token}`)
+        }
+
+        // 自定义后台入口支持: 将请求 URL 中的 /admin 前缀替换为实际配置的后台路径
+        if (opts.replaceCustomAdminPath !== false && adminBaseRoutePath !== '/admin' && /^\/admin\//.test(config.url!)) {
+            config.url = config.url!.replace(/^\/admin\//, adminBaseRoutePath + '/')
         }
 
         // 将请求数据的 key 从 camelCase 转为 snake_case

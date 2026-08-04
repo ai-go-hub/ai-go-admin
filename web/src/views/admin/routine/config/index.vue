@@ -113,7 +113,6 @@ import { useI18n } from 'vue-i18n'
 import AddFrom from './add.vue'
 import { sendTestMail } from '/@/api/admin/routine'
 import AgInput from '/@/components/agInput/index.vue'
-import { adminBaseRoutePath } from '/@/router/static/adminBase'
 import type { Site } from '/@/stores/interface/config'
 import { useConfig } from '/@/stores/config'
 import { uuid } from '/@/utils/random'
@@ -266,11 +265,6 @@ const onSubmit = () => {
                     if (formData[formDataKey] && config.site[key as keyof Site] != formData[formDataKey]) {
                         ;(config.site[key as keyof Site] as any) = formData[formDataKey]
                     }
-                }
-
-                if (formData.entrance && formData.entrance != adminBaseRoutePath) {
-                    window.open(window.location.href.replace(adminBaseRoutePath, formData.entrance))
-                    window.close()
                 }
             })
         }

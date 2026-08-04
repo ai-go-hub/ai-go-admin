@@ -10,12 +10,12 @@ import (
 )
 
 func init() {
-	registry.Register(func(r *gin.Engine) {
+	registry.RegisterAdmin(func(group *gin.RouterGroup) {
 		repo := repoCommon.NewConfigRepository()
 		svc := svcRoutine.NewConfigService(repo)
 		h := handlerRoutine.NewConfigHandler(svc, repo)
 
-		group := r.Group("/admin/routine/config")
-		h.RegisterRoutes(group)
+		subGroup := group.Group("/routine/config")
+		h.RegisterRoutes(subGroup)
 	})
 }

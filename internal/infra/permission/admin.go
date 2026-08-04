@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	"github.com/ai-go-hub/ai-go-admin/pkg/util"
@@ -212,9 +213,9 @@ func (p *Permission) AllRuleIDs(ctx context.Context, ruleStatus *uint8) ([]uint,
 }
 
 // BuildCheckPath 从 fullPath 获取权限节点名称
-// 去掉 "/admin/" 前缀，去掉 params（以 ":" 开头的路径段），然后以 "/" 连接剩余部分
+// 去掉 admin 路径前缀，去掉 params（以 ":" 开头的路径段），然后以 "/" 连接剩余部分
 func BuildCheckPath(fullPath string) string {
-	path := strings.TrimPrefix(fullPath, "/admin/")
+	path := strings.TrimPrefix(fullPath, config.Get().Server.AdminBaseRoutePath+"/")
 	parts := strings.Split(path, "/")
 	filtered := make([]string, 0, len(parts))
 	for _, p := range parts {

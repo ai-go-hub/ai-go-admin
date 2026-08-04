@@ -20,8 +20,9 @@ type App struct {
 
 // 服务配置
 type Server struct {
-	Port           int
-	TrustedProxies []string `mapstructure:"trusted_proxies"`
+	Port               int
+	TrustedProxies     []string `mapstructure:"trusted_proxies"`
+	AdminBaseRoutePath string   `mapstructure:"admin_base_route_path"`
 }
 
 // 单个数据库连接配置

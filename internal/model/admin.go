@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -173,8 +174,8 @@ func (l *AdminLog) BeforeCreate(tx *gorm.DB) error {
 		}
 	}
 
-	// 登录日志：从请求体中提取 username 填充到 Username 字段
-	if l.URL == "/admin/login" {
+	// 登录日志: 从请求体中提取 username 填充到 Username 字段
+	if strings.HasSuffix(l.URL, "/login") {
 		if username, ok := data["username"]; ok {
 			if usernameStr, ok := username.(string); ok {
 				l.Username = usernameStr

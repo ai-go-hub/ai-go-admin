@@ -198,7 +198,7 @@ async function onSubmit() {
         login({ ...loginForm, captcha })
             .then((res) => {
                 adminInfo.dataFill(res.data.data, false)
-                router.push('/admin')
+                router.push({ name: 'admin' })
             })
             .finally(() => {
                 submitLoading.value = false
@@ -465,7 +465,7 @@ onMounted(() => {
         .then((res) => {
             if (res.data.data.type == 'logged_in') {
                 ElMessage.success(t('login.loggedIn'))
-                router.push('/admin')
+                router.push({ name: 'admin' })
                 return
             }
 

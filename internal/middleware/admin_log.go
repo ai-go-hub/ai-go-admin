@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
@@ -35,12 +36,13 @@ func AdminLog() gin.HandlerFunc {
 		}
 
 		// 构建权限检查路径，用于匹配 AdminRule 的 name 字段
+		adminPath := config.Get().Server.AdminBaseRoutePath
 		checkPath := permission.BuildCheckPath(fullPath)
 
 		// 仅记录管理后台请求
 		// 仅记录 POST 请求
 		// 额外排除 list 请求
-		if !strings.HasPrefix(fullPath, "/admin/") || c.Request.Method != http.MethodPost || strings.HasSuffix(checkPath, "/list") {
+		if !strings.HasPrefix(fullPath, adminPath+"/") || c.Request.Method != http.MethodPost || strings.HasSuffix(checkPath, "/list") {
 			c.Next()
 			return
 		}
