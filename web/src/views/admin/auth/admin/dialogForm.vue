@@ -56,7 +56,7 @@
                     </el-form-item>
 
                     <el-form-item :label="t('auth.admin.avatar')">
-                        <AgUpload type="image" v-model="formItems.avatar" />
+                        <AgUpload type="image" topic="avatar" v-model="formItems.avatar" />
                     </el-form-item>
 
                     <el-form-item :label="t('common.email')" prop="email">
