@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // root 本地磁盘存储根目录
@@ -55,6 +56,8 @@ func (l *Local) Exists(storedFilename string) bool {
 }
 
 // FullPath 返回文件在磁盘上的完整存储路径
-func (l *Local) FullPath(storedFilename string) string {
-	return filepath.Join(root, filepath.FromSlash(storedFilename))
+func (l *Local) FullPath(path string) string {
+	// 先去掉可能存在的 root 目录前缀，避免重复拼接
+	clean := strings.TrimPrefix(path, "/"+root)
+	return filepath.Join(root, filepath.FromSlash(clean))
 }
