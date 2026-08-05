@@ -1,10 +1,10 @@
 package auth
 
 import (
-	handlerAdmin "github.com/ai-go-hub/ai-go-admin/internal/handler/admin"
+	handlerAdmin "github.com/ai-go-hub/ai-go-admin/internal/handler/admin/auth"
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
 	"github.com/ai-go-hub/ai-go-admin/internal/router/registry"
-	svcAdmin "github.com/ai-go-hub/ai-go-admin/internal/service/admin"
+	svcAdmin "github.com/ai-go-hub/ai-go-admin/internal/service/admin/auth"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +15,7 @@ func init() {
 		svc := svcAdmin.NewAdminLogService(repo)
 		h := handlerAdmin.NewAdminLogHandler(svc)
 
-		subGroup := group.Group("/auth/admin-log")
+		subGroup := group.Group("/auth/log")
 		h.RegisterRoutes(subGroup)
 	})
 }

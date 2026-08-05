@@ -1,10 +1,10 @@
-package admin
+package auth
 
 import (
 	"github.com/ai-go-hub/ai-go-admin/internal/handler"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
-	svcAdmin "github.com/ai-go-hub/ai-go-admin/internal/service/admin"
+	svcAdmin "github.com/ai-go-hub/ai-go-admin/internal/service/admin/auth"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,7 +31,7 @@ func NewAdminLogHandler(svc *svcAdmin.AdminLogService) *AdminLogHandler {
 }
 
 // RegisterRoutes 注册路由，日志只读，仅注册 List 和 Get
-// 无需验权，列表只会读取当前管理员的日志记录，菜单规则管理内保留下级 read 权限节点，用于决定菜单是否显示
+// 无需验权，列表只会读取当前管理员的日志记录，同时菜单规则管理内保留下级 read 权限节点，用于决定菜单是否显示
 func (h *AdminLogHandler) RegisterRoutes(group *gin.RouterGroup) {
 	group.POST("/list", middleware.AdminAuth(), h.List)
 	group.GET("/get/:pk", middleware.AdminAuth(), h.Get)

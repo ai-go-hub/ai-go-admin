@@ -190,7 +190,7 @@ const onFullScreen = () => {
 
 const onAdminInfo = () => {
     state.showAdminInfoPopover = false
-    router.push({ name: 'routine/adminInfo' })
+    router.push({ name: 'routine/profile' })
 }
 
 const onLogout = () => {

@@ -115,7 +115,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getAdminInfo, updateAdminInfo, getAdminLog } from '/@/api/admin/routine/index'
+import { getAdminProfile, updateAdminProfile, getAdminLog } from '/@/api/admin/routine/index'
 import { dayjs, type FormItemRule } from 'element-plus'
 import { fullURL, resetForm } from '/@/utils/common'
 import { uuid } from '/@/utils/random'
@@ -125,7 +125,7 @@ import { useAdminInfo } from '/@/stores/adminInfo'
 import { isEmpty } from 'lodash-es'
 
 defineOptions({
-    name: 'routine/adminInfo',
+    name: 'routine/profile',
 })
 
 const { t } = useI18n()
@@ -155,6 +155,7 @@ const state: {
         limit: 11,
         sort: 'created_at',
         order: 'desc',
+        wheres: [],
     },
     logCurrentPage: 1,
     logPageSize: 11,
@@ -164,6 +165,25 @@ const state: {
 
 const getLog = () => {
     state.logLoading = true
+
+    /**
+     * 仅查询当前管理员日志
+     * 1. 日志接口服务端层面已做限制，非超管仅能查询到自己的操作日志，所以不存在越权的问题
+     * 2. 此处的筛选是针对超管的，因为个人资料页面，超管也不应该显示其他管理员的日志
+     */
+    state.logFilter.wheres = [
+        {
+            wheres: [
+                {
+                    field: 'admin_id',
+                    value: adminInfoStore.id,
+                    operator: 'eq',
+                },
+            ],
+            or: false,
+        },
+    ]
+
     getAdminLog(state.logFilter)
         .then((res) => {
             state.log = res.data.data.list
@@ -212,7 +232,7 @@ const onSubmit = (formEl: any) => {
     formEl?.validate((valid: boolean) => {
         if (valid) {
             state.buttonLoading = true
-            updateAdminInfo(adminInfoStore.id, {
+            updateAdminProfile(adminInfoStore.id, {
                 id: state.adminInfo.id,
                 avatar: state.adminInfo.avatar,
                 username: state.adminInfo.username,
@@ -235,7 +255,7 @@ const onSubmit = (formEl: any) => {
 
 onMounted(() => {
     // 获取最新的管理员个人信息
-    getAdminInfo(adminInfoStore.id).then((res) => {
+    getAdminProfile(adminInfoStore.id).then((res) => {
         state.adminInfo = res.data.data.row
         // 重新渲染表单以记录初始值
         state.formKey = uuid()

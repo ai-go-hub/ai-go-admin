@@ -39,7 +39,7 @@ let optButtons: OptButton[] = [
 ]
 
 const tableManager = useTableManager({
-    api: new TableManagerAPI('/admin/auth/admin-log/'),
+    api: new TableManagerAPI('/admin/auth/log/'),
     table: {
         column: [
             { label: 'ID', prop: 'id', align: 'center', operator: 'BETWEEN', width: 70 },

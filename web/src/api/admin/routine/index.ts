@@ -4,9 +4,9 @@ import request from '/@/utils/request'
  * 获取当前管理员最新个人信息
  * @param id 管理员 ID
  */
-export function getAdminInfo(id: number) {
+export function getAdminProfile(id: number) {
     return request({
-        url: `/admin/auth/admin/get/${id}`,
+        url: `/admin/routine/profile/get/${id}`,
         method: 'GET',
     })
 }
@@ -16,10 +16,10 @@ export function getAdminInfo(id: number) {
  * @param id 管理员 ID
  * @param data 更新数据
  */
-export function updateAdminInfo(id: number, data: AnyObj) {
+export function updateAdminProfile(id: number, data: AnyObj) {
     return request(
         {
-            url: `/admin/auth/admin/update/${id}`,
+            url: `/admin/routine/profile/update/${id}`,
             method: 'POST',
             data,
         },
@@ -35,7 +35,7 @@ export function updateAdminInfo(id: number, data: AnyObj) {
  */
 export function getAdminLog(data: AnyObj) {
     return request({
-        url: '/admin/auth/admin-log/list',
+        url: '/admin/auth/log/list',
         method: 'POST',
         data,
     })
