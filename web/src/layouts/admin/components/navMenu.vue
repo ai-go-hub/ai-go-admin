@@ -120,7 +120,14 @@
                     </div>
                 </div>
                 <div class="admin-info-footer">
-                    <el-button @click="onAdminInfo" type="primary" plain>{{ t('layouts.profile') }}</el-button>
+                    <el-button
+                        v-if="auth({ name: '/admin/routine/profile', subNodeName: '/admin/routine/profile/read' })"
+                        @click="onAdminInfo"
+                        type="primary"
+                        plain
+                    >
+                        {{ t('layouts.profile') }}
+                    </el-button>
                     <el-button @click="onLogout" type="danger" plain>{{ t('layouts.logout') }}</el-button>
                 </div>
             </div>
@@ -148,7 +155,7 @@ import router from '/@/router'
 import { useAdminInfo } from '/@/stores/adminInfo'
 import { useConfig } from '/@/stores/config'
 import { ADMIN_INFO } from '/@/stores/constant/cacheKey'
-import { fullURL } from '/@/utils/common'
+import { auth, fullURL } from '/@/utils/common'
 import { Local, Session } from '/@/utils/storage'
 import { hotUpdateState, reloadServer } from '/@/utils/vite'
 
