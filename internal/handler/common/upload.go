@@ -20,7 +20,7 @@ func NewUploadHandler(up *upload.Service) *UploadHandler {
 
 // Upload 处理文件上传
 func (h *UploadHandler) Upload(c *gin.Context) {
-	topic := c.PostForm("topic")
+	topic := c.DefaultPostForm("topic", "default")
 	driver := c.DefaultPostForm("driver", "local")
 
 	file, err := c.FormFile("file")
