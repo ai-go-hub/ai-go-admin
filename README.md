@@ -75,33 +75,6 @@ go run cmd/main.go migrate up
 
 # 2. 启动 API 服务
 go run cmd/main.go
-
-# 或编译后再运行
-go build -o ./tmp/aigo.exe ./cmd/main.go
-tmp/aigo.exe migrate up
-tmp/aigo.exe serve
-```
-
-其他常用命令：
-
-```bash
-# 启动服务（带文件热更新，开发用）
-air
-
-# 查看迁移状态
-tmp/aigo.exe migrate status
-
-# 创建新的迁移 SQL 文件
-tmp/aigo.exe migrate create test
-
-# 回滚最近一次迁移
-tmp/aigo.exe migrate down
-
-# 回滚全部迁移
-tmp/aigo.exe migrate down --all
-
-# 修复 dirty 状态
-tmp/aigo.exe migrate force -1
 ```
 
 **🧑‍💻 前端**
@@ -114,6 +87,8 @@ pnpm i
 pnpm dev
 ```
 
+> 前后端两个服务启动后，浏览器访问：[localhost:1818](http://localhost:1818/#/)，后台账号 `admin`，密码 `admin888`
+
 ### 联系我们
 
 - [加 QQ 群：860406643](https://qm.qq.com/q/GE0qcmaTo6)
@@ -124,9 +99,11 @@ pnpm dev
 
 ### 项目预览
 
-|                                                             |                                                                     |
-| ----------------------------------------------------------- | ------------------------------------------------------------------- |
-| ![登录](https://thankphp.com/ai-go/preview/login-admin.png) | ![点选验证码](https://thankphp.com/ai-go/preview/captcha-admin.png) |
+|                                                                   |                                                                     |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| ![登录](https://thankphp.com/ai-go/preview/login-admin.png)       | ![控制台](https://thankphp.com/ai-go/preview/dashboard.png)         |
+| ![布局配置](https://thankphp.com/ai-go/preview/layout-config.png) | ![系统配置](https://thankphp.com/ai-go/preview/routine-config.png)  |
+| ![个人资料](https://thankphp.com/ai-go/preview/profile.png)       | ![点选验证码](https://thankphp.com/ai-go/preview/captcha-admin.png) |
 
 ### 特别鸣谢
 
