@@ -48,7 +48,11 @@ INSERT INTO "__PREFIX__admin_rules" ("id", "pid", "type", "title",           "na
     (29, 26,   'node', '删除',           'routine/attachment/delete',  '',                     '',                        '',          '',    '',                                              1,           '',       '',       0,       1,        NOW(),        NOW()),
     (30, 22,   'menu', '个人资料',       'routine/profile',            'routine/profile',      'lucide-user',             'tab',       '',    '/src/views/admin/routine/profile.vue',          1,           '',       '',       97,      1,        NOW(),        NOW()),
     (31, 30,   'node', '查看',           'routine/profile/read',       '',                     '',                        '',          '',    '',                                              1,           '',       '',       0,       1,        NOW(),        NOW()),
-    (32, 30,   'node', '更新',           'routine/profile/update',     '',                     '',                        '',          '',    '',                                              1,           '',       '',       0,       1,        NOW(),        NOW())
+    (32, 30,   'node', '更新',           'routine/profile/update',     '',                     '',                        '',          '',    '',                                              1,           '',       '',       0,       1,        NOW(),        NOW()),
+    (33, NULL, 'menu', 'CRUD代码生成',   'crud/crud',                  'crud/crud',            'lucide-code-xml',         'tab',       '',    '/src/views/admin/crud/index.vue',               1,           '',       '',       996,     1,        NOW(),        NOW()),
+    (34, 33,   'node', '查看',           'crud/crud/read',             '',                     '',                        '',          '',    '',                                              1,           '',       '',       0,       1,        NOW(),        NOW()),
+    (35, 33,   'node', '创建',           'crud/crud/create',           '',                     '',                        '',          '',    '',                                              1,           '',       '',       0,       1,        NOW(),        NOW()),
+    (36, 33,   'node', '删除',           'crud/crud/delete',           '',                     '',                        '',          '',    '',                                              1,           '',       '',       0,       1,        NOW(),        NOW())
 ON CONFLICT DO NOTHING;
 
 -- 初始化管理员分组
