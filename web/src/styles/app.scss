@@ -80,6 +80,14 @@ body,
 .ag-operate-form {
     padding-top: 20px;
 }
+.block-help {
+    display: block;
+    width: 100%;
+    color: var(--el-color-info);
+    font-size: 13px;
+    line-height: 16px;
+    padding-top: 5px;
+}
 
 // ==================== 页面切换动画 ====================
 .slide-right-enter-active,
