@@ -1,8 +1,12 @@
 package model
 
-import "time"
+import (
+	"time"
 
-// Token 令牌模型，用于存储各类用户令牌
+	"gorm.io/datatypes"
+)
+
+// Token 令牌模型
 type Token struct {
 	Token     string    `gorm:"comment:令牌;type:varchar(64);primaryKey" json:"-"`
 	Type      string    `gorm:"comment:令牌类型;type:varchar(32);not null" json:"type"`
@@ -86,4 +90,20 @@ type Area struct {
 // TableName 指定 Area 模型表名
 func (Area) TableName() string {
 	return "areas"
+}
+
+// CrudLog CRUD 记录模型
+type CrudLog struct {
+	ID        uint           `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
+	Name      string         `gorm:"comment:表名;type:varchar(255);not null;default:''" json:"name"`
+	Comment   string         `gorm:"comment:注释;type:varchar(255);not null;default:''" json:"comment"`
+	Table     datatypes.JSON `gorm:"comment:数据表数据;type:jsonb" json:"table"`
+	Fields    datatypes.JSON `gorm:"comment:字段数据;type:jsonb" json:"fields"`
+	Status    string         `gorm:"comment:状态:deleted=已删除,succeeded=成功,failed=失败,generating=生成中;type:varchar(64);not null;default:''" json:"status"`
+	CreatedAt time.Time      `gorm:"comment:创建时间" json:"created_at"`
+}
+
+// TableName 指定 CrudLog 模型表名
+func (CrudLog) TableName() string {
+	return "crud_logs"
 }

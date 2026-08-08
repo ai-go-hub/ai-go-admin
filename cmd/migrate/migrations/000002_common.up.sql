@@ -111,3 +111,23 @@ COMMENT ON COLUMN "__PREFIX__areas"."name" IS '名称';
 COMMENT ON COLUMN "__PREFIX__areas"."level" IS '等级';
 COMMENT ON COLUMN "__PREFIX__areas"."code" IS '行政区划代码';
 COMMENT ON COLUMN "__PREFIX__areas"."zip" IS '邮编';
+
+-- ===== crud_logs CRUD 记录表 =====
+CREATE TABLE IF NOT EXISTS "__PREFIX__crud_logs" (
+    "id"         bigserial PRIMARY KEY,
+    "name"       varchar(255) NOT NULL DEFAULT '',
+    "comment"    varchar(255) NOT NULL DEFAULT '',
+    "table"      jsonb,
+    "fields"     jsonb,
+    "status"     varchar(64) NOT NULL DEFAULT '',
+    "created_at" timestamptz
+);
+
+COMMENT ON TABLE "__PREFIX__crud_logs" IS 'CRUD 记录表';
+COMMENT ON COLUMN "__PREFIX__crud_logs"."id" IS 'ID';
+COMMENT ON COLUMN "__PREFIX__crud_logs"."name" IS '表名';
+COMMENT ON COLUMN "__PREFIX__crud_logs"."comment" IS '注释';
+COMMENT ON COLUMN "__PREFIX__crud_logs"."table" IS '数据表数据';
+COMMENT ON COLUMN "__PREFIX__crud_logs"."fields" IS '字段数据';
+COMMENT ON COLUMN "__PREFIX__crud_logs"."status" IS '状态:deleted=已删除,succeeded=成功,failed=失败,generating=生成中';
+COMMENT ON COLUMN "__PREFIX__crud_logs"."created_at" IS '创建时间';

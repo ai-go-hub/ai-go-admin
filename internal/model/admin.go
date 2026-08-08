@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Admin 管理员账号模型
 type Admin struct {
 	ID                 uint               `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
 	Username           string             `gorm:"comment:用户名;type:varchar(64);not null;default:''" json:"username" binding:"required"`

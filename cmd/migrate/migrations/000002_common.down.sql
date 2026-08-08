@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS "__PREFIX__crud_logs";
 DROP TABLE IF EXISTS "__PREFIX__areas";
 DROP TABLE IF EXISTS "__PREFIX__attachments";
 DROP TABLE IF EXISTS "__PREFIX__configs";
