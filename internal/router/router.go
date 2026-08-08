@@ -5,6 +5,7 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
 	_ "github.com/ai-go-hub/ai-go-admin/internal/router/admin"
 	_ "github.com/ai-go-hub/ai-go-admin/internal/router/admin/auth"
+	_ "github.com/ai-go-hub/ai-go-admin/internal/router/admin/crud"
 	_ "github.com/ai-go-hub/ai-go-admin/internal/router/admin/routine"
 	_ "github.com/ai-go-hub/ai-go-admin/internal/router/common"
 
