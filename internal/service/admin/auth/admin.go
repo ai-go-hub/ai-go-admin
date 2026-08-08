@@ -10,6 +10,7 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
+	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 
 	"golang.org/x/crypto/bcrypt"
@@ -25,11 +26,11 @@ type AuthAdminExtension struct {
 type AuthAdminService struct {
 	service.IService[model.Admin]
 	repo      *repoAdmin.AdminRepository
-	groupRepo *repoAdmin.AdminGroupRepository
+	groupRepo *repoAuth.AdminGroupRepository
 }
 
 // NewAuthAdminService 创建管理员账号管理服务实例
-func NewAuthAdminService(repo *repoAdmin.AdminRepository, groupRepo *repoAdmin.AdminGroupRepository) *AuthAdminService {
+func NewAuthAdminService(repo *repoAdmin.AdminRepository, groupRepo *repoAuth.AdminGroupRepository) *AuthAdminService {
 	return &AuthAdminService{
 		IService:  service.NewService(repo),
 		repo:      repo,

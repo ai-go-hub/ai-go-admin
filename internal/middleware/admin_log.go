@@ -12,7 +12,7 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	"github.com/ai-go-hub/ai-go-admin/internal/repository"
-	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
+	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
 	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 
 	"github.com/gin-gonic/gin"
@@ -85,7 +85,7 @@ func AdminLog() gin.HandlerFunc {
 		// 异步写入日志
 		go func() {
 			var title string
-			repo := repoAdmin.NewAdminLogRepository()
+			repo := repoAuth.NewAdminLogRepository()
 			if hasCustomTitle {
 				title = customTitle.(string)
 			} else {

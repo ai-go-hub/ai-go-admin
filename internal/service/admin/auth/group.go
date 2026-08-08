@@ -12,7 +12,7 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	"github.com/ai-go-hub/ai-go-admin/internal/repository"
-	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
+	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 
 	"gorm.io/gorm"
@@ -28,12 +28,12 @@ type AuthAdminGroupExtension struct {
 // AuthAdminGroupService 管理员分组管理服务
 type AuthAdminGroupService struct {
 	service.IService[model.AdminGroup]
-	repo     *repoAdmin.AdminGroupRepository
-	ruleRepo *repoAdmin.AdminRuleRepository
+	repo     *repoAuth.AdminGroupRepository
+	ruleRepo *repoAuth.AdminRuleRepository
 }
 
 // NewAuthAdminGroupService 创建管理员分组管理服务实例
-func NewAuthAdminGroupService(repo *repoAdmin.AdminGroupRepository, ruleRepo *repoAdmin.AdminRuleRepository) *AuthAdminGroupService {
+func NewAuthAdminGroupService(repo *repoAuth.AdminGroupRepository, ruleRepo *repoAuth.AdminRuleRepository) *AuthAdminGroupService {
 	return &AuthAdminGroupService{
 		IService: service.NewService(repo),
 		repo:     repo,

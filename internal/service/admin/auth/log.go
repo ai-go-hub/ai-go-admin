@@ -7,7 +7,7 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
-	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
+	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 )
 
@@ -19,11 +19,11 @@ type AdminLogExtension struct {
 // AdminLogService 管理员日志服务
 type AdminLogService struct {
 	service.IService[model.AdminLog]
-	repo *repoAdmin.AdminLogRepository
+	repo *repoAuth.AdminLogRepository
 }
 
 // NewAdminLogService 创建管理员日志服务实例
-func NewAdminLogService(repo *repoAdmin.AdminLogRepository) *AdminLogService {
+func NewAdminLogService(repo *repoAuth.AdminLogRepository) *AdminLogService {
 	return &AdminLogService{
 		IService: service.NewService(repo),
 		repo:     repo,

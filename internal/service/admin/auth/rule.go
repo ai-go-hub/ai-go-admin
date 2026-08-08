@@ -9,7 +9,7 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	"github.com/ai-go-hub/ai-go-admin/internal/repository"
-	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
+	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 
@@ -24,11 +24,11 @@ type AuthAdminRuleExtension struct {
 // AuthAdminRuleService 菜单和权限规则管理服务
 type AuthAdminRuleService struct {
 	service.IService[model.AdminRule]
-	repo *repoAdmin.AdminRuleRepository
+	repo *repoAuth.AdminRuleRepository
 }
 
 // NewAuthAdminRuleService 创建菜单和权限规则管理服务实例
-func NewAuthAdminRuleService(repo *repoAdmin.AdminRuleRepository) *AuthAdminRuleService {
+func NewAuthAdminRuleService(repo *repoAuth.AdminRuleRepository) *AuthAdminRuleService {
 	return &AuthAdminRuleService{
 		IService: service.NewService(repo),
 		repo:     repo,
