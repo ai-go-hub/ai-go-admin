@@ -66,7 +66,7 @@
                         <el-input
                             type="textarea"
                             v-model="state.addConfig.dict"
-                            :placeholder="t('routine.config.strAttrTip')"
+                            :placeholder="t('common.strAttrTip')"
                             :rows="3"
                             @keyup.enter.stop=""
                             @keyup.ctrl.enter="onAddSubmit()"
@@ -77,7 +77,7 @@
                         <el-input
                             type="textarea"
                             v-model="state.addConfig.input_extend"
-                            :placeholder="t('routine.config.strAttrTip')"
+                            :placeholder="t('common.strAttrTip')"
                             :rows="3"
                             @keyup.enter.stop=""
                             @keyup.ctrl.enter="onAddSubmit()"

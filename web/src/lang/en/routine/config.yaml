@@ -18,4 +18,3 @@ deleteConfigurationConfirm: Are you sure to delete the configuration item?
 configurationUpdated: Configuration updated successfully
 configurationAdded: Added successfully
 areYouSureToDelete: Are you sure to delete the configuration item?
-strAttrTip: 'One per line, no quotes. Example: class=test-item'

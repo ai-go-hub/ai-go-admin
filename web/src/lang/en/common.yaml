@@ -51,6 +51,7 @@ all: All
 submenu: Submenu
 url: URL
 save: Save
+confirm: Confirm
 saveAndContinue: Save and edit the next item
 status: Status
 disable: Disable
@@ -61,18 +62,14 @@ invalidEntry: Please enter a valid {field}
 accountFormatError: Must be 3-16 characters, start with a letter, and contain only letters, digits, and underscores.
 passwordFormatError: 6-32 chars, no & < > " ' allowed.
 varNameFormatError: Only letters, digits and underscores allowed; cannot start with a digit.
+strAttrTip: 'One per line, no quotes. Example: class=test-item'
 content: Content
 required: Required
 mobile: Mobile
 account: Account
-password: Password
 varName: Variable name
 richTextRequired: Rich text is required
 email: Email
-date: Date
-number: Number
-integer: Integer
-float: Float
 lastLoginAt: Last login at
 updatedAt: Updated at
 createdAt: Created at
@@ -80,3 +77,31 @@ operate: Operate
 noData: No data
 weigh: Weigh
 info: Info
+none: None
+unknown: Unknown
+choice: Choice
+multiple: Multiple
+reminder: Notice
+date: Date
+number: Number
+integer: Integer
+password: Password
+float: Float
+time: Time
+datetime: Date time
+year: Year
+array: Array
+richText: Rich text
+textarea: Textarea
+switch: Switch
+select: Select
+radio: Radio
+checkbox: Checkbox
+file: File
+image: Image
+images: Images
+string: String
+color: Color
+iconSelect: Icon select
+areaSelect: Area select
+remoteSelect: Remote select

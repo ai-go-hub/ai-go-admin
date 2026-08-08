@@ -18,4 +18,3 @@ deleteConfigurationConfirm: 确定删除该配置项吗？
 configurationUpdated: 当前页面配置项更新成功
 configurationAdded: 新增成功
 areYouSureToDelete: 确定要删除配置项吗？
-strAttrTip: '一行一个，无需引号，比如: class=test-item'

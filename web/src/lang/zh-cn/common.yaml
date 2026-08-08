@@ -51,6 +51,7 @@ all: 所有
 submenu: 子菜单
 url: 链接地址
 save: 保存
+confirm: 确定
 saveAndContinue: 保存并编辑下一项
 status: 状态
 disable: 禁用
@@ -61,18 +62,14 @@ invalidEntry: 请输入有效的{field}
 accountFormatError: 长度须为 3-16 个字符，以字母开头，且只能包含字母、数字和下划线
 passwordFormatError: 密码要求6到32位，不能包含 & < > " '
 varNameFormatError: 仅支持汉字、字母、数字、下划线，且不能以数字开头
+strAttrTip: '一行一个，无需引号，比如: class=test-item'
 content: 内容
 required: 必填
 mobile: 手机号
 account: 账户名
-password: 密码
 varName: 变量名
 richTextRequired: 富文本必填
 email: 电子邮箱
-date: 日期
-number: 数字
-integer: 整数
-float: 浮点数
 lastLoginAt: 上次登录时间
 updatedAt: 更新时间
 createdAt: 创建时间
@@ -80,3 +77,31 @@ operate: 操作
 noData: 无数据
 weigh: 权重
 info: 详情
+none: 无
+unknown: 未知
+choice: 选择
+multiple: 多选
+reminder: 温馨提示
+date: 日期
+number: 数字
+integer: 整数
+password: 密码
+float: 浮点数
+time: 时间
+datetime: 时间日期
+year: 年份
+array: 数组
+richText: 富文本
+textarea: 多行文本
+switch: 开关
+select: 下拉框
+radio: 单选框
+checkbox: 复选框
+file: 文件
+image: 图片
+images: 多图
+string: 字符串
+color: 颜色
+iconSelect: 图标选择
+areaSelect: 省份区域选择
+remoteSelect: 远程下拉
