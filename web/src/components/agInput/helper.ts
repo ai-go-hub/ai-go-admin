@@ -89,6 +89,11 @@ export const fieldData: Record<string, FieldData> = {
     },
 
     // ==================== 数字 ====================
+    int: {
+        type: 'bigint',
+        length: 64,
+        ...defaultNUPPD,
+    },
     number: {
         type: 'numeric',
         length: 10,
@@ -152,7 +157,7 @@ export const fieldData: Record<string, FieldData> = {
         ...defaultNUPPD,
     },
 
-    // ==================== date / timestamptz ====================
+    // ==================== date / datetime ====================
     date: {
         type: 'date',
         length: 0,
