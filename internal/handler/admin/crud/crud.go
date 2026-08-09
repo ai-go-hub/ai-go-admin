@@ -50,6 +50,11 @@ func (h *Handler) TableList(c *gin.Context) {
 		return
 	}
 
+	// 遍历修改 comment 为 "table - comment" 格式
+	for i := range tables {
+		tables[i].Comment = tables[i].Table + " - " + tables[i].Comment
+	}
+
 	httpx.Success(c, httpx.WithData(gin.H{
 		"list": tables,
 	}))
