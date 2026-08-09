@@ -123,9 +123,7 @@ ORDER BY a.attnum
 
 // ModelList 获取模型列表
 func (s *Service) ModelList() ([]ModelInfo, error) {
-	const modelDir = "internal/model"
-
-	files, err := filepath.Glob(filepath.Join(modelDir, "*.go"))
+	files, err := filepath.Glob(filepath.Join(GenBaseDir["model"], "*.go"))
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +169,7 @@ func (s *Service) ModelList() ([]ModelInfo, error) {
 				models = append(models, ModelInfo{
 					Name:    typeSpec.Name.Name,
 					Package: node.Name.Name,
-					File:    strings.ReplaceAll(file, "/", "\\"),
+					File:    filepath.ToSlash(file),
 					Comment: comment,
 				})
 			}
