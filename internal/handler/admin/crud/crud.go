@@ -28,6 +28,7 @@ func (h *Handler) RegisterRoutes(group *gin.RouterGroup) {
 	group.GET("/model-list", middleware.AdminAuth(), h.ModelList)
 	group.POST("/table-list", middleware.AdminAuth(), h.TableList)
 	group.GET("/table-field-list", middleware.AdminAuth(), h.TableFieldList)
+	group.GET("/generate-file-basic-data", middleware.AdminAuth(), h.GenerateFileBasicData)
 }
 
 // TableList 数据表列表
@@ -91,6 +92,27 @@ func (h *Handler) ModelList(c *gin.Context) {
 	httpx.Success(c, httpx.WithData(gin.H{
 		"list": models,
 	}))
+}
+
+// GenerateFileBasicData 生成文件基本信息
+func (h *Handler) GenerateFileBasicData(c *gin.Context) {
+	if !h.checkPermission(c, []string{"crud/crud/create"}) {
+		return
+	}
+	app := c.Query("app")
+	table := c.Query("table")
+	if table == "" || app == "" {
+		httpx.Fail(c, httpx.WithMessage("参数错误: 不能为空"))
+		return
+	}
+
+	types := []string{"model", "handler", "service", "repository", "router", "views"}
+	data := make(map[string]svcCrud.GenerateFileBasicDataInfo, len(types))
+	for _, typ := range types {
+		data[typ] = svcCrud.GenerateFileBasicData(typ, table, app)
+	}
+
+	httpx.Success(c, httpx.WithData(data))
 }
 
 // checkPermission 校验 CRUD 权限节点，无权限时返回 false（内部已输出响应）
