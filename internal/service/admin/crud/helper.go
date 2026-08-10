@@ -1,6 +1,11 @@
 package crud
 
-import "strings"
+import (
+	"context"
+	"strings"
+
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
+)
 
 // GenBaseDir 各类生成文件的基准目录
 var GenBaseDir = map[string]string{
@@ -173,4 +178,21 @@ func LastDirName(path string) string {
 		return path[i+1:]
 	}
 	return path
+}
+
+// TableComment 获取指定数据表的注释
+func TableComment(ctx context.Context, table string) (string, error) {
+	db := database.DB().WithContext(ctx)
+	table = withPrefix(table)
+
+	var comment string
+	if err := db.Raw(`
+SELECT COALESCE(obj_description(t.oid, 'pg_class'), '') AS "comment"
+FROM pg_catalog.pg_class t
+JOIN pg_catalog.pg_namespace n ON n.oid = t.relnamespace
+WHERE n.nspname = current_schema()
+    AND t.relname = ?`, table).Scan(&comment).Error; err != nil {
+		return "", err
+	}
+	return comment, nil
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
+	repoCrud "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/crud"
 	svcCrud "github.com/ai-go-hub/ai-go-admin/internal/service/admin/crud"
 
 	"github.com/gin-gonic/gin"
@@ -13,13 +14,15 @@ import (
 
 // Handler 可视化 CRUD 控制器
 type Handler struct {
-	svc *svcCrud.Service
+	svc  *svcCrud.Service
+	repo *repoCrud.CrudLogRepository
 }
 
 // NewHandler 创建可视化 CRUD 控制器实例
-func NewHandler(svc *svcCrud.Service) *Handler {
+func NewHandler(svc *svcCrud.Service, repo *repoCrud.CrudLogRepository) *Handler {
 	return &Handler{
-		svc: svc,
+		svc:  svc,
+		repo: repo,
 	}
 }
 
@@ -29,6 +32,8 @@ func (h *Handler) RegisterRoutes(group *gin.RouterGroup) {
 	group.POST("/table-list", middleware.AdminAuth(), h.TableList)
 	group.GET("/table-field-list", middleware.AdminAuth(), h.TableFieldList)
 	group.GET("/generate-file-basic-data", middleware.AdminAuth(), h.GenerateFileBasicData)
+	group.GET("/check-log", middleware.AdminAuth(), h.CheckLog)
+	group.GET("/parse-table-data", middleware.AdminAuth(), h.ParseTableData)
 }
 
 // TableList 数据表列表
@@ -118,6 +123,63 @@ func (h *Handler) GenerateFileBasicData(c *gin.Context) {
 	}
 
 	httpx.Success(c, httpx.WithData(data))
+}
+
+// CheckLog 查询指定数据表的 CRUD 记录
+func (h *Handler) CheckLog(c *gin.Context) {
+	if !h.checkPermission(c, []string{"crud/crud/read"}) {
+		return
+	}
+	table := c.Query("table")
+	if table == "" {
+		httpx.Fail(c, httpx.WithMessage("参数错误: table 不能为空"))
+		return
+	}
+
+	log, err := h.repo.FindSucceededByName(c.Request.Context(), table)
+	if err != nil {
+		httpx.Fail(c, httpx.WithMessage("查询 CRUD 记录失败: "+err.Error()))
+		return
+	}
+
+	var id any
+	if log != nil {
+		id = log.ID
+	}
+
+	httpx.Success(c, httpx.WithData(gin.H{
+		"id": id,
+	}))
+}
+
+// ParseTableData 解析指定数据表的字段数据
+func (h *Handler) ParseTableData(c *gin.Context) {
+	if !h.checkPermission(c, []string{"crud/crud/read"}) {
+		return
+	}
+
+	table := c.Query("table")
+	if table == "" {
+		httpx.Fail(c, httpx.WithMessage("参数错误: table 不能为空"))
+		return
+	}
+
+	columns, err := h.svc.ParseFieldData(c.Request.Context(), table)
+	if err != nil {
+		httpx.Fail(c, httpx.WithMessage("解析字段数据失败: "+err.Error()))
+		return
+	}
+
+	comment, err := svcCrud.TableComment(c.Request.Context(), table)
+	if err != nil {
+		httpx.Fail(c, httpx.WithMessage("查询数据表注释失败: "+err.Error()))
+		return
+	}
+
+	httpx.Success(c, httpx.WithData(gin.H{
+		"columns": columns,
+		"comment": comment,
+	}))
 }
 
 // checkPermission 校验 CRUD 权限节点，无权限时返回 false（内部已输出响应）
