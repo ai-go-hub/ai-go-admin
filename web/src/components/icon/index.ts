@@ -7,6 +7,21 @@ type IconMap = Record<string, Component>
 
 const lucideCache: IconMap = {}
 
+/*
+ * 归一化图标名称: 去除所有分隔符并转小写
+ */
+function normalizeIconName(s: string): string {
+    return s.toLowerCase().replace(/[^a-z0-9]/g, '')
+}
+
+/*
+ * 在图标映射中查找归一化后与目标名称一致的导出键
+ */
+function findIconKey(icons: IconMap, name: string): string | undefined {
+    const target = normalizeIconName(name)
+    return Object.keys(icons).find((k) => normalizeIconName(k) === target)
+}
+
 export function getLucideComponent(name: string): Component | null {
     const key = upperFirst(camelCase(name))
     if (lucideCache[key]) {
@@ -17,7 +32,11 @@ export function getLucideComponent(name: string): Component | null {
 
     if (import.meta.env.DEV) {
         let iconsPromise: Promise<IconMap> | null = null
-        loader = () => (iconsPromise ??= import('@lucide/vue').then((m) => m.icons as IconMap)).then((icons) => icons[key] || { render: () => null })
+        loader = () =>
+            (iconsPromise ??= import('@lucide/vue').then((m) => m.icons as IconMap)).then((icons) => {
+                const matchedKey = icons[key] ? key : findIconKey(icons, name)
+                return (matchedKey && icons[matchedKey]) || { render: () => null }
+            })
     } else {
         const batchLoaders: Record<string, () => Promise<IconMap>> = {
             'a-c': () => import('virtual:lucide-icons/a-c') as Promise<IconMap>,
@@ -38,7 +57,11 @@ export function getLucideComponent(name: string): Component | null {
                   ? 'q-s'
                   : 't-z'
 
-        loader = () => batchLoaders[batch]().then((icons) => icons[key] || { render: () => null })
+        loader = () =>
+            batchLoaders[batch]().then((icons) => {
+                const matchedKey = icons[key] ? key : findIconKey(icons, name)
+                return (matchedKey && icons[matchedKey]) || { render: () => null }
+            })
     }
 
     const asyncComp = defineAsyncComponent(loader)
