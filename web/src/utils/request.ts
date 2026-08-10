@@ -192,7 +192,7 @@ instance.interceptors.response.use(
             if (opts.showErrorMessage !== false) {
                 ElMessage.error(response.data.message || i18n.global.t('common.operationFailed'))
             }
-            return Promise.reject(response.data.message || i18n.global.t('common.operationFailed'))
+            return Promise.reject(response)
         }
 
         if (opts.showSuccessMessage) {
