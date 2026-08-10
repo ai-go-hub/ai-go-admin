@@ -28,12 +28,14 @@ func NewHandler(svc *svcCrud.Service, repo *repoCrud.CrudLogRepository) *Handler
 
 // RegisterRoutes 注册路由
 func (h *Handler) RegisterRoutes(group *gin.RouterGroup) {
-	group.GET("/model-list", middleware.AdminAuth(), h.ModelList)
-	group.POST("/table-list", middleware.AdminAuth(), h.TableList)
 	group.GET("/table-field-list", middleware.AdminAuth(), h.TableFieldList)
 	group.GET("/generate-file-basic-data", middleware.AdminAuth(), h.GenerateFileBasicData)
 	group.GET("/check-log", middleware.AdminAuth(), h.CheckLog)
 	group.GET("/parse-table-data", middleware.AdminAuth(), h.ParseTableData)
+
+	// 使用 POST，以便远程下拉使用（可以发送筛选数据等）
+	group.POST("/model-list", middleware.AdminAuth(), h.ModelList)
+	group.POST("/table-list", middleware.AdminAuth(), h.TableList)
 }
 
 // TableList 数据表列表
@@ -97,6 +99,11 @@ func (h *Handler) ModelList(c *gin.Context) {
 	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("读取模型列表失败: "+err.Error()))
 		return
+	}
+
+	// 遍历修改 comment 为 "model name - comment" 格式
+	for i := range models {
+		models[i].Comment = models[i].Name + " - " + models[i].Comment
 	}
 
 	httpx.Success(c, httpx.WithData(gin.H{
