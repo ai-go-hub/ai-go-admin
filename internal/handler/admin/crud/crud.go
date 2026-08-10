@@ -1,41 +1,47 @@
 package crud
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
+	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
 	repoCrud "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/crud"
 	svcCrud "github.com/ai-go-hub/ai-go-admin/internal/service/admin/crud"
+	"github.com/ai-go-hub/ai-go-admin/pkg/filesystem"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // Handler 可视化 CRUD 控制器
 type Handler struct {
-	svc  *svcCrud.Service
-	repo *repoCrud.CrudLogRepository
+	svc      *svcCrud.Service
+	repo     *repoCrud.CrudLogRepository
+	repoAuth *repoAuth.AdminRuleRepository
 }
 
 // NewHandler 创建可视化 CRUD 控制器实例
-func NewHandler(svc *svcCrud.Service, repo *repoCrud.CrudLogRepository) *Handler {
+func NewHandler(svc *svcCrud.Service, repo *repoCrud.CrudLogRepository, repoAuth *repoAuth.AdminRuleRepository) *Handler {
 	return &Handler{
-		svc:  svc,
-		repo: repo,
+		svc:      svc,
+		repo:     repo,
+		repoAuth: repoAuth,
 	}
 }
 
 // RegisterRoutes 注册路由
 func (h *Handler) RegisterRoutes(group *gin.RouterGroup) {
 	group.GET("/table-field-list", middleware.AdminAuth(), h.TableFieldList)
-	group.GET("/generate-file-basic-data", middleware.AdminAuth(), h.GenerateFileBasicData)
+	group.GET("/generate-basic-data", middleware.AdminAuth(), h.GenerateBasicData)
 	group.GET("/check-log", middleware.AdminAuth(), h.CheckLog)
 	group.GET("/parse-table-data", middleware.AdminAuth(), h.ParseTableData)
 
-	// 使用 POST，以便远程下拉使用（可以发送筛选数据等）
 	group.POST("/model-list", middleware.AdminAuth(), h.ModelList)
 	group.POST("/table-list", middleware.AdminAuth(), h.TableList)
+	group.POST("/check-generate", middleware.AdminAuth(), h.CheckGenerate)
 }
 
 // TableList 数据表列表
@@ -111,8 +117,8 @@ func (h *Handler) ModelList(c *gin.Context) {
 	}))
 }
 
-// GenerateFileBasicData 生成文件基本信息
-func (h *Handler) GenerateFileBasicData(c *gin.Context) {
+// GenerateBasicData 生成 CRUD 基本信息（文件生成位置、路由路径）
+func (h *Handler) GenerateBasicData(c *gin.Context) {
 	if !h.checkPermission(c, []string{"crud/crud/create"}) {
 		return
 	}
@@ -124,12 +130,15 @@ func (h *Handler) GenerateFileBasicData(c *gin.Context) {
 	}
 
 	types := []string{"model", "handler", "service", "repository", "router", "views"}
-	data := make(map[string]svcCrud.GenerateFileBasicDataInfo, len(types))
+	files := make(map[string]svcCrud.GenerateFileBasicDataInfo, len(types))
 	for _, typ := range types {
-		data[typ] = svcCrud.GenerateFileBasicData(typ, table, app)
+		files[typ] = svcCrud.GenerateFileBasicData(typ, table, app)
 	}
 
-	httpx.Success(c, httpx.WithData(data))
+	httpx.Success(c, httpx.WithData(gin.H{
+		"files": files,
+		"route": svcCrud.GenerateRoutePath(table),
+	}))
 }
 
 // CheckLog 查询指定数据表的 CRUD 记录
@@ -157,6 +166,52 @@ func (h *Handler) CheckLog(c *gin.Context) {
 	httpx.Success(c, httpx.WithData(gin.H{
 		"id": id,
 	}))
+}
+
+// CheckGenerate 生成前检查
+func (h *Handler) CheckGenerate(c *gin.Context) {
+	var req struct {
+		Table       string `json:"table"`
+		HandlerFile string `json:"handler"`
+		RoutePath   string `json:"route"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
+		return
+	}
+
+	// 检查 handler 文件是否存在（存在则生成时会覆盖）
+	fileExists, err := filesystem.Exists(req.HandlerFile)
+	if err != nil {
+		httpx.Fail(c, httpx.WithMessage("检查控制器文件失败: "+err.Error()))
+		return
+	}
+
+	// 检查数据表是否存在
+	tableExists, err := h.svc.TableExists(c.Request.Context(), req.Table)
+	if err != nil {
+		httpx.Fail(c, httpx.WithMessage("检查数据表失败: "+err.Error()))
+		return
+	}
+
+	// 检查菜单规则是否存在（未查得时 menu 返回 false，不报错）
+	menu, err := h.repoAuth.FindByPath(c.Request.Context(), req.RoutePath)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		httpx.Fail(c, httpx.WithMessage("检查菜单规则失败: "+err.Error()))
+		return
+	}
+	menuExists := menu != nil
+
+	if !fileExists || !tableExists || !menuExists {
+		httpx.Fail(c, httpx.WithData(gin.H{
+			"handler": fileExists,
+			"table":   tableExists,
+			"menu":    menuExists,
+		}), httpx.WithCode(-1))
+		return
+	}
+
+	httpx.Success(c)
 }
 
 // ParseTableData 解析指定数据表的字段数据

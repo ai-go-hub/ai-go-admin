@@ -80,6 +80,24 @@ WHERE c.relkind = 'r'
 	return tables, nil
 }
 
+// TableExists 检查数据表是否存在
+func (s *Service) TableExists(ctx context.Context, table string) (bool, error) {
+	db := database.DB().WithContext(ctx)
+	table = withPrefix(table)
+
+	var count int64
+	if err := db.Raw(`
+SELECT COUNT(*) AS count
+FROM pg_catalog.pg_class t
+JOIN pg_catalog.pg_namespace n ON n.oid = t.relnamespace
+WHERE n.nspname = current_schema()
+    AND t.relkind = 'r'
+    AND t.relname = ?`, table).Scan(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 // TableFieldList 获取指定数据表的字段列表与主键
 func (s *Service) TableFieldList(ctx context.Context, table string) (string, []FieldInfo, error) {
 	db := database.DB().WithContext(ctx)

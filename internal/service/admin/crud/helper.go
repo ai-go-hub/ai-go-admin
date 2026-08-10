@@ -32,6 +32,15 @@ type GenerateFileBasicDataInfo struct {
 	EnFile   string `json:"en_file,omitempty"` // 语言包 en 文件路径
 }
 
+// GenerateRoutePath 获取生成路由路径
+func GenerateRoutePath(table string) string {
+	segs := SplitTablePath(table)
+	if len(segs) == 0 {
+		return ""
+	}
+	return strings.Join(segs, "/")
+}
+
 // GenerateFileBasicData 获取生成文件的基本信息
 func GenerateFileBasicData(typ, table, app string) GenerateFileBasicDataInfo {
 	data := GenerateFileBasicDataInfo{
