@@ -3,57 +3,59 @@ package crud
 import (
 	"reflect"
 	"testing"
+
+	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 )
 
 func TestGenerateFileBasicData(t *testing.T) {
 	cases := []struct {
-		name  string
-		typ   string
-		table string
-		app   string
-		want  GenerateFileBasicDataInfo
+		name string
+		typ  string
+		path string
+		app  string
+		want dto.GenerateFileBasicDataInfo
 	}{
 		{
 			"model 平铺",
 			"model", "user_log", "admin",
-			GenerateFileBasicDataInfo{Type: "model", Table: "user_log", App: "admin", Dir: "internal/model", File: "internal/model/user_log.go", Package: "model", LastName: "user_log", Name: "UserLog"},
+			dto.GenerateFileBasicDataInfo{Type: "model", Path: "user_log", App: "admin", Dir: "internal/model", File: "internal/model/user_log.go", Package: "model", LastName: "user_log", Name: "UserLog"},
 		},
 		{
 			"handler",
 			"handler", "auth_rule", "admin",
-			GenerateFileBasicDataInfo{Type: "handler", Table: "auth_rule", App: "admin", Dir: "internal/handler/admin/auth", File: "internal/handler/admin/auth/rule.go", Package: "auth", LastName: "rule", Name: "AuthRule"},
+			dto.GenerateFileBasicDataInfo{Type: "handler", Path: "auth_rule", App: "admin", Dir: "internal/handler/admin/auth", File: "internal/handler/admin/auth/rule.go", Package: "auth", LastName: "rule", Name: "AuthRule"},
 		},
 		{
 			"service",
 			"service", "auth_rule", "admin",
-			GenerateFileBasicDataInfo{Type: "service", Table: "auth_rule", App: "admin", Dir: "internal/service/admin/auth", File: "internal/service/admin/auth/rule.go", Package: "auth", LastName: "rule", Name: "AuthRule"},
+			dto.GenerateFileBasicDataInfo{Type: "service", Path: "auth_rule", App: "admin", Dir: "internal/service/admin/auth", File: "internal/service/admin/auth/rule.go", Package: "auth", LastName: "rule", Name: "AuthRule"},
 		},
 		{
 			"repository",
 			"repository", "auth_rule", "admin",
-			GenerateFileBasicDataInfo{Type: "repository", Table: "auth_rule", App: "admin", Dir: "internal/repository/admin/auth", File: "internal/repository/admin/auth/rule.go", Package: "auth", LastName: "rule", Name: "AuthRule"},
+			dto.GenerateFileBasicDataInfo{Type: "repository", Path: "auth_rule", App: "admin", Dir: "internal/repository/admin/auth", File: "internal/repository/admin/auth/rule.go", Package: "auth", LastName: "rule", Name: "AuthRule"},
 		},
 		{
 			"router",
 			"router", "auth_rule", "admin",
-			GenerateFileBasicDataInfo{Type: "router", Table: "auth_rule", App: "admin", Dir: "internal/router/admin/auth", File: "internal/router/admin/auth/rule.go", Package: "auth", LastName: "rule", Name: "AuthRule"},
+			dto.GenerateFileBasicDataInfo{Type: "router", Path: "auth_rule", App: "admin", Dir: "internal/router/admin/auth", File: "internal/router/admin/auth/rule.go", Package: "auth", LastName: "rule", Name: "AuthRule"},
 		},
 		{
 			"views 目录",
 			"views", "auth_rule", "admin",
-			GenerateFileBasicDataInfo{Type: "views", Table: "auth_rule", App: "admin", Dir: "web/src/views/admin/auth/rule", LastName: "rule", Name: "AuthRule"},
+			dto.GenerateFileBasicDataInfo{Type: "views", Path: "auth_rule", App: "admin", Dir: "web/src/views/admin/auth/rule", LastName: "rule", Name: "AuthRule"},
 		},
 		{
 			"lang 语言包",
 			"lang", "auth_rule", "admin",
-			GenerateFileBasicDataInfo{Type: "lang", Table: "auth_rule", App: "admin", Dir: "web/src/lang", LastName: "rule", Name: "AuthRule", CnFile: "web/src/lang/zh-cn/auth/rule.yaml", EnFile: "web/src/lang/en/auth/rule.yaml"},
+			dto.GenerateFileBasicDataInfo{Type: "lang", Path: "auth_rule", App: "admin", Dir: "web/src/lang", LastName: "rule", Name: "AuthRule", CnFile: "web/src/lang/zh-cn/auth/rule.yaml", EnFile: "web/src/lang/en/auth/rule.yaml", LangKey: "auth.rule"},
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if got := GenerateFileBasicData(c.typ, c.table, c.app); got != c.want {
-				t.Errorf("GenerateFileBasicData(%q, %q, %q) = %+v, want %+v", c.typ, c.table, c.app, got, c.want)
+			if got := GenerateFileBasicData(c.typ, c.path, c.app); got != c.want {
+				t.Errorf("GenerateFileBasicData(%q, %q, %q) = %+v, want %+v", c.typ, c.path, c.app, got, c.want)
 			}
 		})
 	}
@@ -83,27 +85,27 @@ func TestParseGenerateFileBasicData(t *testing.T) {
 		name string
 		typ  string
 		path string
-		want GenerateFileBasicDataInfo
+		want dto.GenerateFileBasicDataInfo
 	}{
 		{
 			"model 平铺", "model", "internal/model/user_log.go",
-			GenerateFileBasicDataInfo{Type: "model", Table: "user_log", Dir: "internal/model", File: "internal/model/user_log.go", Package: "model", LastName: "user_log", Name: "UserLog"},
+			dto.GenerateFileBasicDataInfo{Type: "model", Path: "user_log", Dir: "internal/model", File: "internal/model/user_log.go", Package: "model", LastName: "user_log", Name: "UserLog"},
 		},
 		{
 			"model 子级", "model", "internal/model/auth/rule.go",
-			GenerateFileBasicDataInfo{Type: "model", Table: "auth_rule", Dir: "internal/model/auth", File: "internal/model/auth/rule.go", Package: "auth", LastName: "auth_rule", Name: "AuthRule"},
+			dto.GenerateFileBasicDataInfo{Type: "model", Path: "auth_rule", Dir: "internal/model/auth", File: "internal/model/auth/rule.go", Package: "auth", LastName: "auth_rule", Name: "AuthRule"},
 		},
 		{
 			"lang 目录 zh-cn", "lang", "web/src/lang/zh-cn/auth",
-			GenerateFileBasicDataInfo{Type: "lang", Table: "auth", Dir: "web/src/lang/zh-cn/auth", LastName: "auth", Name: "Auth"},
+			dto.GenerateFileBasicDataInfo{Type: "lang", Path: "auth", Dir: "web/src/lang/zh-cn/auth", LastName: "auth", Name: "Auth"},
 		},
 		{
 			"lang 目录 en", "lang", "web/src/lang/en/auth/rule",
-			GenerateFileBasicDataInfo{Type: "lang", Table: "auth_rule", Dir: "web/src/lang/en/auth/rule", LastName: "rule", Name: "AuthRule"},
+			dto.GenerateFileBasicDataInfo{Type: "lang", Path: "auth_rule", Dir: "web/src/lang/en/auth/rule", LastName: "rule", Name: "AuthRule"},
 		},
 		{
 			"views 目录", "views", "web/src/views/admin/auth/rule",
-			GenerateFileBasicDataInfo{Type: "views", Table: "auth_rule", App: "admin", Dir: "web/src/views/admin/auth/rule", LastName: "rule", Name: "AuthRule"},
+			dto.GenerateFileBasicDataInfo{Type: "views", Path: "auth_rule", App: "admin", Dir: "web/src/views/admin/auth/rule", LastName: "rule", Name: "AuthRule"},
 		},
 	}
 	for _, c := range checks {
@@ -125,14 +127,14 @@ func TestParseGenerateFileBasicData(t *testing.T) {
 			{"model", "internal/model"},                   // base 目录非 .go
 		}
 		for _, c := range zeroCases {
-			if got := ParseGenerateFileBasicData(c.typ, c.path); got != (GenerateFileBasicDataInfo{}) {
+			if got := ParseGenerateFileBasicData(c.typ, c.path); got != (dto.GenerateFileBasicDataInfo{}) {
 				t.Errorf("%s/%s: got %+v, want 零值", c.typ, c.path, got)
 			}
 		}
 	})
 }
 
-func TestSplitTablePath(t *testing.T) {
+func TestSplitPath(t *testing.T) {
 	cases := []struct {
 		name  string
 		table string
@@ -145,28 +147,8 @@ func TestSplitTablePath(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if got := SplitTablePath(c.table); !reflect.DeepEqual(got, c.want) {
-				t.Errorf("SplitTablePath(%q) = %v, want %v", c.table, got, c.want)
-			}
-		})
-	}
-}
-
-func TestPascalCase(t *testing.T) {
-	cases := []struct {
-		name string
-		segs []string
-		want string
-	}{
-		{"user_log 拆分后", []string{"user", "log"}, "UserLog"},
-		{"auth_rule 拆分后", []string{"auth", "rule"}, "AuthRule"},
-		{"空段被跳过", []string{"user", "", "log"}, "UserLog"},
-		{"空输入", nil, ""},
-	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			if got := PascalCase(c.segs); got != c.want {
-				t.Errorf("PascalCase(%v) = %q, want %q", c.segs, got, c.want)
+			if got := SplitPath(c.table); !reflect.DeepEqual(got, c.want) {
+				t.Errorf("SplitPath(%q) = %v, want %v", c.table, got, c.want)
 			}
 		})
 	}
@@ -206,6 +188,31 @@ func TestLastDirName(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			if got := LastDirName(c.path); got != c.want {
 				t.Errorf("LastDirName(%q) = %q, want %q", c.path, got, c.want)
+			}
+		})
+	}
+}
+
+func TestParseFieldComment(t *testing.T) {
+	cases := []struct {
+		name    string
+		comment string
+		title   string
+		dict    []DictItem
+	}{
+		{"空串", "", "", nil},
+		{"无字典", "标题", "标题", nil},
+		{"只有冒号", "标题:", "标题", nil},
+		{"带字典", "状态:opt0=启用,opt1=禁用", "状态", []DictItem{{Key: "opt0", Value: "启用"}, {Key: "opt1", Value: "禁用"}}},
+		{"字典项无等号", "标题:opt0", "标题", nil},
+		{"字典带空格", "标题: a=1 , b=2 ", "标题", []DictItem{{Key: "a", Value: "1"}, {Key: "b", Value: "2"}}},
+		{"多个冒号取首个", "a:b=c:d", "a", []DictItem{{Key: "b", Value: "c:d"}}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			title, dict := ParseFieldComment(c.comment)
+			if title != c.title || !reflect.DeepEqual(dict, c.dict) {
+				t.Errorf("ParseFieldComment(%q) = %q %v, want %q %v", c.comment, title, dict, c.title, c.dict)
 			}
 		})
 	}

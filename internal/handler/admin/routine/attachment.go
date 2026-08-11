@@ -17,8 +17,12 @@ type AttachmentHandler struct {
 // NewAttachmentHandler 创建附件控制器实例
 func NewAttachmentHandler(svc *svcRoutine.AttachmentService) *AttachmentHandler {
 	return &AttachmentHandler{
-		Handler: handler.NewHandler(svc),
-		svc:     svc,
+		Handler: handler.NewHandler(svc,
+			handler.WithOmitFields(handler.ActionFields{
+				Update: []string{"id"},
+			}),
+		),
+		svc: svc,
 	}
 }
 

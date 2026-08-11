@@ -1,0 +1,62 @@
+<template>
+    <div class="default-main">
+        <TableHeader
+            :manager="tableManager"
+            v-model:com-search="tableManager.comSearch"
+            :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
+        />
+        <Table {{ if .NeedOnMounted }}ref="tableRef" {{ end }}:manager="tableManager" />
+
+        <DialogForm :manager="tableManager" v-model:form-items="tableManager.form.items!" />
+    </div>
+</template>
+
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import DialogForm from './dialogForm.vue'
+import { TableManagerAPI } from '/@/api/table'
+import TableHeader from '/@/components/table/header/index.vue'
+import { getDefaultOptButtons } from '/@/components/table/index'
+import Table from '/@/components/table/index.vue'
+import { useTableManager } from '/@/hooks/useTableManager'
+{{ if .NeedOnMounted }}import { onMounted, useTemplateRef } from 'vue'
+{{ end }}
+const { t } = useI18n()
+const optButtons = getDefaultOptButtons(['{{ .OptButtons }}'])
+{{ if .NeedOnMounted }}const tableRef = useTemplateRef('tableRef')
+{{ end }}
+const tableManager = useTableManager({
+    api: new TableManagerAPI('{{ .ApiURL }}'),
+    table: {
+        column: [
+{{ .Columns }}
+        ],
+        filter: {
+            sort: '{{ .DefaultSort }}',
+            order: '{{ .DefaultOrder }}',
+        },
+{{- if .HasDblClickNotEditColumn }}
+        dblClickNotEditColumn: {{ .DblClickNotEditColumn }},
+{{- end }}
+    },
+{{ if .HasFormDefaultItems }}    form: {
+        defaultItems: {
+{{ .FormDefaultItems }}        },
+    },
+{{ end }}
+})
+{{ if .NeedOnMounted }}
+onMounted(() => {
+    tableManager.table.ref = tableRef.value
+    tableManager.initCtx()
+    tableManager.getData()?.then(() => {
+        tableManager.initDragSort()
+    })
+})
+{{ else }}
+tableManager.initCtx()
+tableManager.getData()
+{{ end }}
+</script>
+
+<style scoped lang="scss"></style>

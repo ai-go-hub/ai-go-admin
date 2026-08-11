@@ -1,0 +1,24 @@
+package model
+{{ if .Imports }}
+{{ .Imports }}
+{{ end }}
+// {{ .Name }}{{ if .Comment }} {{ .Comment }}{{ end }}
+type {{ .Name }} struct {
+{{ range .Fields }}{{ .Line }}
+{{ end }}}
+
+// TableName 指定 {{ .Name }} 模型表名
+func ({{ .Name }}) TableName() string {
+	return "{{ .Table }}"
+}
+{{ if .HasWeigh }}
+// AfterCreate 新增后，若 Weigh 未指定则回填为主键 ID
+func (r *{{ .Name }}) AfterCreate(tx *gorm.DB) error {
+	if r.Weigh != nil && *r.Weigh != 0 {
+		return nil
+	}
+	weigh := {{ .WeighType }}(r.ID)
+	r.Weigh = &weigh
+	return tx.Model(r).Update("weigh", r.ID).Error
+}
+{{ end }}

@@ -1,0 +1,9 @@
+comment: 注释
+statusGenerating: 生成中
+statusSucceeded: 成功
+statusFailed: 失败
+statusDeleted: 已删除
+deleteRecords: 确认删除生成的 CRUD 代码？
+logStartTip: 以此记录开始 CRUD 设计？
+continue: 复制或继续设计
+delete: 删除 CRUD 代码

@@ -6,6 +6,7 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/spf13/viper v1.21.0
+	golang.org/x/sys v0.41.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
 	gorm.io/plugin/dbresolver v1.6.2
@@ -81,7 +82,6 @@ require (
 	golang.org/x/crypto v0.48.0
 	golang.org/x/net v0.51.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 )

@@ -7,6 +7,7 @@ import (
 
 	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/bindx"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	"github.com/ai-go-hub/ai-go-admin/internal/repository"
 	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
@@ -36,19 +37,19 @@ func NewAuthAdminRuleService(repo *repoAuth.AdminRuleRepository) *AuthAdminRuleS
 }
 
 // Create 覆写通用创建方法: 增加服务层校验
-func (s *AuthAdminRuleService) Create(ctx context.Context, entity *model.AdminRule, opts service.Options) error {
-	if err := s.validateRule(ctx, entity, opts.PrimaryKeyValue); err != nil {
+func (s *AuthAdminRuleService) Create(ctx context.Context, tri *bindx.Tri[model.AdminRule], opts service.Options) error {
+	if err := s.validateRule(ctx, &tri.Model, opts.PrimaryKeyValue); err != nil {
 		return err
 	}
-	return s.IService.Create(ctx, entity, opts)
+	return s.IService.Create(ctx, tri, opts)
 }
 
 // Update 覆写通用更新方法: 增加服务层校验
-func (s *AuthAdminRuleService) Update(ctx context.Context, entity *model.AdminRule, opts service.Options) error {
-	if err := s.validateRule(ctx, entity, opts.PrimaryKeyValue); err != nil {
+func (s *AuthAdminRuleService) Update(ctx context.Context, tri *bindx.Tri[model.AdminRule], opts service.Options) error {
+	if err := s.validateRule(ctx, &tri.Model, opts.PrimaryKeyValue); err != nil {
 		return err
 	}
-	return s.IService.Update(ctx, entity, opts)
+	return s.IService.Update(ctx, tri, opts)
 }
 
 // Delete 覆写通用删除方法: 校验被删规则没有游离的子级

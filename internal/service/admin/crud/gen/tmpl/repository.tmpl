@@ -1,0 +1,15 @@
+package {{.Package}}
+{{ if .Imports }}
+{{ .Imports }}
+{{ end }}
+// {{.ModelName}}Repository{{ if .Comment }} {{.Comment}}{{ end }}仓储
+type {{.ModelName}}Repository struct {
+	*repository.Repository[{{.ModelPkg}}.{{.ModelName}}]
+}
+
+// New{{.ModelName}}Repository 创建{{ if .Comment }}{{.Comment}}{{ end }}仓储实例
+func New{{.ModelName}}Repository() *{{.ModelName}}Repository {
+	return &{{.ModelName}}Repository{
+		Repository: repository.NewRepository[{{.ModelPkg}}.{{.ModelName}}](),
+	}
+}{{ .Methods }}

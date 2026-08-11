@@ -41,6 +41,9 @@ importers:
       pinia-plugin-persistedstate:
         specifier: 4.7.1
         version: 4.7.1(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))
+      pluralize-esm:
+        specifier: ^9.0.5
+        version: 9.0.5
       screenfull:
         specifier: 6.0.2
         version: 6.0.2
@@ -1446,6 +1449,10 @@ packages:
 
   pkg-types@2.3.1:
     resolution: {integrity: sha512-y+ichcgc2LrADuhLNAx8DFjVfgz91pRxfZdI3UDhxHvcVEZsenLO+7XaU5vOp0u/7V/wZ+plyuQxtrDlZJ+yeg==}
+
+  pluralize-esm@9.0.5:
+    resolution: {integrity: sha512-Kb2dcpMsIutFw2hYrN0EhsAXOUJTd6FVMIxvNAkZCMQLVt9NGZqQczvGpYDxNWCZeCWLHUPxQIBudWzt1h7VVA==}
+    engines: {node: '>=14.0.0'}
 
   postcss-selector-parser@7.1.2:
     resolution: {integrity: sha512-Wjvt4scRFouioIInHf51IFNP4ltJ2EngJM+cZPGiqbKetBfmP3vpdPV8ID2S6JS6/jdo74N8+aEYH9lQr2C6sA==}
@@ -2956,6 +2963,8 @@ snapshots:
       confbox: 0.2.4
       exsolve: 1.0.8
       pathe: 2.0.3
+
+  pluralize-esm@9.0.5: {}
 
   postcss-selector-parser@7.1.2:
     dependencies:

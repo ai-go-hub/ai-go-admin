@@ -4,7 +4,7 @@
             <el-col :span="10" class="ag-array-key">{{ state.keyTitle }}</el-col>
             <el-col :span="10" class="ag-array-value">{{ state.valueTitle }}</el-col>
         </el-row>
-        <el-row class="ag-array-item" v-for="(item, idx) in state.value" :gutter="10" :key="idx">
+        <el-row class="ag-array-item" v-for="(item, idx) in list" :gutter="10" :key="idx">
             <el-col :span="10">
                 <el-input v-model="item.key"></el-input>
             </el-col>
@@ -24,47 +24,37 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
+import { computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-type agInputArray = { key: string; value: string }
 interface Props {
-    modelValue: agInputArray[]
     keyTitle?: string
     valueTitle?: string
 }
+type agInputArray = { key: string; value: string }
 
 const { t } = useI18n()
 
 const props = withDefaults(defineProps<Props>(), {
-    modelValue: () => [],
     keyTitle: '',
     valueTitle: '',
 })
 
+const model = defineModel<agInputArray[] | null>({ default: () => [] })
+const list = computed<agInputArray[]>(() => model.value ?? [])
+
 const state = reactive({
-    value: props.modelValue,
     keyTitle: props.keyTitle ? props.keyTitle : t('common.arrayKey'),
     valueTitle: props.valueTitle ? props.valueTitle : t('common.arrayValue'),
 })
 
 const onAddArrayItem = () => {
-    state.value.push({
-        key: '',
-        value: '',
-    })
+    model.value = [...(model.value ?? []), { key: '', value: '' }]
 }
 
 const onDelArrayItem = (idx: number) => {
-    state.value.splice(idx, 1)
+    model.value = (model.value ?? []).filter((_, i) => i !== idx)
 }
-
-watch(
-    () => props.modelValue,
-    (newVal) => {
-        state.value = newVal
-    }
-)
 </script>
 
 <style scoped lang="scss">

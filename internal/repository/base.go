@@ -35,7 +35,7 @@ type IRepository[T any] interface {
 	Get(ctx context.Context, opts Options) (*T, error)
 	List(ctx context.Context, opts Options) ([]T, error)
 	Count(ctx context.Context, opts Options) (int64, error)
-	Update(ctx context.Context, entity *T, opts Options) error
+	Update(ctx context.Context, entity map[string]any, opts Options) error
 	Delete(ctx context.Context, opts Options) error
 	PrimaryKeyField() (string, error)       // 获取主键字段
 	FieldExists(field string) (bool, error) // 检查一个字段是否存在
@@ -87,21 +87,12 @@ func (r *Repository[T]) DB() *gorm.DB {
 func (r *Repository[T]) Create(ctx context.Context, entity *T, opts Options) error {
 	var q gorm.CreateInterface[T] = gorm.G[T](r.DB())
 
-	// 入库字段的选择
+	// 入库字段的选择与忽略
 	if len(opts.SelectFields) > 0 {
-		q = q.Select(strings.Join(opts.SelectFields, ","))
+		q = q.Select(opts.SelectFields[0], opts.SelectFields[1:])
 	}
-
-	// 入库字段的忽略，未设置则忽略主键字段
-	omitFields := opts.OmitFields
-	if len(omitFields) == 0 {
-		pk, _ := r.PrimaryKeyField()
-		if pk != "" {
-			omitFields = append(omitFields, pk)
-		}
-	}
-	if len(omitFields) > 0 {
-		q = q.Omit(omitFields...)
+	if len(opts.OmitFields) > 0 {
+		q = q.Omit(opts.OmitFields...)
 	}
 
 	return q.Create(ctx, entity)
@@ -127,7 +118,7 @@ func (r *Repository[T]) Get(ctx context.Context, opts Options) (*T, error) {
 
 	// 出库字段的选择与忽略
 	if len(opts.SelectFields) > 0 {
-		q = q.Select(strings.Join(opts.SelectFields, ","))
+		q = q.Select(opts.SelectFields[0], opts.SelectFields[1:])
 	}
 	if len(opts.OmitFields) > 0 {
 		q = q.Omit(opts.OmitFields...)
@@ -151,7 +142,7 @@ func (r *Repository[T]) List(ctx context.Context, opts Options) ([]T, error) {
 
 	// 出库字段的选择与忽略
 	if len(opts.SelectFields) > 0 {
-		q = q.Select(strings.Join(opts.SelectFields, ","))
+		q = q.Select(opts.SelectFields[0], opts.SelectFields[1:])
 	}
 	if len(opts.OmitFields) > 0 {
 		q = q.Omit(opts.OmitFields...)
@@ -170,24 +161,36 @@ func (r *Repository[T]) Count(ctx context.Context, opts Options) (int64, error) 
 }
 
 // Update 根据主键更新记录
-func (r *Repository[T]) Update(ctx context.Context, entity *T, opts Options) error {
+func (r *Repository[T]) Update(ctx context.Context, entity map[string]any, opts Options) error {
 	pkField, err := r.PrimaryKeyField()
 	if err != nil {
 		return err
 	}
 
-	q := gorm.G[T](r.DB()).Where(pkField+" = ?", opts.PrimaryKeyValue)
+	q := r.DB().Model(new(T)).Where(pkField+" = ?", opts.PrimaryKeyValue)
 
 	// 入库字段的选择与忽略
 	if len(opts.SelectFields) > 0 {
-		q = q.Select(strings.Join(opts.SelectFields, ","))
+		q = q.Select(opts.SelectFields[0], opts.SelectFields[1:])
 	}
 	if len(opts.OmitFields) > 0 {
 		q = q.Omit(opts.OmitFields...)
 	}
 
-	_, err = q.Updates(ctx, *entity)
-	return err
+	// 自动时间列由 GORM 自动维护，统一从更新数据中剔除
+	// 不能通过 opts.OmitFields 配置，一旦配置则自动填充功能失效
+	sch, err := r.Schema()
+	if err != nil {
+		return err
+	}
+	for _, field := range sch.Fields {
+		if field.DBName != "" && (field.AutoCreateTime > 0 || field.AutoUpdateTime > 0) {
+			delete(entity, field.DBName)
+			delete(entity, field.Name)
+		}
+	}
+
+	return q.Updates(entity).Error
 }
 
 // Delete 根据主键批量删除记录

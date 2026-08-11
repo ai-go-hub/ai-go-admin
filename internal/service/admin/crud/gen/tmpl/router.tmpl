@@ -1,0 +1,16 @@
+package {{.Package}}
+{{ if .Imports }}
+{{ .Imports }}
+{{ end }}
+func init() {
+	{{ if .IsAdmin }}registry.RegisterAdmin(func(group *gin.RouterGroup) {
+		subGroup := group.Group("{{.GroupPath}}"){{ else }}registry.Register(func(r *gin.Engine) {
+		group := r.Group("{{.GroupPath}}"){{ end }}
+
+		repo := {{.RepoAlias}}.New{{.ModelName}}Repository()
+		svc := {{.SvcAlias}}.New{{.ModelName}}Service(repo)
+		h := {{.HandlerAlias}}.New{{.ModelName}}Handler(svc)
+
+		h.RegisterRoutes({{ if .IsAdmin }}subGroup{{ else }}group{{ end }})
+	})
+}

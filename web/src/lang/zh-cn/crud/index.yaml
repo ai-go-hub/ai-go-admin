@@ -1,0 +1,151 @@
+weigh: 权重（拖拽排序）
+remark: 备注
+primaryKey: 主键
+remoteSelect: 远程下拉（关联表）
+remoteSelects: 远程下拉（关联多选）
+radio: '单选框:opt0=选项一,opt1=选项二'
+checkbox: '复选框:opt0=选项一,opt1=选项二'
+select: '下拉框:opt0=选项一,opt1=选项二'
+disableSearch: 禁用搜索
+validateMessage: 留空则自动填写验证器 title 属性（看不懂请直接填写完整错误消息）
+remoteSelectRequestTip: 远程下拉组件将请求该 URL 以获取选项数据
+start: 开始
+create: 新建
+createAnew: 从零新建后台 CRUD
+selectTable: 选择数据表
+selectTableSubtitle: 从数据库中选择一个设计好的数据表
+record: CRUD 记录
+recordContinue: 从以往生成的 CRUD 代码继续
+quickExperience: 快速体验
+experience11: 准备好
+experience12: 开发环境
+experience13: '站点端口为: 1818'
+experience21: 在本页点击
+experience22: 选择数据表
+experience23: （可选择 samples 数据表）
+experience31: 点击
+experience32: 生成 CRUD 代码
+experience33: ，点击
+experience34: 继续生成
+experience41: 您当前未在开发环境，请
+experience42: 搭建开发环境
+experience43: ，或生成好代码之后重新编译
+or: 或
+table: 数据表
+generatedTip: 选择的表已有成功生成的记录，建议从历史记录开始~
+recordStart: 从历史记录开始
+tableName: 表名
+tableNameTip: 表名（使用名词的复数形式，不影响模型名称）
+tableComment: 数据表注释
+tableCommentPlaceholder: '如: 会员表（将生成为会员管理）'
+sortMethod: 排序方式
+commonFields: 常用字段
+baseFields: 基础字段
+advancedFields: 高级字段
+advancedConfiguration: 高级配置
+common: 常用
+fieldName: 字段名
+fieldComment: 字段注释
+fieldCommentsCrudDictionary: 字段注释（CRUD 字典）
+fieldType: 字段类型
+length: 长度
+decimalPoint: 小数点
+fieldDefaults: 字段默认值
+pleaseInputTheDefaultValue: 请输入默认值
+autoIncrement: 自动递增
+always: 总是
+generatedByDefault: 仅在未传递时
+unique: 唯一
+allowNull: 允许 NULL
+fieldProperties: 字段属性
+fieldFormProperties: 字段表单属性
+fieldTableProperties: 字段表格属性
+generateType: 生成类型
+fieldsAsTableColumns: 作为表格列的字段
+fieldsAsFormItems: 作为表单项的字段
+tableQuickSearchFields: 表格快速搜索字段
+tableDefaultSortFields: 表格默认排序字段
+selectFieldFirstTip: 请先从左侧选择一个字段
+fieldsDisplayedInTheTable: 在表格中显示的字段
+remoteSelectInfo: 远程下拉关联信息
+associatedDataTable: 关联数据表
+apiUrl: 数据接口URL
+apiUrlExample: '比如: /admin/user/list'
+dropDownValueField: 下拉 value 字段
+dropDownLabelField: 下拉 label 字段
+valueFieldPlaceholder: 请选择 select 组件的 value 字段
+labelFieldPlaceholder: 请选择 select 组件的 label 字段
+tableFieldsPlaceholder: 请选择在表格中显示的字段
+remoteUrl: 远程下拉数据接口 URL
+remoteTable: 关联数据表
+dataSourceConfigurationType: 数据源配置类型
+quickConfig: 选择历史 CRUD 记录自动配置
+customConfiguration: 自定义配置
+generatedHandlerLocation: 生成的控制器位置
+generatedDataModelLocation: 生成的数据模型位置
+generatedRepositoryLocation: 生成的数据仓储位置
+generatedServiceLocation: 生成的服务文件位置
+generatedRouterLocation: 生成的路由注册文件位置
+webEndViewDirectory: WEB端视图目录
+routePath: 前后端路由路径
+theRelativePathToTheGeneratedCode: 生成代码的相对位置
+codeLocationTip: '快速的组合代码生成位置，请填写相对路径，格式如: user/group、user_group'
+commonRepository: 公共仓储
+confirmCrudCodeGeneration: 确认生成 CRUD 代码
+continueBuilding: 继续生成
+tableDesignChange: 表设计变更
+dataTableDesignChangesPreview: 数据表设计变更预览
+designChangeTips: 取消勾选后，则该项变动不会尝试同步至数据表（通常用于已经手动修改过表结构等情况）
+tableReBuild: 删表重建
+tableReBuildBlockHelp: 不调整表结构，直接删除已有数据表并重建，此举可以确保CRUD代码/记录与数据表结构一致
+addField: 添加字段
+deleteField: 删除字段
+modifyFieldName: 修改字段名称
+modifyFieldOrder: 修改字段顺序
+modifyFieldProperties: 修改字段属性
+firstField: 第一个字段
+after: 之后
+generateCrudCode: 生成 CRUD 代码
+giveUp: 放弃
+yes: 是
+no: 否
+pleaseEnterTheDataTableName: 请输入数据表名！
+pleaseEnterTheCorrectTableName: 请输入正确的数据表名！
+tableNameFormatTip: 请使用小写加下划线作为表名，小写字母开头，可以带有数字
+pleaseDesignThePrimaryKeyField: 请设计主键字段！
+thereCanOnlyBeOnePrimaryKeyField: 只可以有一个主键字段。
+fieldNameDuplication: '字段名称 {field} 重复！'
+invalidFieldName: '字段名 {field} 不符合规范，请以 字母、_ 开头，不能出现 字母、数字、下划线 以外的字符'
+giveUpConfirm: 放弃设计不可逆，确定要放弃吗？
+tableExistsTip: 数据表已经存在，继续生成将自动删除原表并建立新的数据表（数据表是空的或您已勾选删表重建）！
+handlerExistsTip: 控制器已经存在，继续生成将自动覆盖已有代码！
+menuRuleExistsTip: 同名菜单规则已经存在，本次生成将不会创建菜单和权限节点！
+fieldCommentTip: 字段注释将作为 CRUD 字典，冒号前将识别为字段标题，冒号后识别为数据字典
+resetGenerateTypeAttr: 字段生成类型已修改，是否将字段设计（字段名除外）重置为新类型预设的方案？
+viteHotWarning: 未找到 Vite 热更新服务，请在开发环境生成代码，或重新编译后使用新增的功能
+dragToDesign: 拖动左侧元素至此处以开始设计CRUD
+designEfficiency: 自行确定设计有效性
+emptyString: 空字符串
+noDefaultValue: 不设默认值
+width: 表格列宽度
+sortable: 字段排序
+operator: 公共搜索操作符
+comSearchRender: 公共搜索输入框渲染方案
+comSearchInputAttr: 公共搜索输入框扩展属性
+render: 渲染方案
+step: 步进值
+rows: 行数
+remotePk: 远程下拉 value 字段
+remoteField: 远程下拉 label 字段
+remoteModelFile: 关联表模型位置
+remoteModelName: 关联表模型名称
+remoteModelPackage: 关联表模型包名
+remoteCrudLog: CRUD 记录
+relationFields: 关联表显示字段
+imageMultiple: 图片多选上传
+fileMultiple: 文件多选上传
+selectMultiple: 下拉框多选
+validator: 验证规则
+validatorMsg: 验证错误提示
+joinTableTip: 远程下拉本与模型无关，此处的配置是为了自动完成模型层面的关联定义
+serverRestarting: 等待 API 服务重启...

@@ -17,6 +17,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/bindx"
 	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 )
 
@@ -42,56 +43,60 @@ func NewAuthAdminGroupService(repo *repoAuth.AdminGroupRepository, ruleRepo *rep
 }
 
 // Create 覆写通用创建方法
-func (s *AuthAdminGroupService) Create(ctx context.Context, entity *model.AdminGroup, opts service.Options) error {
+func (s *AuthAdminGroupService) Create(ctx context.Context, tri *bindx.Tri[model.AdminGroup], opts service.Options) error {
 	// 分组基本信息校验
-	if err := s.validateGroup(ctx, entity, opts); err != nil {
+	if err := s.validateGroup(ctx, &tri.Model, opts); err != nil {
 		return err
 	}
 
 	// 若选中的规则已覆盖全部规则，折叠为通配符 "*"
-	hasAll, err := hasAllRules(ctx, entity)
+	hasAll, err := hasAllRules(ctx, tri.Model.Rules)
 	if err != nil {
 		return err
 	}
 	if hasAll {
-		entity.Rules = util.ToPtr("*")
+		tri.Model.Rules = util.ToPtr("*")
 	}
 
 	// 权限规则校验
-	if err := s.validateRules(ctx, entity, opts); err != nil {
+	if err := s.validateRules(ctx, &tri.Model, opts); err != nil {
 		return err
 	}
-	return s.IService.Create(ctx, entity, opts)
+	return s.IService.Create(ctx, tri, opts)
 }
 
 // Update 覆写通用更新方法
-func (s *AuthAdminGroupService) Update(ctx context.Context, entity *model.AdminGroup, opts service.Options) error {
+func (s *AuthAdminGroupService) Update(ctx context.Context, tri *bindx.Tri[model.AdminGroup], opts service.Options) error {
 	// 分组基本信息校验
-	if err := s.validateGroup(ctx, entity, opts); err != nil {
+	if err := s.validateGroup(ctx, &tri.Model, opts); err != nil {
 		return err
 	}
 
 	// 不允许将分组挂到自身的后代分组下，避免形成环
-	if pid := util.FromPtr(entity.Pid); pid != 0 {
+	if pid := util.FromPtr(tri.Model.Pid); pid != 0 {
 		if err := s.ensurePidNotDescendant(ctx, opts.PrimaryKeyValue, pid); err != nil {
 			return err
 		}
 	}
 
 	// 若选中的规则已覆盖全部规则，折叠为通配符 "*"
-	hasAll, err := hasAllRules(ctx, entity)
+	hasAll, err := hasAllRules(ctx, tri.Model.Rules)
 	if err != nil {
 		return err
 	}
 	if hasAll {
-		entity.Rules = util.ToPtr("*")
+		// 用于更新数据库
+		tri.Map["rules"] = "*"
+
+		// 用于后续权限规则校验
+		tri.Model.Rules = util.ToPtr("*")
 	}
 
 	// 权限规则校验
-	if err := s.validateRules(ctx, entity, opts); err != nil {
+	if err := s.validateRules(ctx, &tri.Model, opts); err != nil {
 		return err
 	}
-	return s.IService.Update(ctx, entity, opts)
+	return s.IService.Update(ctx, tri, opts)
 }
 
 // Delete 覆写通用删除方法: 校验被删分组没有游离的子级
@@ -500,10 +505,9 @@ func parseRuleIDs(rules *string) ([]uint, error) {
 	return ids, nil
 }
 
-// hasAllRules 判断 entity.Rules 中的规则 ID 是否已覆盖数据库中的全部规则
-// 仅做数据判定，不改变 entity，也不做任何权限校验
-func hasAllRules(ctx context.Context, entity *model.AdminGroup) (bool, error) {
-	ruleIDs, err := parseRuleIDs(entity.Rules)
+// hasAllRules 判断 rules 中的规则 ID 是否已覆盖数据库中的全部规则
+func hasAllRules(ctx context.Context, rules *string) (bool, error) {
+	ruleIDs, err := parseRuleIDs(rules)
 	if err != nil || len(ruleIDs) == 0 {
 		return false, err
 	}

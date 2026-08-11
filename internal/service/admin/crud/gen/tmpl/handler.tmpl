@@ -1,0 +1,21 @@
+package {{.Package}}
+{{ if .Imports }}
+{{ .Imports }}
+{{ end }}
+// {{.ModelName}}Handler{{ if .Comment }} {{.Comment}}{{ end }}控制器
+type {{.ModelName}}Handler struct {
+	*handler.Handler[{{.ModelPkg}}.{{.ModelName}}]
+	svc *{{.SvcAlias}}.{{.ModelName}}Service
+}
+
+// New{{.ModelName}}Handler 创建{{ if .Comment }}{{.Comment}}{{ end }}控制器实例
+func New{{.ModelName}}Handler(svc *{{.SvcAlias}}.{{.ModelName}}Service) *{{.ModelName}}Handler {
+	h := &{{.ModelName}}Handler{svc: svc}
+	h.Handler = handler.NewHandler(svc{{ .HandlerOptions }})
+	return h
+}
+
+// RegisterRoutes 注册路由
+func (h *{{.ModelName}}Handler) RegisterRoutes(group *gin.RouterGroup) {
+	handler.RegisterBaseRoutes(h, group)
+}

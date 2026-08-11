@@ -27,6 +27,9 @@ func NewAuthAdminGroupHandler(svc *svcAuth.AuthAdminGroupService) *AuthAdminGrou
 					AdminSession: middleware.GetAdmin(c),
 				}
 			}),
+			handler.WithOmitFields(handler.ActionFields{
+				Update: []string{"id"},
+			}),
 		),
 		svc: svc,
 	}

@@ -11,8 +11,8 @@ import (
 // Admin 管理员账号模型
 type Admin struct {
 	ID                 uint               `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
-	Username           string             `gorm:"comment:用户名;type:varchar(64);not null;default:''" json:"username" binding:"required"`
-	Nickname           string             `gorm:"comment:昵称;type:varchar(64);not null;default:''" json:"nickname" binding:"required"`
+	Username           string             `gorm:"comment:用户名;type:varchar(64);not null;default:''" json:"username"`
+	Nickname           string             `gorm:"comment:昵称;type:varchar(64);not null;default:''" json:"nickname"`
 	Avatar             *string            `gorm:"comment:头像;type:varchar(255)" json:"avatar"`
 	Email              *string            `gorm:"comment:邮箱;type:varchar(128)" json:"email"`
 	Mobile             *string            `gorm:"comment:手机号;type:varchar(16)" json:"mobile"`
@@ -21,7 +21,7 @@ type Admin struct {
 	LastLoginIP        *string            `gorm:"comment:上次登录IP;type:varchar(64)" json:"last_login_ip"`
 	Password           string             `gorm:"comment:密码;type:varchar(255);not null;default:''" json:"-"`
 	Bio                *string            `gorm:"comment:个人简介;type:varchar(255)" json:"bio"`
-	Status             string             `gorm:"comment:状态:enable=启用,disable=禁用;type:varchar(64);not null;default:'enable'" json:"status" binding:"required"`
+	Status             string             `gorm:"comment:状态:enable=启用,disable=禁用;type:varchar(64);not null;default:'enable'" json:"status"`
 	UpdatedAt          *time.Time         `gorm:"comment:更新时间" json:"updated_at"`
 	CreatedAt          *time.Time         `gorm:"comment:创建时间" json:"created_at"`
 	DeletedAt          *gorm.DeletedAt    `gorm:"comment:删除时间;index" json:"-"`
@@ -34,23 +34,24 @@ func (Admin) TableName() string {
 
 // AdminRule 菜单和权限规则模型
 type AdminRule struct {
-	ID        uint       `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
-	Pid       *uint      `gorm:"comment:上级规则" json:"pid"`
-	Type      string     `gorm:"comment:规则类型:dir=规则目录,menu=菜单项,node=权限节点;type:varchar(64);not null;default:''" binding:"required,oneof=dir menu node" json:"type"`
-	Title     string     `gorm:"comment:规则标题;type:varchar(64);not null;default:''" binding:"required" json:"title"`
-	Name      string     `gorm:"comment:规则名称;type:varchar(64);not null;default:''" binding:"required" json:"name"`
-	Path      *string    `gorm:"comment:菜单路由路径;type:varchar(255);default:''" json:"path"`
-	Icon      *string    `gorm:"comment:菜单图标;type:varchar(64);default:''" json:"icon"`
-	OpenType  *string    `gorm:"comment:菜单打开方式:tab=选项卡,link=链接,iframe=Iframe;type:varchar(64);default:''" json:"open_type"`
-	URL       *string    `gorm:"comment:菜单URL;type:varchar(255);default:''" json:"url"`
-	Component *string    `gorm:"comment:菜单组件路径;type:varchar(255);default:''" json:"component"`
-	Keepalive *uint8     `gorm:"comment:缓存:0=关闭,1=开启;default:0" json:"keepalive"`
-	Extend    *string    `gorm:"comment:扩展属性:add_route_only=只添加为路由,add_menu_only=只添加为菜单;type:varchar(64);default:''" json:"extend"`
-	Remark    *string    `gorm:"comment:备注;type:varchar(255);default:''" json:"remark"`
-	Weigh     *int       `gorm:"comment:权重;default:0" json:"weigh"`
-	Status    *uint8     `gorm:"comment:状态:0=禁用,1=启用;not null;default:1" binding:"required" json:"status"`
-	UpdatedAt *time.Time `gorm:"comment:更新时间" json:"updated_at"`
-	CreatedAt *time.Time `gorm:"comment:创建时间" json:"created_at"`
+	ID        uint         `gorm:"comment:ID;primarykey;autoIncrement" json:"id"`
+	Pid       *uint        `gorm:"comment:上级规则" json:"pid"`
+	Type      string       `gorm:"comment:规则类型:dir=规则目录,menu=菜单项,node=权限节点;type:varchar(64);not null;default:''" binding:"required,oneof=dir menu node" json:"type"`
+	Title     string       `gorm:"comment:规则标题;type:varchar(64);not null;default:''" binding:"required" json:"title"`
+	Name      string       `gorm:"comment:规则名称;type:varchar(64);not null;default:''" binding:"required" json:"name"`
+	Path      *string      `gorm:"comment:菜单路由路径;type:varchar(255);default:''" json:"path"`
+	Icon      *string      `gorm:"comment:菜单图标;type:varchar(64);default:''" json:"icon"`
+	OpenType  *string      `gorm:"comment:菜单打开方式:tab=选项卡,link=链接,iframe=Iframe;type:varchar(64);default:''" json:"open_type"`
+	URL       *string      `gorm:"comment:菜单URL;type:varchar(255);default:''" json:"url"`
+	Component *string      `gorm:"comment:菜单组件路径;type:varchar(255);default:''" json:"component"`
+	Keepalive *uint8       `gorm:"comment:缓存:0=关闭,1=开启;default:0" json:"keepalive"`
+	Extend    *string      `gorm:"comment:扩展属性:add_route_only=只添加为路由,add_menu_only=只添加为菜单;type:varchar(64);default:''" json:"extend"`
+	Remark    *string      `gorm:"comment:备注;type:varchar(255);default:''" json:"remark"`
+	Weigh     *int         `gorm:"comment:权重;default:0" json:"weigh"`
+	Status    *uint8       `gorm:"comment:状态:0=禁用,1=启用;not null;default:1" binding:"required" json:"status"`
+	UpdatedAt *time.Time   `gorm:"comment:更新时间" json:"updated_at"`
+	CreatedAt *time.Time   `gorm:"comment:创建时间" json:"created_at"`
+	Children  []*AdminRule `gorm:"-" json:"children,omitempty"`
 }
 
 func (AdminRule) TableName() string {

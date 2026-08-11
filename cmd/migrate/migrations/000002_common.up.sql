@@ -119,6 +119,7 @@ CREATE TABLE IF NOT EXISTS "__PREFIX__crud_logs" (
     "comment"    varchar(255) NOT NULL DEFAULT '',
     "table"      jsonb,
     "fields"     jsonb,
+    "sql"        text DEFAULT NULL,
     "status"     varchar(64) NOT NULL DEFAULT '',
     "created_at" timestamptz
 );
@@ -129,5 +130,6 @@ COMMENT ON COLUMN "__PREFIX__crud_logs"."name" IS '表名';
 COMMENT ON COLUMN "__PREFIX__crud_logs"."comment" IS '注释';
 COMMENT ON COLUMN "__PREFIX__crud_logs"."table" IS '数据表数据';
 COMMENT ON COLUMN "__PREFIX__crud_logs"."fields" IS '字段数据';
+COMMENT ON COLUMN "__PREFIX__crud_logs"."sql" IS '执行的SQL';
 COMMENT ON COLUMN "__PREFIX__crud_logs"."status" IS '状态:deleted=已删除,succeeded=成功,failed=失败,generating=生成中';
 COMMENT ON COLUMN "__PREFIX__crud_logs"."created_at" IS '创建时间';

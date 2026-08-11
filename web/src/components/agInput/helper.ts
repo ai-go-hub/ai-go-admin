@@ -28,26 +28,34 @@ export const fieldData: Record<string, FieldData> = {
         type: 'varchar',
         length: 255,
         ...defaultNUPPD,
+        null: false,
+        defaultType: 'EMPTY STRING',
     },
     string: {
         type: 'varchar',
         length: 255,
         ...defaultNUPPD,
+        null: false,
+        defaultType: 'EMPTY STRING',
     },
     password: {
         type: 'varchar',
         length: 64,
         ...defaultNUPPD,
+        null: false,
+        defaultType: 'EMPTY STRING',
     },
     radio: {
         type: 'varchar',
         length: 64,
         ...defaultNUPPD,
+        // 此处默认为 null，但 CRUD 设计器中提供了 radio 字典后默认值为第一个选项
     },
     select: {
         type: 'varchar',
         length: 64,
         ...defaultNUPPD,
+        // 默认值规划同 radio
     },
     color: {
         type: 'varchar',
@@ -68,11 +76,15 @@ export const fieldData: Record<string, FieldData> = {
         type: 'varchar',
         length: 255,
         ...defaultNUPPD,
+        null: false,
+        defaultType: 'EMPTY STRING',
     },
     file: {
         type: 'varchar',
         length: 255,
         ...defaultNUPPD,
+        null: false,
+        defaultType: 'EMPTY STRING',
     },
     time: {
         type: 'varchar',
@@ -86,6 +98,9 @@ export const fieldData: Record<string, FieldData> = {
         type: 'boolean',
         length: 0,
         ...defaultNUPPD,
+        null: false,
+        defaultType: 'INPUT',
+        default: 'false',
     },
 
     // ==================== 数字 ====================
@@ -93,17 +108,26 @@ export const fieldData: Record<string, FieldData> = {
         type: 'bigint',
         length: 64,
         ...defaultNUPPD,
+        null: false,
+        defaultType: 'INPUT',
+        default: '0',
     },
     number: {
         type: 'numeric',
         length: 10,
         ...defaultNUPPD,
         precision: 2,
+        null: false,
+        defaultType: 'INPUT',
+        default: '0',
     },
     remoteSelect: {
         type: 'bigint',
         length: 64,
         ...defaultNUPPD,
+        null: false,
+        defaultType: 'INPUT',
+        default: '0',
     },
     year: {
         // 年份选择器 el-date-picker 的绑定值为 string，但数据库层面最好使用 int 来方便查询和比较
@@ -150,11 +174,15 @@ export const fieldData: Record<string, FieldData> = {
         type: 'text',
         length: 0,
         ...defaultNUPPD,
+        null: false,
+        defaultType: 'EMPTY STRING',
     },
     textarea: {
         type: 'text',
         length: 0,
         ...defaultNUPPD,
+        null: false,
+        defaultType: 'EMPTY STRING',
     },
 
     // ==================== date / datetime ====================

@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/bindx"
 	"github.com/ai-go-hub/ai-go-admin/internal/repository"
 
 	"gorm.io/gorm"
@@ -46,11 +47,11 @@ type Options struct {
 
 // IService 通用服务接口
 type IService[T any] interface {
-	Create(ctx context.Context, entity *T, opts Options) error
+	Create(ctx context.Context, tri *bindx.Tri[T], opts Options) error
 	Get(ctx context.Context, opts Options) (*T, error)
 	List(ctx context.Context, opts Options) ([]T, error)
 	Count(ctx context.Context, opts Options) (int64, error)
-	Update(ctx context.Context, entity *T, opts Options) error
+	Update(ctx context.Context, tri *bindx.Tri[T], opts Options) error
 	Delete(ctx context.Context, opts Options) error
 	Sort(ctx context.Context, opts Options, move, target, direction string, weigh int64) error
 	BuildRepoOpts(opts Options) repository.Options
@@ -73,8 +74,8 @@ func NewService[T any](repo repository.IRepository[T]) IService[T] {
 }
 
 // Create 创建记录
-func (s *Service[T]) Create(ctx context.Context, entity *T, opts Options) error {
-	return s.repo.Create(ctx, entity, s.BuildRepoOpts(opts))
+func (s *Service[T]) Create(ctx context.Context, tri *bindx.Tri[T], opts Options) error {
+	return s.repo.Create(ctx, &tri.Model, s.BuildRepoOpts(opts))
 }
 
 // Get 查询单条记录
@@ -96,8 +97,8 @@ func (s *Service[T]) Count(ctx context.Context, opts Options) (int64, error) {
 }
 
 // Update 根据主键更新记录
-func (s *Service[T]) Update(ctx context.Context, entity *T, opts Options) error {
-	return s.repo.Update(ctx, entity, s.BuildRepoOpts(opts))
+func (s *Service[T]) Update(ctx context.Context, tri *bindx.Tri[T], opts Options) error {
+	return s.repo.Update(ctx, tri.Map, s.BuildRepoOpts(opts))
 }
 
 // Delete 根据主键批量删除记录

@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"context"
+
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/bindx"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
 	"github.com/ai-go-hub/ai-go-admin/internal/repository"
@@ -39,8 +42,8 @@ type Handler[T any] struct {
 
 // Adapter 声明对应方法的数据适配器
 type Adapter struct {
-	Get  func(any, service.Options) (any, error)
-	List func(any, service.Options) (any, error)
+	Get  func(context.Context, any, service.Options) (any, error)
+	List func(context.Context, any, service.Options) (any, error)
 }
 
 // ActionFields 声明对应方法的 Omit / Select 字段列表
@@ -142,14 +145,20 @@ func (h *Handler[T]) Config() HandlerConfig {
 
 // Create 新增记录
 func (h *Handler[T]) Create(c *gin.Context) {
-	var entity T
-	if err := c.ShouldBindJSON(&entity); err != nil {
+	body, err := c.GetRawData()
+	if err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
+		return
+	}
+
+	var tri bindx.Tri[T]
+	if err := bindx.ShouldBindTri(body, &tri); err != nil {
 		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
 		return
 	}
 
 	opts := h.BuildSerOpts(c, "Create", Request{})
-	if err := h.svc.Create(c.Request.Context(), &entity, opts); err != nil {
+	if err := h.svc.Create(c.Request.Context(), &tri, opts); err != nil {
 		httpx.Fail(c, httpx.WithMessage("创建失败: "+err.Error()))
 		return
 	}
@@ -157,12 +166,20 @@ func (h *Handler[T]) Create(c *gin.Context) {
 	httpx.Success(c)
 }
 
-// Update 更新记录
+// Update 更新记录，更新数据直接用 map（tri.Map）而不是结构体（tri.Model）:
+//   - 能区分"前端传 null（将清空字段）"与"未传（不做更新）"，结构体无法区分；
+//   - 各层使用仓储的 Update 方法时，传 map 可实现所见即所得（结构体更新有默认赋零值和自动跳过零值机制）。
 func (h *Handler[T]) Update(c *gin.Context) {
 	pk := c.Param("pk")
 
-	var entity T
-	if err := c.ShouldBindJSON(&entity); err != nil {
+	body, err := c.GetRawData()
+	if err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
+		return
+	}
+
+	var tri bindx.Tri[T]
+	if err := bindx.ShouldBindTri(body, &tri); err != nil {
 		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
 		return
 	}
@@ -171,7 +188,7 @@ func (h *Handler[T]) Update(c *gin.Context) {
 		PrimaryKeyValue: pk,
 	})
 
-	if err := h.svc.Update(c.Request.Context(), &entity, opts); err != nil {
+	if err := h.svc.Update(c.Request.Context(), &tri, opts); err != nil {
 		httpx.Fail(c, httpx.WithMessage("更新失败: "+err.Error()))
 		return
 	}
@@ -206,7 +223,7 @@ func (h *Handler[T]) List(c *gin.Context) {
 	}
 
 	if h.cfg.Adapter.List != nil {
-		adapted, err := h.cfg.Adapter.List(list, opts)
+		adapted, err := h.cfg.Adapter.List(c.Request.Context(), list, opts)
 		if err != nil {
 			httpx.Fail(c, httpx.WithMessage("数据适配器错误: "+err.Error()))
 			return
@@ -234,7 +251,7 @@ func (h *Handler[T]) Get(c *gin.Context) {
 	}
 
 	if h.cfg.Adapter.Get != nil {
-		adapted, err := h.cfg.Adapter.Get(entity, opts)
+		adapted, err := h.cfg.Adapter.Get(c.Request.Context(), entity, opts)
 		if err != nil {
 			httpx.Fail(c, httpx.WithMessage("数据适配器错误: "+err.Error()))
 			return

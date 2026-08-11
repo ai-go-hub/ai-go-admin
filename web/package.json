@@ -23,6 +23,7 @@
         "nprogress": "0.2.0",
         "pinia": "3.0.4",
         "pinia-plugin-persistedstate": "4.7.1",
+        "pluralize-esm": "9.0.5",
         "screenfull": "6.0.2",
         "sortablejs": "1.15.7",
         "vue": "3.5.33",

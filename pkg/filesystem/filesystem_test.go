@@ -3,8 +3,49 @@ package filesystem
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
+
+func TestDir(t *testing.T) {
+	cases := []struct {
+		name string
+		path string
+		want string
+	}{
+		{"相对路径", "internal/model/user_log.go", "internal/model"},
+		{"反斜杠绝对路径", `C:\proj\a\b.go`, "C:/proj/a"},
+		{"斜杠路径", "a/b/c.go", "a/b"},
+		{"无目录", "x.go", "."},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := Dir(c.path); got != c.want {
+				t.Errorf("Dir(%q) = %q, want %q", c.path, got, c.want)
+			}
+		})
+	}
+}
+
+func TestFormatGoFile(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "x.go")
+	messy := "package x\nfunc  F( ){\nreturn 1\n}\n"
+	if err := os.WriteFile(p, []byte(messy), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := FormatGoFile(p); err != nil {
+		t.Fatal(err)
+	}
+	got, err := os.ReadFile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := string(got)
+	if strings.Contains(s, "func  F( ){") || !strings.Contains(s, "func F() {") || !strings.Contains(s, "\treturn 1") {
+		t.Errorf("go fmt 未生效:\n%s", s)
+	}
+}
 
 func TestTrimExt(t *testing.T) {
 	cases := []struct {

@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/handler"
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/bindx"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
@@ -10,7 +11,6 @@ import (
 	svcAuth "github.com/ai-go-hub/ai-go-admin/internal/service/admin/auth"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/copier"
 )
 
 // AuthAdminHandler 管理员账号管理控制器
@@ -24,8 +24,9 @@ func NewAuthAdminHandler(svc *svcAuth.AuthAdminService) *AuthAdminHandler {
 	return &AuthAdminHandler{
 		Handler: handler.NewHandler(svc,
 			handler.WithOmitFields(handler.ActionFields{
-				// 创建时忽略以下字段不入库
+				// 仓储层忽略以下字段不入库
 				Create: []string{"id", "login_failure", "last_login_at", "last_login_ip", "deleted_at"},
+				Update: []string{"id", "group_ids"},
 			}),
 			handler.WithPreloads([]repository.Preload{
 				{Association: "AdminGroupAccesses.Group"},
@@ -41,21 +42,23 @@ func NewAuthAdminHandler(svc *svcAuth.AuthAdminService) *AuthAdminHandler {
 	}
 }
 
-// Create 覆写: 专用 DTO 接收请求数据（model.Admin.Password 有 json:"-"，无法直接绑定）
+// Create 覆写: 专用 DTO 接收请求数据
 func (h *AuthAdminHandler) Create(c *gin.Context) {
-	var req dto.AdminCreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	body, err := c.GetRawData()
+	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
 		return
 	}
 
-	entity := &model.Admin{}
-	if err := copier.Copy(entity, req); err != nil {
-		httpx.Fail(c, httpx.WithMessage("参数转换失败: "+err.Error()))
+	var tri bindx.Tri[model.Admin]
+	tri.DTO = &dto.AdminCreateRequest{}
+	if err := bindx.ShouldBindTri(body, &tri); err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
 		return
 	}
 
-	if err := h.svc.Create(c.Request.Context(), entity, h.BuildSerOpts(c, "Create", handler.Request{})); err != nil {
+	opts := h.BuildSerOpts(c, "Create", handler.Request{})
+	if err := h.svc.Create(c.Request.Context(), &tri, opts); err != nil {
 		httpx.Fail(c, httpx.WithMessage("创建失败: "+err.Error()))
 		return
 	}
@@ -63,19 +66,20 @@ func (h *AuthAdminHandler) Create(c *gin.Context) {
 	httpx.Success(c)
 }
 
-// Update 覆写: 用专用 DTO 接收请求数据，且 Password 为空时不更新
+// Update 覆写: 用 DTO 完成必填校验并接收密码等字段
 func (h *AuthAdminHandler) Update(c *gin.Context) {
 	pk := c.Param("pk")
 
-	var req dto.AdminUpdateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	body, err := c.GetRawData()
+	if err != nil {
 		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
 		return
 	}
 
-	entity := model.Admin{}
-	if err := copier.Copy(&entity, req); err != nil {
-		httpx.Fail(c, httpx.WithMessage("参数转换失败: "+err.Error()))
+	var tri bindx.Tri[model.Admin]
+	tri.DTO = &dto.AdminUpdateRequest{}
+	if err := bindx.ShouldBindTri(body, &tri); err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
 		return
 	}
 
@@ -83,7 +87,7 @@ func (h *AuthAdminHandler) Update(c *gin.Context) {
 		PrimaryKeyValue: pk,
 	})
 
-	if err := h.svc.Update(c.Request.Context(), &entity, opts); err != nil {
+	if err := h.svc.Update(c.Request.Context(), &tri, opts); err != nil {
 		httpx.Fail(c, httpx.WithMessage("更新失败: "+err.Error()))
 		return
 	}

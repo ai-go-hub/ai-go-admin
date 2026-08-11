@@ -8,6 +8,7 @@ import (
 
 	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
+	"github.com/ai-go-hub/ai-go-admin/internal/kit/bindx"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
 	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
@@ -39,40 +40,45 @@ func NewAuthAdminService(repo *repoAdmin.AdminRepository, groupRepo *repoAuth.Ad
 }
 
 // Create 覆写通用创建方法: 校验用户名唯一 + 加密密码 + 校验分组权限
-func (s *AuthAdminService) Create(ctx context.Context, entity *model.Admin, opts service.Options) error {
-	if entity.Username == "" {
+func (s *AuthAdminService) Create(ctx context.Context, tri *bindx.Tri[model.Admin], opts service.Options) error {
+	if tri.Model.Username == "" {
 		return errors.New("用户名不能为空")
 	}
-	if _, err := s.repo.FindByUsername(ctx, entity.Username); err == nil {
+	if _, err := s.repo.FindByUsername(ctx, tri.Model.Username); err == nil {
 		return errors.New("用户名已存在")
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 
-	if entity.Password == "" {
+	if tri.Model.Password == "" {
 		return errors.New("密码不能为空")
 	}
-	hashed, err := bcrypt.GenerateFromPassword([]byte(entity.Password), bcrypt.DefaultCost)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(tri.Model.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("密码加密失败: %w", err)
 	}
-	entity.Password = string(hashed)
+	tri.Model.Password = string(hashed)
 
 	// 校验分组权限
-	if err := s.validateGroupAccesses(ctx, entity.AdminGroupAccesses, opts); err != nil {
+	if err := s.validateGroupAccesses(ctx, tri.Model.AdminGroupAccesses, opts); err != nil {
 		return err
 	}
 
-	return s.IService.Create(ctx, entity, opts)
+	return s.IService.Create(ctx, tri, opts)
 }
 
-// Update 覆写通用更新方法: 用户名唯一校验 + 密码为空时跳过更新，非空则加密 + 校验分组权限
-// 依赖 GORM struct 更新时会跳过零值字段的特性，因此密码为空不会覆盖旧值
-func (s *AuthAdminService) Update(ctx context.Context, entity *model.Admin, opts service.Options) error {
-	if entity.Username == "" {
+// Update 覆写通用更新方法: 用户名唯一校验 + 密码为空时移除字段不更新，非空则加密 + 分组关联替换
+func (s *AuthAdminService) Update(ctx context.Context, tri *bindx.Tri[model.Admin], opts service.Options) error {
+	pk, err := strconv.ParseUint(opts.PrimaryKeyValue, 10, 32)
+	if err != nil {
+		return errors.New("主键值错误")
+	}
+
+	// 用户名唯一校验
+	if tri.Model.Username == "" {
 		return errors.New("用户名不能为空")
 	}
-	userNameExist, err := s.repo.FindByUsername(ctx, entity.Username)
+	userNameExist, err := s.repo.FindByUsername(ctx, tri.Model.Username)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
@@ -80,31 +86,28 @@ func (s *AuthAdminService) Update(ctx context.Context, entity *model.Admin, opts
 		return errors.New("用户名已存在")
 	}
 
-	if entity.Password != "" {
-		hashed, err := bcrypt.GenerateFromPassword([]byte(entity.Password), bcrypt.DefaultCost)
+	// 密码为空时移除字段，确保不覆盖旧密码；非空则加密后写入
+	// model.Admin.Password 为 json:"-"，但控制器已用 DTO 绑定并经 copier 填入 Model.Password
+	if tri.Model.Password != "" {
+		hashed, err := bcrypt.GenerateFromPassword([]byte(tri.Model.Password), bcrypt.DefaultCost)
 		if err != nil {
 			return fmt.Errorf("密码加密失败: %w", err)
 		}
-		entity.Password = string(hashed)
+		tri.Map["password"] = string(hashed)
+	} else {
+		delete(tri.Map, "password")
 	}
 
-	pk, err := strconv.ParseUint(opts.PrimaryKeyValue, 10, 32)
-	if err != nil {
-		return errors.New("主键值错误")
-	}
-
-	// 保存分组关联数据，以便后续先清空再插入
-	accesses := entity.AdminGroupAccesses
-
-	// 置空以免基类自动处理关联数据
-	entity.AdminGroupAccesses = nil
+	// 分组信息提取
+	accesses := tri.Model.AdminGroupAccesses
+	delete(tri.Map, "admin_group_accesses")
 
 	// 校验分组权限
 	if err := s.validateGroupAccesses(ctx, accesses, opts); err != nil {
 		return err
 	}
 
-	if err := s.IService.Update(ctx, entity, opts); err != nil {
+	if err := s.IService.Update(ctx, tri, opts); err != nil {
 		return err
 	}
 

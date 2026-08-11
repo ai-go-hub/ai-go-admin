@@ -1,12 +1,44 @@
 package filesystem
 
 import (
+	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 )
+
+// Dir 返回路径所在目录（统一 / 分隔）
+func Dir(path string) string {
+	return filepath.ToSlash(filepath.Dir(filepath.ToSlash(path)))
+}
+
+// FormatGoFile 对 Go 文件执行 go fmt 格式化命令
+func FormatGoFile(path string) error {
+	cmd := exec.Command("go", "fmt", path)
+	cmd.Dir, _ = os.Getwd()
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return errors.New("go fmt 命令执行失败，请自行格式化: " + path + ": " + err.Error() + ": " + strings.TrimSpace(string(out)))
+	}
+	return nil
+}
+
+// FormatWithPrettier 在 根目录/web 下执行 npx prettier --write <path> 命令
+func FormatWithPrettier(path string) error {
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		return err
+	}
+	cmd := exec.Command("npx", "prettier", "--write", abs)
+	wd, _ := os.Getwd()
+	cmd.Dir = filepath.Join(wd, "web")
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return errors.New("prettier 格式化前端代码失败，请手动格式化: " + path + ": " + err.Error() + ": " + strings.TrimSpace(string(out)))
+	}
+	return nil
+}
 
 // TrimExt 返回去除了路径和扩展名的文件名
 // path:文件路径或完整文件名

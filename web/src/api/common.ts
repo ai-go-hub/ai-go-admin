@@ -110,3 +110,17 @@ export function selectList(listURL: string, data: AnyObj = {}) {
         data,
     })
 }
+
+// ==================== ping ====================
+
+export function ping() {
+    return request(
+        {
+            url: '/ping',
+            method: 'GET',
+        },
+        {
+            showNetworkErrorMessage: false,
+        }
+    )
+}

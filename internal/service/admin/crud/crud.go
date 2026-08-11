@@ -9,8 +9,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
+	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
+	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
+	tbl "github.com/ai-go-hub/ai-go-admin/internal/service/admin/crud/table"
+	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 )
 
 // TableInfo 数据表信息
@@ -43,14 +47,8 @@ func NewService() *Service {
 	return &Service{}
 }
 
-// withPrefix 规范化表名: 已带前缀则先剥除再拼接，防止前缀重复
-func withPrefix(name string) string {
-	prefix := config.Get().Database.Prefix
-	return prefix + strings.TrimPrefix(name, prefix)
-}
-
 // TableList 获取当前项目数据库中的数据表列表
-func (s *Service) TableList(ctx context.Context, excludeTables []string) ([]TableInfo, error) {
+func (s *Service) TableList(ctx context.Context, exclusions []string) ([]TableInfo, error) {
 	db := database.DB().WithContext(ctx)
 
 	q := `
@@ -63,10 +61,10 @@ WHERE c.relkind = 'r'
     AND n.nspname = current_schema()
 `
 	var args []any
-	if len(excludeTables) > 0 {
-		excluded := make([]string, 0, len(excludeTables))
-		for _, name := range excludeTables {
-			excluded = append(excluded, withPrefix(name))
+	if len(exclusions) > 0 {
+		excluded := make([]string, 0, len(exclusions))
+		for _, name := range exclusions {
+			excluded = append(excluded, WithPrefix(name))
 		}
 		q += "    AND c.relname NOT IN (?)\n"
 		args = append(args, excluded)
@@ -77,31 +75,14 @@ WHERE c.relkind = 'r'
 	if err := db.Raw(q, args...).Scan(&tables).Error; err != nil {
 		return nil, err
 	}
+	sort.Slice(tables, func(i, j int) bool { return tables[i].Table < tables[j].Table })
 	return tables, nil
-}
-
-// TableExists 检查数据表是否存在
-func (s *Service) TableExists(ctx context.Context, table string) (bool, error) {
-	db := database.DB().WithContext(ctx)
-	table = withPrefix(table)
-
-	var count int64
-	if err := db.Raw(`
-SELECT COUNT(*) AS count
-FROM pg_catalog.pg_class t
-JOIN pg_catalog.pg_namespace n ON n.oid = t.relnamespace
-WHERE n.nspname = current_schema()
-    AND t.relkind = 'r'
-    AND t.relname = ?`, table).Scan(&count).Error; err != nil {
-		return false, err
-	}
-	return count > 0, nil
 }
 
 // TableFieldList 获取指定数据表的字段列表与主键
 func (s *Service) TableFieldList(ctx context.Context, table string) (string, []FieldInfo, error) {
 	db := database.DB().WithContext(ctx)
-	table = withPrefix(table)
+	table = WithPrefix(table)
 
 	var fields []FieldInfo
 	fieldsSQL := `
@@ -140,12 +121,17 @@ ORDER BY a.attnum
 }
 
 // ModelList 获取模型列表
-func (s *Service) ModelList() ([]ModelInfo, error) {
+func (s *Service) ModelList(exclusions []string) ([]ModelInfo, error) {
 	files, err := filepath.Glob(filepath.Join(GenBaseDir["model"], "*.go"))
 	if err != nil {
 		return nil, err
 	}
 	sort.Strings(files)
+
+	excluded := make(map[string]struct{}, len(exclusions))
+	for _, name := range exclusions {
+		excluded[name] = struct{}{}
+	}
 
 	var models []ModelInfo
 	for _, file := range files {
@@ -172,6 +158,10 @@ func (s *Service) ModelList() ([]ModelInfo, error) {
 				if _, ok := typeSpec.Type.(*ast.StructType); !ok {
 					continue
 				}
+				// 排除指定模型名
+				if _, ok := excluded[typeSpec.Name.Name]; ok {
+					continue
+				}
 
 				// 读取结构体上方注释，并去掉开头的结构体名称前缀
 				comment := ""
@@ -193,5 +183,116 @@ func (s *Service) ModelList() ([]ModelInfo, error) {
 			}
 		}
 	}
+	sort.Slice(models, func(i, j int) bool { return models[i].Name < models[j].Name })
 	return models, nil
+}
+
+// menuNode 菜单权限节点
+type menuNode struct {
+	title  string
+	action string
+}
+
+// CreateMenuRule 写入后台菜单与权限节点，多层级路由如 a/b/c 会生成 a、a/b 两个目录与 a/b/c 菜单
+func CreateMenuRule(ctx context.Context, repoAuth *repoAuth.AdminRuleRepository, basic map[string]dto.GenerateFileBasicDataInfo, table dto.CRUDTable, fields []dto.CRUDFields) error {
+	// 菜单 name/path 取前端路由路径，组件路径取视图目录
+	views := basic["views"]
+	menuPath := table.RoutePath
+	if menuPath == "" {
+		return nil
+	}
+
+	empty := ""
+	keepalive := uint8(1)
+	status := uint8(1)
+	weigh := 0
+
+	// 组装权限节点，作为菜单的子级
+	nodes := []menuNode{
+		{"查看", "read"},
+		{"添加", "create"},
+		{"更新", "update"},
+		{"删除", "delete"},
+	}
+	if HasWeighDesign(fields) {
+		nodes = append(nodes, menuNode{"排序", "sort"})
+	}
+	children := make([]*model.AdminRule, 0, len(nodes))
+	for _, n := range nodes {
+		children = append(children, &model.AdminRule{
+			Type:      "node",
+			Title:     n.title,
+			Name:      menuPath + "/" + n.action,
+			Path:      &empty,
+			Icon:      &empty,
+			OpenType:  &empty,
+			URL:       &empty,
+			Component: &empty,
+			Keepalive: &keepalive,
+			Extend:    &empty,
+			Remark:    &empty,
+			Weigh:     &weigh,
+			Status:    &status,
+		})
+	}
+
+	// 自底向上组装目录链: 中间层 Type=dir，最后一层 Type=menu，权限节点挂在菜单下
+	component := "/" + strings.TrimPrefix(views.Dir+"/index.vue", "web/")
+	segs := SplitPath(menuPath)
+	for i := len(segs) - 1; i >= 0; i-- {
+		levelPath := strings.Join(segs[:i+1], "/")
+		isLast := i == len(segs)-1
+		ruleType := "dir"
+		title := segs[i]
+		ruleComponent := &empty
+		ruleOpenType := &empty
+		if isLast {
+			ruleType = "menu"
+			title = table.Comment + "管理"
+			ruleComponent = &component
+			ruleOpenType = util.ToPtr("tab")
+		}
+		rule := &model.AdminRule{
+			Type:      ruleType,
+			Title:     title,
+			Name:      levelPath,
+			Path:      &levelPath,
+			Icon:      &empty,
+			OpenType:  ruleOpenType,
+			URL:       &empty,
+			Component: ruleComponent,
+			Keepalive: &keepalive,
+			Extend:    &empty,
+			Remark:    &empty,
+			Weigh:     &weigh,
+			Status:    &status,
+			Children:  children,
+		}
+		children = []*model.AdminRule{rule}
+	}
+
+	return repoAuth.BatchCreate(ctx, children, nil)
+}
+
+// HandleTableDesign 同步或创建数据表；返回执行的 SQL 列表
+func HandleTableDesign(ctx context.Context, table dto.CRUDTable, fields []dto.CRUDFields) ([]string, error) {
+	tableName := WithPrefix(table.Name)
+	var sqls []string
+
+	// 表不存在则按字段定义新建
+	if !tbl.TableExists(ctx, tableName) {
+		if err := tbl.CreateTable(ctx, tableName, table, fields, &sqls); err != nil {
+			return nil, err
+		}
+		return sqls, nil
+	}
+	if err := tbl.SyncTableDesign(ctx, tableName, table, fields, &sqls); err != nil {
+		return nil, err
+	}
+	return sqls, nil
+}
+
+// ParseFieldData 解析指定数据表的字段数据
+func (s *Service) ParseFieldData(ctx context.Context, table string) ([]tbl.FieldItem, error) {
+	return tbl.ParseFieldData(ctx, WithPrefix(table))
 }

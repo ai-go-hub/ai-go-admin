@@ -1,4 +1,4 @@
-package crud
+package table
 
 import (
 	"context"
@@ -78,9 +78,8 @@ ORDER BY c.ordinal_position
 `
 
 // ParseFieldData 解析指定数据表的字段数据
-func (s *Service) ParseFieldData(ctx context.Context, table string) ([]FieldItem, error) {
+func ParseFieldData(ctx context.Context, table string) ([]FieldItem, error) {
 	db := database.DB().WithContext(ctx)
-	table = withPrefix(table)
 
 	var cols []RawColumn
 	if err := db.Raw(columnsSQL, table).Scan(&cols).Error; err != nil {
@@ -220,8 +219,16 @@ var designTypeNames = []string{
 	"selects",
 	"string", "switch", "editor", "images", "select",
 	"weigh", "float", "radio", "array", "image", "files", "color",
-	"year", "date", "time", "area", "file", "icon",
+	"year", "date", "time", "file",
 	"int",
+}
+
+// designTypeNameMap 按字段名精确匹配推断 designType
+var designTypeNameMap = map[string]string{
+	"status": "radio",
+	"avatar": "image",
+	"icon":   "iconSelect",
+	"area":   "areaSelect",
 }
 
 // resolveDesignType 解析字段的 designType
@@ -241,17 +248,15 @@ func resolveDesignType(name, typ string, isPK bool) string {
 
 // inferByName 按字段名称推断 designType
 func inferByName(name string) string {
-	if name == "status" {
-		return "radio"
-	}
 	if strings.HasSuffix(name, "_ids") {
 		return "remoteSelects"
 	}
 	if strings.HasSuffix(name, "_id") {
 		return "remoteSelect"
 	}
-	if strings.Contains(name, "avatar") {
-		return "image"
+	// 精确匹配先行
+	if dt, ok := designTypeNameMap[name]; ok {
+		return dt
 	}
 	for _, dt := range designTypeNames {
 		if strings.Contains(name, dt) {

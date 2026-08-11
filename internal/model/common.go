@@ -99,6 +99,7 @@ type CrudLog struct {
 	Comment   string         `gorm:"comment:注释;type:varchar(255);not null;default:''" json:"comment"`
 	Table     datatypes.JSON `gorm:"comment:数据表数据;type:jsonb" json:"table"`
 	Fields    datatypes.JSON `gorm:"comment:字段数据;type:jsonb" json:"fields"`
+	Sql       *string        `gorm:"comment:执行的SQL;type:text" json:"sql"`
 	Status    string         `gorm:"comment:状态:deleted=已删除,succeeded=成功,failed=失败,generating=生成中;type:varchar(64);not null;default:''" json:"status"`
 	CreatedAt time.Time      `gorm:"comment:创建时间" json:"created_at"`
 }

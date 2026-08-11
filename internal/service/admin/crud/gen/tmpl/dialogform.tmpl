@@ -1,0 +1,73 @@
+<template>
+    <!-- 对话框表单 -->
+    <el-dialog
+        class="ag-operate-dialog"
+        :close-on-click-modal="false"
+        :model-value="['create', 'update'].includes(manager.form.operate!)"
+        @close="manager.toggleForm"
+        :destroy-on-close="true"
+        :draggable="true"
+    >
+        <template #header>
+            <div class="title">
+                {{ "{{" }} manager.form.operate == 'create' ? t('common.add') : t('common.edit') {{ "}}" }}
+            </div>
+        </template>
+        <el-scrollbar v-loading="manager.form.loading" class="ag-table-form-scrollbar">
+            <div
+                class="ag-operate-form"
+                :class="'ag-' + manager.form.operate + '-form'"
+                :style="config.layout.shrink ? '' : 'width: calc(100% - ' + manager.form.labelWidth! / 2 + 'px)'"
+            >
+                <el-form
+                    ref="formRef"
+                    @keyup.enter="manager.submitForm(formRef)"
+                    :model="formItems"
+                    :label-position="config.layout.shrink ? 'top' : 'right'"
+                    :label-width="manager.form.labelWidth + 'px'"
+                    :rules="rules"
+                    v-if="!manager.form.loading"
+                >
+{{ .FormFields }}
+                </el-form>
+            </div>
+        </el-scrollbar>
+        <template #footer>
+            <div :style="'width: calc(100% - ' + manager.form.labelWidth! / 1.8 + 'px)'">
+                <el-button @click="manager.toggleForm()">{{ "{{" }} t('common.cancel') {{ "}}" }}</el-button>
+                <el-button :loading="manager.form.submitLoading" @click="manager.submitForm(formRef)" type="primary">
+                    {{ "{{" }} manager.form.operatePKs && manager.form.operatePKs.length > 1 ? t('common.saveAndContinue') : t('common.save') {{ "}}" }}
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
+</template>
+
+<script setup lang="ts">
+import { useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+{{ if .HasValidatorRule }}import { buildValidatorRule } from '/@/utils/validate'
+{{ end }}import type { FormItemRule } from 'element-plus'
+import { useConfig } from '/@/stores/config'
+{{ if .HasAgUpload }}import AgUpload from '/@/components/agInput/components/agUpload.vue'
+{{ end }}{{ if .HasRemoteSelect }}import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
+{{ end }}{{ if .HasAreaSelect }}import AreaSelect from '/@/components/agInput/components/areaSelect.vue'
+{{ end }}{{ if .HasArrayInput }}import ArrayInput from '/@/components/agInput/components/array.vue'
+{{ end }}{{ if .HasIconSelect }}import IconSelect from '/@/components/agInput/components/iconSelect.vue'
+{{ end }}{{ if .HasEditor }}import Editor from '/@/components/agInput/components/editor.vue'
+{{ end }}
+interface Props {
+    manager: TableManagerInstance
+}
+
+defineProps<Props>()
+const formItems = defineModel<AnyObj>('formItems', { required: true })
+
+const config = useConfig()
+const formRef = useTemplateRef('formRef')
+
+const { t } = useI18n()
+
+{{ .Rules }}</script>
+
+<style scoped lang="scss"></style>

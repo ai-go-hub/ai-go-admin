@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"context"
+
 	"github.com/ai-go-hub/ai-go-admin/internal/handler"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
@@ -23,7 +25,7 @@ func NewAuthAdminRuleHandler(svc *svcAuth.AuthAdminRuleService) *AuthAdminRuleHa
 		Handler: handler.NewHandler(svc,
 			handler.WithAdapter(handler.Adapter{
 				// 定义控制器层的数据适配器（就不需要重写控制器层的 List 方法了）
-				List: func(data any, opts service.Options) (any, error) {
+				List: func(ctx context.Context, data any, opts service.Options) (any, error) {
 					rules, ok := data.([]model.AdminRule)
 					if !ok {
 						return data, nil
@@ -46,6 +48,9 @@ func NewAuthAdminRuleHandler(svc *svcAuth.AuthAdminRuleService) *AuthAdminRuleHa
 					// 避免 HTTP 层的中间件侵入到服务层，此处显式传递为扩展参数
 					AdminSession: middleware.GetAdmin(c),
 				}
+			}),
+			handler.WithOmitFields(handler.ActionFields{
+				Update: []string{"id"},
 			}),
 		),
 		svc: svc,

@@ -19,7 +19,6 @@ import { CellRendererProps } from '/@/components/table/types'
 
 const loading = ref(false)
 const props = defineProps<CellRendererProps>()
-const modelValue = ref(props.cellValue)
 const modelValueType = typeof props.cellValue
 
 const getDefaultValue = (type: 'active' | 'inactive') => {
@@ -31,6 +30,8 @@ const getDefaultValue = (type: 'active' | 'inactive') => {
         return type == 'active' ? true : false
     }
 }
+
+const modelValue = ref(props.cellValue == null ? getDefaultValue('inactive') : props.cellValue)
 
 const onChange = (value: string | number | boolean) => {
     loading.value = true

@@ -1,0 +1,18 @@
+package {{.Package}}
+{{ if .Imports }}
+{{ .Imports }}
+{{ end }}
+// {{.ModelName}}Service{{ if .Comment }} {{.Comment}}{{ end }}服务
+type {{.ModelName}}Service struct {
+	service.IService[{{.ModelPkg}}.{{.ModelName}}]
+	repo *{{.RepoAlias}}.{{.ModelName}}Repository
+}
+
+// New{{.ModelName}}Service 创建{{ if .Comment }}{{.Comment}}{{ end }}服务实例
+func New{{.ModelName}}Service(repo *{{.RepoAlias}}.{{.ModelName}}Repository) *{{.ModelName}}Service {
+	return &{{.ModelName}}Service{
+		IService: service.NewService(repo),
+		repo:     repo,
+	}
+}
+{{ if .Methods }}{{ .Methods }}{{ end }}

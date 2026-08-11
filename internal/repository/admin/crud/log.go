@@ -36,3 +36,10 @@ func (r *CrudLogRepository) FindSucceededByName(ctx context.Context, table strin
 	}
 	return &log, nil
 }
+
+// ListByIDs 按主键批量查询 CRUD 记录
+func (r *CrudLogRepository) ListByIDs(ctx context.Context, ids []string) ([]model.CrudLog, error) {
+	return gorm.G[model.CrudLog](r.DB()).
+		Where("id IN ?", ids).
+		Find(ctx)
+}

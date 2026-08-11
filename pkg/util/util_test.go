@@ -4,6 +4,77 @@ import "testing"
 
 // ==================== Str 相关测试 ====================
 
+func TestSnakeToPascal(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"user_log", "UserLog"},
+		{"auth_rule", "AuthRule"},
+		{"auth/rule", "AuthRule"},
+		{"123", "123"},
+		{"a1_b2", "A1B2"},
+		{"user", "User"},
+		{"", ""},
+		{"a__b", "AB"},
+		{"__test__", "Test"},
+	}
+	for _, c := range cases {
+		if got := SnakeToPascal(c.in); got != c.want {
+			t.Errorf("SnakeToPascal(%q) = %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+func TestSnakeToLowerCamel(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"user_log", "userLog"},
+		{"user_id", "userId"},
+		{"auth_rule", "authRule"},
+		{"auth/rule", "authRule"},
+		{"created_at", "createdAt"},
+		{"updated_at", "updatedAt"},
+		{"start_time", "startTime"},
+		{"a1_b2", "a1B2"},
+		{"a_b_c", "aBC"},
+		{"user", "user"},
+		{"weigh", "weigh"},
+		{"123", "123"},
+		{"", ""},
+		{"a__b", "aB"},
+		{"__test__", "test"},
+	}
+	for _, c := range cases {
+		if got := SnakeToLowerCamel(c.in); got != c.want {
+			t.Errorf("SnakeToLowerCamel(%q) = %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+func TestPascalToSnake(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"Admin", "admin"},
+		{"AdminRule", "admin_rule"},
+		{"AdminID", "admin_id"},
+		{"UserLog", "user_log"},
+		{"ID", "id"},
+		{"APIKey", "api_key"},
+		{"User2API", "user2_api"},
+		{"UserAPI", "user_api"},
+		{"中文", "中文"},
+		{"123", "123"},
+		{"", ""},
+	}
+	for _, c := range cases {
+		if got := PascalToSnake(c.in); got != c.want {
+			t.Errorf("PascalToSnake(%q) = %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
 func TestTruncateStr(t *testing.T) {
 	tests := []struct {
 		name string
