@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // TrimExt 返回去除了路径和扩展名的文件名
@@ -74,4 +75,106 @@ func ReadDir(dir string) ([]string, error) {
 		return nil
 	})
 	return paths, err
+}
+
+// AbsInProject 将路径规范化为项目根目录下的绝对路径
+func AbsInProject(rel string) (string, bool) {
+	abs, err := filepath.Abs(rel)
+	if err != nil {
+		return "", false
+	}
+
+	root, err := os.Getwd()
+	if err != nil {
+		return "", false
+	}
+
+	// 仅允许位于项目根目录内，防止越界
+	if abs != root && !strings.HasPrefix(abs, root+string(filepath.Separator)) {
+		return "", false
+	}
+	return abs, true
+}
+
+// RemoveFileWithRetry 删除文件并返回是否删除成功；Windows 下句柄可能被短暂占用，故重试数次
+func RemoveFileWithRetry(path string) bool {
+	for range 5 {
+		if err := os.Remove(path); err == nil {
+			return true
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	return false
+}
+
+// RemoveDirWithRetry 删除空目录；Windows 下目录句柄可能被短暂占用，故重试数次
+func RemoveDirWithRetry(dir string) bool {
+	for range 5 {
+		if err := os.Remove(dir); err == nil {
+			return true
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	return false
+}
+
+// RemoveAllWithRetry 删除 root 之下的所有子项；path 必须是 root 的严格子路径
+func RemoveAllWithRetry(path, root string) bool {
+	path, err := filepath.Abs(path)
+	if err != nil {
+		return false
+	}
+
+	if root == "" {
+		root, err = os.Getwd()
+	} else {
+		root, err = filepath.Abs(root)
+	}
+	if err != nil {
+		return false
+	}
+
+	if path == root || !strings.HasPrefix(path, root+string(filepath.Separator)) {
+		return false
+	}
+	for range 5 {
+		if err := os.RemoveAll(path); err == nil {
+			return true
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	return false
+}
+
+// RemoveEmptyParents 从文件所在目录向上删除已为空的目录，遇非空目录或项目根目录时停止
+func RemoveEmptyParents(path string) {
+	root, err := os.Getwd()
+	if err != nil {
+		return
+	}
+	for dir := filepath.Dir(path); ; dir = filepath.Dir(dir) {
+		rel, err := filepath.Rel(root, dir)
+		if err != nil || rel == "." || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			return
+		}
+		entries, err := os.ReadDir(dir)
+		if err != nil || len(entries) > 0 {
+			return
+		}
+		if !RemoveDirWithRetry(dir) {
+			return
+		}
+	}
+}
+
+// RemoveFileWithCleanup 删除项目内的文件，并清理因删除而变空的目录
+func RemoveFileWithCleanup(rel string) {
+	path, ok := AbsInProject(rel)
+	if !ok {
+		return
+	}
+	if !RemoveFileWithRetry(path) {
+		return
+	}
+	RemoveEmptyParents(path)
 }
