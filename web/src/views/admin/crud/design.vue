@@ -1252,6 +1252,7 @@ const loadData = () => {
                 }
 
                 state.table = res.data.data.table
+                tableDesignChangeInit()
                 if (res.data.data.empty) {
                     state.table.rebuild = 'Yes'
                 }
