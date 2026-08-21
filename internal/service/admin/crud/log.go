@@ -102,7 +102,15 @@ func removeGeneratedModule(table dto.CRUDTable) {
 func CrudLog(ctx context.Context, repo *repoCrud.CrudLogRepository, data dto.CrudLogData) (uint, error) {
 	id := util.FromPtr(data.ID)
 	if id > 0 {
-		if err := repo.Update(ctx, map[string]any{"status": data.Status, "sql": data.Sql}, repository.Options{
+		// 按需组装更新 map（只更新 status 和 sql）
+		updates := map[string]any{}
+		if data.Status != "" {
+			updates["status"] = data.Status
+		}
+		if data.Sql != nil {
+			updates["sql"] = data.Sql
+		}
+		if err := repo.Update(ctx, updates, repository.Options{
 			PrimaryKeyValue: strconv.FormatUint(uint64(id), 10),
 		}); err != nil {
 			return 0, err
