@@ -49,7 +49,7 @@
             <div class="tech-grid">
                 <div v-for="item in techStack" :key="item.name" class="tech-card">
                     <div class="tech-icon" :style="{ background: item.gradient }">
-                        <el-icon :size="28"><component :is="item.icon" /></el-icon>
+                        <Icon :name="item.icon" size="28" />
                     </div>
                     <h3>{{ item.name }}</h3>
                     <p>{{ item.desc }}</p>
@@ -159,7 +159,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowDown, ArrowRight, Coin, Connection, Cpu, DataBoard, Grid, Monitor, Plus, Setting, UserFilled } from '@element-plus/icons-vue'
+import { ArrowDown, ArrowRight, Cpu, Plus, UserFilled } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useConfig } from '/@/stores/config'
@@ -184,37 +184,37 @@ const techStack: TechItem[] = [
     {
         name: 'Golang',
         desc: t('index.techGolang'),
-        icon: Monitor,
+        icon: 'lucide-rocket',
         gradient: 'linear-gradient(135deg, #00ADD8, #00ADD8cc)',
     },
     {
         name: 'TypeScript',
         desc: t('index.techTypeScript'),
-        icon: DataBoard,
+        icon: 'lucide-file-type-corner',
         gradient: 'linear-gradient(135deg, #3178C6, #3178C6cc)',
     },
     {
         name: 'PostgreSQL',
         desc: t('index.techPostgreSQL'),
-        icon: Coin,
+        icon: 'lucide-database-zap',
         gradient: 'linear-gradient(135deg, #4169E1, #4169E1cc)',
     },
     {
-        name: 'Vue 3 + Pinia',
+        name: 'Vue3 + Vite',
         desc: t('index.techVue'),
-        icon: Connection,
+        icon: 'lucide-monitor-smartphone',
         gradient: 'linear-gradient(135deg, #4FC08D, #4FC08Dcc)',
     },
     {
         name: 'Element Plus',
         desc: t('index.techElementPlus'),
-        icon: Grid,
+        icon: 'lucide-component',
         gradient: 'linear-gradient(135deg, #409EFF, #409EFFcc)',
     },
     {
-        name: 'Claude Code',
-        desc: t('index.techClaudeCode'),
-        icon: Setting,
+        name: 'Coding Agent',
+        desc: t('index.techAgent'),
+        icon: 'lucide-bot-message-square',
         gradient: 'linear-gradient(135deg, #D97706, #D97706cc)',
     },
 ]

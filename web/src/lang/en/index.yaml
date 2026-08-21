@@ -1,6 +1,6 @@
 # Hero section
-heroBadge: AI Paddles, Human Steers
-heroDesc: Built with Golang + GORM + TypeScript + Vite + Element Plus and other popular tech stacks
+heroBadge: AI as the craft, humans set the bounds.
+heroDesc: Built with Golang + Vue3 + TypeScript + Vite + Element Plus and other top-tier tech stacks
 enterAdmin: Admin Panel
 learnTech: Tech Stack
 scrollDown: Scroll Down
@@ -9,19 +9,19 @@ scrollDown: Scroll Down
 techTitle: Tech Stack
 techSubtitle: Popular, stable, and efficient technology choices
 techGolang: High-performance backend language, Gin framework + GORM + generic-driven server architecture
-techTypeScript: Type-safe JavaScript superset, the top choice for frontend, used to write Vue 3
-techPostgreSQL: Powerful open-source relational database, GORM AutoMigrate for automatic table creation, read-write separation
-techVue: Progressive frontend framework with lightweight state management, setup sugar + Vite build
-techElementPlus: The most popular component library in the Vue 3 ecosystem, unified UI style, i18n out of the box
-techClaudeCode: AI-driven coding assistant for code generation, refactoring, and review — efficient human-AI collaboration
+techTypeScript: Type-safe JavaScript superset — the top frontend choice, powering Vue 3 and itself built in Go
+techPostgreSQL: Powerful open-source relational database with read-write separation and golang-migrate for automatic table migration
+techVue: Progressive frontend framework with top-tier build tooling, setup sugar, and Pinia for lightweight state management
+techElementPlus: A popular component library in the Vue 3 ecosystem with unified UI style and i18n out of the box
+techAgent: Flexibly use AI-driven coding agents like Codex / CC — they handle code generation, refactoring, and initial review, while developers orchestrate and accept, maximizing human-AI collaboration
 
 # Development philosophy
 philosophyTitle: Philosophy
-philosophySubtitle: AI writes fast, humans refine with precision — crafting a production-grade e-commerce project
+philosophySubtitle: AI writes fast, humans refine with precision — crafting a production-grade admin project
 humanCommand: Human Command
-humanDesc: The author leverages extensive development experience to steer the project architecture and direction, ensuring every line of code is well-considered and free from AI hallucination pitfalls.
+humanDesc: The author steers the project architecture and direction with extensive development experience, reviewing every line of code to keep it well-considered and meticulously polished — free from AI hallucination pitfalls.
 aiWriter: AI Execution
-aiDesc: Claude Code serves as the primary coding assistant, efficiently handling repetitive tasks and code generation, significantly boosting development speed and code quality.
+aiDesc: AI-driven coding agents like Codex / CC are the primary coding tools, handling repetitive work and code generation to boost development speed and code quality.
 
 # Open-source blog
 blogTitle: Open Source Blog
