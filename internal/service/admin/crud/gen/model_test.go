@@ -64,6 +64,7 @@ func TestRenderModelFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	content = strings.ReplaceAll(content, "\r\n", "\n")
 
 	for _, want := range []string{
 		"package model\n",
@@ -98,6 +99,7 @@ func TestRenderModelFileNoImports(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	content = strings.ReplaceAll(content, "\r\n", "\n")
 	if strings.Contains(content, "import") {
 		t.Errorf("无 import 时不应出现 import 块:\n%s", content)
 	}
@@ -144,5 +146,26 @@ func TestBuildGoType(t *testing.T) {
 				t.Errorf("buildGoType(%+v) = %q, want %q", c.field, got, c.want)
 			}
 		})
+	}
+}
+
+// TestRenderModelFileXssTag 验证 editor 字段自动追加 xss:"html" 标签，非 editor 字段不加
+func TestRenderModelFileXssTag(t *testing.T) {
+	table := dto.CRUDTable{Name: "article", Comment: "文章"}
+	fields := []dto.CRUDFields{
+		{Name: "id", Type: "bigint", Comment: "ID", PrimaryKey: true},
+		{Name: "title", Type: "varchar", Length: 255, Comment: "标题"},
+		{Name: "content", Type: "text", Comment: "内容", DesignType: "editor"},
+	}
+	content, err := crud.RenderTmpl(modelTmpl, buildModelFileData(modelBasic("Article"), table, fields))
+	if err != nil {
+		t.Fatal(err)
+	}
+	content = strings.ReplaceAll(content, "\r\n", "\n")
+	if !strings.Contains(content, `json:"content" xss:"html"`) {
+		t.Errorf("editor 字段缺少 xss:\"html\" 标签\n%s", content)
+	}
+	if strings.Contains(content, `json:"title" xss:`) {
+		t.Errorf("非 editor 字段不应有 xss tag\n%s", content)
 	}
 }

@@ -36,6 +36,7 @@ type modelFileField struct {
 	JSONTag    string // json tag 值
 	GormTag    string // gorm tag 值
 	BindingTag string // binding tag 值
+	XssTag     string // xss tag 值
 	Line       string // 单行字段定义
 }
 
@@ -58,13 +59,18 @@ func buildModelFileData(basic map[string]dto.GenerateFileBasicDataInfo, table dt
 			imports = append(imports, crud.ImportSpec("gorm.io/datatypes"))
 		}
 
-		fileFields = append(fileFields, modelFileField{
+		mf := modelFileField{
 			Name:       snakeToPascal(f.Name),
 			Type:       buildGoType(f),
 			JSONTag:    f.Name,
 			GormTag:    buildGormTag(f),
 			BindingTag: buildBindingTag(f),
-		})
+		}
+		if f.DesignType == "editor" {
+			mf.XssTag = "html"
+		}
+
+		fileFields = append(fileFields, mf)
 
 		if f.DesignType == "weigh" {
 			data.HasWeigh = true
@@ -104,6 +110,9 @@ func buildModelFileData(basic map[string]dto.GenerateFileBasicDataInfo, table dt
 		line := fmt.Sprintf("\t%s %s `gorm:\"%s\" json:\"%s\"", f.Name, f.Type, f.GormTag, f.JSONTag)
 		if f.BindingTag != "" {
 			line += fmt.Sprintf(" binding:\"%s\"", f.BindingTag)
+		}
+		if f.XssTag != "" {
+			line += fmt.Sprintf(" xss:\"%s\"", f.XssTag)
 		}
 		f.Line = line + "`"
 	}
