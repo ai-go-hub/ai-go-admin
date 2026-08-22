@@ -1,13 +1,13 @@
+import i18n from '@/lang/index'
+import router from '@/router/index'
+import adminBaseRoute from '@/router/static/adminBase'
+import { useConfig } from '@/stores/config'
+import { useMenu } from '@/stores/menu'
+import { isAdminApp } from '@/utils/common'
+import { closeMask } from '@/utils/mask'
 import { ElNotification } from 'element-plus'
 import { compact, reverse } from 'lodash-es'
 import type { RouteRecordRaw } from 'vue-router'
-import i18n from '/@/lang/index'
-import router from '/@/router/index'
-import adminBaseRoute from '/@/router/static/adminBase'
-import { useConfig } from '/@/stores/config'
-import { useMenu } from '/@/stores/menu'
-import { isAdminApp } from '/@/utils/common'
-import { closeMask } from '/@/utils/mask'
 
 /**
  * 获取第一个菜单
@@ -203,7 +203,7 @@ export const addRouteItem = (viewsComponent: Record<string, any>, route: any, pa
         component
     if (route.openType == 'iframe') {
         path = (isAdminApp() ? adminBaseRoute.path : '/') + '/iframe/' + encodeURIComponent(route.url)
-        component = () => import('/@/layouts/common/router-view/iframe.vue')
+        component = () => import('@/layouts/common/router-view/iframe.vue')
     } else {
         path = parentName ? route.path : '/' + route.path
         component = viewsComponent[route.component]

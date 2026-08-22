@@ -63,11 +63,11 @@
 </template>
 
 <script setup lang="ts">
+import { getElementPlusIconNames, getLucideIconNames } from '@/components/agInput/components/iconSelect'
+import { copy } from '@/utils/common'
 import { useEventListener } from '@vueuse/core'
 import { ElMessage, type Placement } from 'element-plus'
 import { computed, nextTick, onMounted, reactive, useTemplateRef, watch } from 'vue'
-import { getElementPlusIconNames, getLucideIconNames } from '/@/components/agInput/components/iconSelect'
-import { copy } from '/@/utils/common'
 
 type IconType = 'ele' | 'lucide'
 

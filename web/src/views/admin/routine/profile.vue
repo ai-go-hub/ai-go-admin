@@ -115,13 +115,13 @@
 <script setup lang="ts">
 import { onMounted, reactive, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getAdminProfile, updateAdminProfile, getAdminLog } from '/@/api/admin/routine/index'
+import { getAdminProfile, updateAdminProfile, getAdminLog } from '@/api/admin/routine/index'
 import { dayjs, type FormItemRule } from 'element-plus'
-import { fullURL, resetForm } from '/@/utils/common'
-import { uuid } from '/@/utils/random'
-import { buildValidatorRule, regularPassword } from '/@/utils/validate'
-import AgUpload from '/@/components/agInput/components/agUpload.vue'
-import { useAdminInfo } from '/@/stores/adminInfo'
+import { fullURL, resetForm } from '@/utils/common'
+import { uuid } from '@/utils/random'
+import { buildValidatorRule, regularPassword } from '@/utils/validate'
+import AgUpload from '@/components/agInput/components/agUpload.vue'
+import { useAdminInfo } from '@/stores/adminInfo'
 import { isEmpty } from 'lodash-es'
 
 defineOptions({

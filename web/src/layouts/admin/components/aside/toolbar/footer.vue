@@ -25,13 +25,13 @@
 </template>
 
 <script setup lang="ts">
+import MenuSearchDialog from '@/layouts/admin/components/aside/toolbar/menuSearch/dialog.vue'
+import { useConfig } from '@/stores/config'
+import { BEFORE_RESIZE_LAYOUT } from '@/stores/constant/cacheKey'
+import { setNavTabsWidth } from '@/utils/layout'
+import { closeMask } from '@/utils/mask'
+import { Session } from '@/utils/storage'
 import { ref } from 'vue'
-import MenuSearchDialog from '/@/layouts/admin/components/aside/toolbar/menuSearch/dialog.vue'
-import { useConfig } from '/@/stores/config'
-import { BEFORE_RESIZE_LAYOUT } from '/@/stores/constant/cacheKey'
-import { setNavTabsWidth } from '/@/utils/layout'
-import { closeMask } from '/@/utils/mask'
-import { Session } from '/@/utils/storage'
 
 const config = useConfig()
 const menuSearchDialogVisible = ref(false)

@@ -12,14 +12,14 @@
 </template>
 
 <script setup lang="ts">
+import { TableManagerAPI } from '@/api/table'
+import TableHeader from '@/components/table/header/index.vue'
+import Table from '@/components/table/index.vue'
+import { useTableManager } from '@/hooks/useTableManager'
+import { buildJsonToElTreeData } from '@/utils/common'
 import { cloneDeep } from 'lodash-es'
 import { useI18n } from 'vue-i18n'
 import Info from './info.vue'
-import { TableManagerAPI } from '/@/api/table'
-import TableHeader from '/@/components/table/header/index.vue'
-import Table from '/@/components/table/index.vue'
-import { useTableManager } from '/@/hooks/useTableManager'
-import { buildJsonToElTreeData } from '/@/utils/common'
 
 const { t } = useI18n()
 

@@ -22,19 +22,19 @@
 </template>
 
 <script setup lang="ts">
+import { getAdminRules } from '@/api/admin/auth/index'
+import { TableManagerAPI } from '@/api/table'
+import TableHeader from '@/components/table/header/index.vue'
+import { getDefaultOptButtons } from '@/components/table/index'
+import Table from '@/components/table/index.vue'
+import { useTableManager } from '@/hooks/useTableManager'
+import { useConfig } from '@/stores/config'
+import { adminLayoutHeaderBarHeight } from '@/utils/layout'
+import { uuid } from '@/utils/random'
 import { cloneDeep, debounce } from 'lodash-es'
 import { nextTick, onMounted, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DialogForm from './dialogForm.vue'
-import { getAdminRules } from '/@/api/admin/auth/index'
-import { TableManagerAPI } from '/@/api/table'
-import TableHeader from '/@/components/table/header/index.vue'
-import { getDefaultOptButtons } from '/@/components/table/index'
-import Table from '/@/components/table/index.vue'
-import { useTableManager } from '/@/hooks/useTableManager'
-import { useConfig } from '/@/stores/config'
-import { adminLayoutHeaderBarHeight } from '/@/utils/layout'
-import { uuid } from '/@/utils/random'
 
 const { t } = useI18n()
 const config = useConfig()

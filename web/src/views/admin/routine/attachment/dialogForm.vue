@@ -82,12 +82,12 @@
 </template>
 
 <script setup lang="ts">
+import { useConfig } from '@/stores/config'
+import { buildValidatorRule } from '@/utils/validate'
 import type { FormItemRule } from 'element-plus'
 import { computed, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatFileSize, previewRenderFormatter } from './index'
-import { useConfig } from '/@/stores/config'
-import { buildValidatorRule } from '/@/utils/validate'
 
 interface Props {
     manager: TableManagerInstance

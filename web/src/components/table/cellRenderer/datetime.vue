@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
+import { CellRendererProps } from '@/components/table/types'
 import { dayjs } from 'element-plus'
 import { computed } from 'vue'
-import { CellRendererProps } from '/@/components/table/types'
 
 const props = defineProps<CellRendererProps>()
 

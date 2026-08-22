@@ -13,10 +13,10 @@
 </template>
 
 <script setup lang="ts">
+import router from '@/router/index'
+import { useMenu } from '@/stores/menu'
+import { getFirstMenu } from '@/utils/router'
 import { onMounted, onUnmounted, reactive } from 'vue'
-import router from '/@/router/index'
-import { useMenu } from '/@/stores/menu'
-import { getFirstMenu } from '/@/utils/router'
 
 let timer: number
 const menu = useMenu()

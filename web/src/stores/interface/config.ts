@@ -1,4 +1,4 @@
-import { LangKey } from '/@/lang/index'
+import { LangKey } from '@/lang/index'
 
 export interface Lang {
     // 激活语言

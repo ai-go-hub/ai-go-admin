@@ -29,10 +29,10 @@
 </template>
 
 <script setup lang="ts">
+import { invokeTableContextDataFun } from '@/components/table/index'
+import { CellRendererProps } from '@/components/table/types'
 import { TagProps } from 'element-plus'
 import { isArray, isEmpty } from 'lodash-es'
-import { invokeTableContextDataFun } from '/@/components/table/index'
-import { CellRendererProps } from '/@/components/table/types'
 
 const props = defineProps<CellRendererProps>()
 

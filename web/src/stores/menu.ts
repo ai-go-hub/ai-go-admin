@@ -1,7 +1,7 @@
+import { adminBaseRoutePath } from '@/router/static/adminBase'
+import type { Menu } from '@/stores/interface/index'
 import { defineStore } from 'pinia'
 import type { RouteRecordRaw } from 'vue-router'
-import { adminBaseRoutePath } from '/@/router/static/adminBase'
-import type { Menu } from '/@/stores/interface/index'
 
 export const useMenu = defineStore('menu', {
     state: (): Menu => {

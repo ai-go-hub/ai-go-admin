@@ -1,7 +1,7 @@
+import { ADMIN_INFO } from '@/stores/constant/cacheKey'
+import type { AdminInfo } from '@/stores/interface'
 import { difference, pick } from 'lodash-es'
 import { defineStore } from 'pinia'
-import { ADMIN_INFO } from '/@/stores/constant/cacheKey'
-import type { AdminInfo } from '/@/stores/interface'
 
 export const useAdminInfo = defineStore('adminInfo', {
     state: (): AdminInfo => {

@@ -531,10 +531,28 @@ func CreateIndexVueFile(basic map[string]dto.GenerateFileBasicDataInfo, table dt
 
 	apiURL := "/" + basic["router"].App + "/" + strings.Trim(table.RoutePath, "/") + "/"
 
+	// imports 的拼接带有正确的排序，排序依据为 vscode source.organizeImports 指令排序结果
+	imports := make([]string, 0, 8)
+	imports = append(imports,
+		"import { TableManagerAPI } from '@/api/table'",
+		"import TableHeader from '@/components/table/header/index.vue'",
+		"import { getDefaultOptButtons } from '@/components/table/index'",
+		"import Table from '@/components/table/index.vue'",
+		"import { useTableManager } from '@/hooks/useTableManager'",
+	)
+	if weigh {
+		imports = append(imports, "import { onMounted, useTemplateRef } from 'vue'")
+	}
+	imports = append(imports,
+		"import { useI18n } from 'vue-i18n'",
+		"import DialogForm from './dialogForm.vue'",
+	)
+
 	defaultItems := buildFormDefaultItems(fields)
 	dblClickNotEditColumn, hasDblClickNotEditColumn := buildDblClickNotEditColumn(fields)
 	content, err := crud.RenderTmpl(indexvueTmpl, map[string]any{
 		"ApiURL":                   apiURL,
+		"Imports":                  strings.Join(imports, "\n"),
 		"NeedOnMounted":            weigh,
 		"OptButtons":               optButtons,
 		"Columns":                  columns,
@@ -588,16 +606,40 @@ func CreateDialogFormFile(basic map[string]dto.GenerateFileBasicDataInfo, table 
 		rulesBlock = "const rules: Partial<Record<string, FormItemRule[]>> = {\n" + strings.Join(rules, "\n") + "\n}\n"
 	}
 
+	// imports 的拼接带有正确的排序，排序依据为 vscode source.organizeImports 指令排序结果
+	imports := make([]string, 0, 11)
+	if importSet["AgUpload"] {
+		imports = append(imports, "import AgUpload from '@/components/agInput/components/agUpload.vue'")
+	}
+	if importSet["AreaSelect"] {
+		imports = append(imports, "import AreaSelect from '@/components/agInput/components/areaSelect.vue'")
+	}
+	if importSet["ArrayInput"] {
+		imports = append(imports, "import ArrayInput from '@/components/agInput/components/array.vue'")
+	}
+	if importSet["Editor"] {
+		imports = append(imports, "import Editor from '@/components/agInput/components/editor.vue'")
+	}
+	if importSet["IconSelect"] {
+		imports = append(imports, "import IconSelect from '@/components/agInput/components/iconSelect.vue'")
+	}
+	if importSet["RemoteSelect"] {
+		imports = append(imports, "import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'")
+	}
+	imports = append(imports, "import { useConfig } from '@/stores/config'")
+	if len(rules) > 0 {
+		imports = append(imports, "import { buildValidatorRule } from '@/utils/validate'")
+	}
+	imports = append(imports,
+		"import type { FormItemRule } from 'element-plus'",
+		"import { useTemplateRef } from 'vue'",
+		"import { useI18n } from 'vue-i18n'",
+	)
+
 	content, err := crud.RenderTmpl(dialogFormTmpl, map[string]any{
-		"FormFields":       fieldsBlock.String(),
-		"Rules":            rulesBlock,
-		"HasAgUpload":      importSet["AgUpload"],
-		"HasRemoteSelect":  importSet["RemoteSelect"],
-		"HasAreaSelect":    importSet["AreaSelect"],
-		"HasArrayInput":    importSet["ArrayInput"],
-		"HasIconSelect":    importSet["IconSelect"],
-		"HasEditor":        importSet["Editor"],
-		"HasValidatorRule": len(rules) > 0,
+		"FormFields": fieldsBlock.String(),
+		"Rules":      rulesBlock,
+		"Imports":    strings.Join(imports, "\n"),
 	})
 	if err != nil {
 		return err

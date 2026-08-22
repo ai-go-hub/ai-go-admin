@@ -1,3 +1,6 @@
+import type { TableManagerAPI } from '@/api/table'
+import Icon from '@/components/icon/index.vue'
+import Table from '@/components/table/index.vue'
 import type {
     ButtonProps,
     ButtonType,
@@ -12,9 +15,6 @@ import type {
     TagProps,
 } from 'element-plus'
 import type { Component } from 'vue'
-import type { TableManagerAPI } from '/@/api/table'
-import Icon from '/@/components/icon/index.vue'
-import Table from '/@/components/table/index.vue'
 
 declare global {
     /**

@@ -1,7 +1,7 @@
+import Icon from '@/components/icon/index.vue'
 import * as elIcons from '@element-plus/icons-vue'
 import { camelCase, kebabCase, upperFirst } from 'lodash-es'
 import { App, defineAsyncComponent, type Component } from 'vue'
-import Icon from '/@/components/icon/index.vue'
 
 type IconMap = Record<string, Component>
 

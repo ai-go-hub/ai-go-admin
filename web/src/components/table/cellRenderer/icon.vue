@@ -11,9 +11,9 @@
 </template>
 
 <script setup lang="ts">
-import Icon from '/@/components/icon/index.vue'
-import { invokeTableContextDataFun } from '/@/components/table/index'
-import { CellRendererProps } from '/@/components/table/types'
+import Icon from '@/components/icon/index.vue'
+import { invokeTableContextDataFun } from '@/components/table/index'
+import { CellRendererProps } from '@/components/table/types'
 
 const props = defineProps<CellRendererProps>()
 </script>

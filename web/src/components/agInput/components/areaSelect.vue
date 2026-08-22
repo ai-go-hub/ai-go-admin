@@ -13,10 +13,10 @@
 </template>
 
 <script setup lang="ts">
+import { getArea } from '@/api/common'
 import { toString } from 'lodash-es'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getArea } from '/@/api/common'
 
 const { t } = useI18n()
 

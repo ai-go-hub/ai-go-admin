@@ -1,15 +1,15 @@
 <script lang="ts">
+import { inputTypes } from '@/components/agInput'
+import agUpload from '@/components/agInput/components/agUpload.vue'
+import AreaSelect from '@/components/agInput/components/areaSelect.vue'
+import Array from '@/components/agInput/components/array.vue'
+import Editor from '@/components/agInput/components/editor.vue'
+import IconSelect from '@/components/agInput/components/iconSelect.vue'
+import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'
+import type { InputAttr, ModelValueTypes } from '@/components/agInput/index'
 import { isArray, isString } from 'lodash-es'
 import type { PropType, VNode } from 'vue'
 import { computed, createVNode, defineComponent, resolveComponent } from 'vue'
-import { inputTypes } from '/@/components/agInput'
-import agUpload from '/@/components/agInput/components/agUpload.vue'
-import AreaSelect from '/@/components/agInput/components/areaSelect.vue'
-import Array from '/@/components/agInput/components/array.vue'
-import Editor from '/@/components/agInput/components/editor.vue'
-import IconSelect from '/@/components/agInput/components/iconSelect.vue'
-import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
-import type { InputAttr, ModelValueTypes } from '/@/components/agInput/index'
 
 export default defineComponent({
     name: 'agInput',

@@ -14,7 +14,7 @@
         "allowJs": true,
         "skipLibCheck": true,
         "paths": {
-            "/@/*": ["./src/*"]
+            "@/*": ["./src/*"]
         },
         "types": ["vite/client", "element-plus/global"]
     },

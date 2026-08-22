@@ -14,7 +14,7 @@ const viteConfig = ({ mode }: ConfigEnv): UserConfig => {
         root: process.cwd(),
         resolve: {
             alias: {
-                '/@': resolve(__dirname, 'src'),
+                '@': resolve(__dirname, 'src'),
             },
         },
         base: VITE_BASE_PATH,

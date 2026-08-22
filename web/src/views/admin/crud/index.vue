@@ -5,11 +5,11 @@
 </template>
 
 <script setup lang="ts">
+import { closeHotUpdate, openHotUpdate } from '@/utils/vite'
+import Design from '@/views/admin/crud/design.vue'
+import { state } from '@/views/admin/crud/index'
+import Start from '@/views/admin/crud/start.vue'
 import { onActivated, onDeactivated, onMounted, onUnmounted } from 'vue'
-import { closeHotUpdate, openHotUpdate } from '/@/utils/vite'
-import Design from '/@/views/admin/crud/design.vue'
-import { state } from '/@/views/admin/crud/index'
-import Start from '/@/views/admin/crud/start.vue'
 
 defineOptions({
     name: 'crud/crud',

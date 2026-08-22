@@ -8,9 +8,9 @@
 </template>
 
 <script setup lang="ts">
+import { SYSTEM_ZINDEX } from '@/stores/constant/common'
+import { useNavTab } from '@/stores/navTab'
 import { onMounted, reactive } from 'vue'
-import { SYSTEM_ZINDEX } from '/@/stores/constant/common'
-import { useNavTab } from '/@/stores/navTab'
 
 const navTab = useNavTab()
 const state = reactive({

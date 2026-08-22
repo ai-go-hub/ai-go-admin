@@ -138,18 +138,18 @@
 </template>
 
 <script setup lang="ts">
+import { login } from '@/api/admin'
+import { getLoginConfig } from '@/api/admin/index'
+import clickCaptcha from '@/components/clickCaptcha'
+import type { ClickRequest } from '@/components/clickCaptcha/index'
+import { useAdminInfo } from '@/stores/adminInfo'
+import { useConfig } from '@/stores/config'
 import { Lock, User } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules, InputInstance } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { login } from '/@/api/admin'
-import { getLoginConfig } from '/@/api/admin/index'
-import clickCaptcha from '/@/components/clickCaptcha'
-import type { ClickRequest } from '/@/components/clickCaptcha/index'
-import { useAdminInfo } from '/@/stores/adminInfo'
-import { useConfig } from '/@/stores/config'
 
 const { t } = useI18n()
 const router = useRouter()

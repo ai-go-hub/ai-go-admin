@@ -1,7 +1,7 @@
+import { useConfig } from '@/stores/config'
+import { useNavTab } from '@/stores/navTab'
+import { isAdminApp } from '@/utils/common'
 import type { CSSProperties } from 'vue'
-import { useConfig } from '/@/stores/config'
-import { useNavTab } from '/@/stores/navTab'
-import { isAdminApp } from '/@/utils/common'
 
 /**
  * 管理员后台各个布局顶栏高度

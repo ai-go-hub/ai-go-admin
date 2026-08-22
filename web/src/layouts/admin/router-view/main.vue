@@ -1,6 +1,6 @@
 <template>
     <el-main class="layout-main">
-        <el-scrollbar class="layout-main-scrollbar" :style="layoutMainScrollbarStyle" ref="layoutMainScrollbarRef">
+        <el-scrollbar class="layout-main-scrollbar" :style="layoutMainScrollbarStyle" :ref="layoutMainScrollbarRef">
             <router-view v-slot="{ Component }">
                 <transition :name="config.layout.mainAnimation" mode="out-in">
                     <keep-alive :include="state.keepAliveComponentNameList">
@@ -13,13 +13,13 @@
 </template>
 
 <script setup lang="ts">
+import { useGlobalProperties } from '@/hooks/useGlobalProperties'
+import { useConfig } from '@/stores/config'
+import { useNavTab } from '@/stores/navTab'
+import { layoutMainScrollbarRef, layoutMainScrollbarStyle } from '@/stores/ref'
+import { getMenuDataByRoute } from '@/utils/common'
 import { nextTick, onBeforeMount, onMounted, onUnmounted, reactive, watch } from 'vue'
 import { useRoute, type RouteLocationNormalized } from 'vue-router'
-import { useGlobalProperties } from '/@/hooks/useGlobalProperties'
-import { useConfig } from '/@/stores/config'
-import { useNavTab } from '/@/stores/navTab'
-import { layoutMainScrollbarRef, layoutMainScrollbarStyle } from '/@/stores/ref'
-import { getMenuDataByRoute } from '/@/utils/common'
 
 defineOptions({
     name: 'layout/main',

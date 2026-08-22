@@ -19,11 +19,11 @@
 </template>
 
 <script setup lang="ts">
+import { useConfig } from '@/stores/config'
+import { getFirstMenu, getMenuKey, openMenu } from '@/utils/router'
 import { ElNotification } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import type { RouteRecordRaw } from 'vue-router'
-import { useConfig } from '/@/stores/config'
-import { getFirstMenu, getMenuKey, openMenu } from '/@/utils/router'
 
 const { t } = useI18n()
 const config = useConfig()

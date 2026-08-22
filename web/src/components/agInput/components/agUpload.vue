@@ -80,6 +80,10 @@
 </template>
 
 <script setup lang="ts">
+import { upload as uploadFile } from '@/api/common'
+import { stringToArray } from '@/components/agInput/helper'
+import { arrayFullURL, fullURL, getArrayKey, getFileNameFromPath } from '@/utils/common'
+import { uuid } from '@/utils/random'
 import type { AxiosProgressEvent } from 'axios'
 import type { UploadFiles, UploadProps, UploadRawFile, UploadUserFile } from 'element-plus'
 import { ElMessage, genFileId } from 'element-plus'
@@ -87,10 +91,6 @@ import { cloneDeep } from 'lodash-es'
 import Sortable from 'sortablejs'
 import { computed, nextTick, onMounted, reactive, useAttrs, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { upload as uploadFile } from '/@/api/common'
-import { stringToArray } from '/@/components/agInput/helper'
-import { arrayFullURL, fullURL, getArrayKey, getFileNameFromPath } from '/@/utils/common'
-import { uuid } from '/@/utils/random'
 
 // 禁用 Attributes 自动继承
 defineOptions({

@@ -68,12 +68,12 @@
 </template>
 
 <script setup lang="ts">
+import { getCellValue } from '@/components/table/index'
+import { useConfig } from '@/stores/config'
+import { uuid } from '@/utils/random'
 import type { ElTable, Sort, TableColumnCtx } from 'element-plus'
 import type { Component } from 'vue'
 import { computed, nextTick, useTemplateRef } from 'vue'
-import { getCellValue } from '/@/components/table/index'
-import { useConfig } from '/@/stores/config'
-import { uuid } from '/@/utils/random'
 
 const config = useConfig()
 const tableRef = useTemplateRef('tableRef')

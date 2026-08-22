@@ -150,10 +150,10 @@
 import type { FormItemRule } from 'element-plus'
 import { reactive, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import IconSelect from '/@/components/agInput/components/iconSelect.vue'
-import { useConfig } from '/@/stores/config'
-import { buildValidatorRule } from '/@/utils/validate'
-import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
+import IconSelect from '@/components/agInput/components/iconSelect.vue'
+import { useConfig } from '@/stores/config'
+import { buildValidatorRule } from '@/utils/validate'
+import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'
 
 interface Props {
     manager: TableManagerInstance

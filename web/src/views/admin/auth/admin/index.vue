@@ -12,13 +12,13 @@
 </template>
 
 <script setup lang="ts">
+import { TableManagerAPI } from '@/api/table'
+import TableHeader from '@/components/table/header/index.vue'
+import { getDefaultOptButtons } from '@/components/table/index'
+import Table from '@/components/table/index.vue'
+import { useTableManager } from '@/hooks/useTableManager'
 import { useI18n } from 'vue-i18n'
 import DialogForm from './dialogForm.vue'
-import { TableManagerAPI } from '/@/api/table'
-import TableHeader from '/@/components/table/header/index.vue'
-import { getDefaultOptButtons } from '/@/components/table/index'
-import Table from '/@/components/table/index.vue'
-import { useTableManager } from '/@/hooks/useTableManager'
 
 const { t } = useI18n()
 const optButtons = getDefaultOptButtons(['edit', 'delete'])

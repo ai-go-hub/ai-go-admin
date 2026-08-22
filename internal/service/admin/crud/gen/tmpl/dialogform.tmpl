@@ -44,18 +44,8 @@
 </template>
 
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-{{ if .HasValidatorRule }}import { buildValidatorRule } from '/@/utils/validate'
-{{ end }}import type { FormItemRule } from 'element-plus'
-import { useConfig } from '/@/stores/config'
-{{ if .HasAgUpload }}import AgUpload from '/@/components/agInput/components/agUpload.vue'
-{{ end }}{{ if .HasRemoteSelect }}import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
-{{ end }}{{ if .HasAreaSelect }}import AreaSelect from '/@/components/agInput/components/areaSelect.vue'
-{{ end }}{{ if .HasArrayInput }}import ArrayInput from '/@/components/agInput/components/array.vue'
-{{ end }}{{ if .HasIconSelect }}import IconSelect from '/@/components/agInput/components/iconSelect.vue'
-{{ end }}{{ if .HasEditor }}import Editor from '/@/components/agInput/components/editor.vue'
-{{ end }}
+{{ .Imports }}
+
 interface Props {
     manager: TableManagerInstance
 }

@@ -1,7 +1,7 @@
+import type { ClickRequest } from '@/components/clickCaptcha/index'
+import { uuid } from '@/utils/random'
+import request from '@/utils/request'
 import type { AxiosRequestConfig } from 'axios'
-import type { ClickRequest } from '/@/components/clickCaptcha/index'
-import { uuid } from '/@/utils/random'
-import request from '/@/utils/request'
 
 // ==================== 点选验证码 ====================
 

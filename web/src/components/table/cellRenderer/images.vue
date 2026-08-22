@@ -17,10 +17,10 @@
 </template>
 
 <script setup lang="ts">
+import { invokeTableContextDataFun } from '@/components/table/index'
+import { CellRendererProps } from '@/components/table/types'
+import { arrayFullURL, fullURL } from '@/utils/common'
 import { isArray } from 'lodash-es'
-import { invokeTableContextDataFun } from '/@/components/table/index'
-import { CellRendererProps } from '/@/components/table/types'
-import { arrayFullURL, fullURL } from '/@/utils/common'
 
 const props = defineProps<CellRendererProps>()
 </script>

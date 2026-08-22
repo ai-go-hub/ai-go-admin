@@ -125,15 +125,15 @@
 </template>
 
 <script setup lang="ts">
+import DashboardHeaderIllustration from '@/assets/svg/dashboard-illustration.svg'
+import { useAdminInfo } from '@/stores/adminInfo'
+import { useConfig } from '@/stores/config'
+import { Local } from '@/utils/storage'
 import { useEventListener } from '@vueuse/core'
 import type { ECharts, EChartsOption } from 'echarts'
 import * as echarts from 'echarts'
 import { debounce, padStart } from 'lodash-es'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
-import DashboardHeaderIllustration from '/@/assets/svg/dashboard-illustration.svg'
-import { useAdminInfo } from '/@/stores/adminInfo'
-import { useConfig } from '/@/stores/config'
-import { Local } from '/@/utils/storage'
 
 const config = useConfig()
 const adminInfo = useAdminInfo()

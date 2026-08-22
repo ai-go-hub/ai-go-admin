@@ -1,10 +1,10 @@
+import { LangKey } from '@/lang'
+import { CONFIG } from '@/stores/constant/cacheKey'
+import type { Lang, Layout, Site } from '@/stores/interface/config'
+import { useMenu } from '@/stores/menu'
 import { pick } from 'lodash-es'
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
-import { LangKey } from '/@/lang'
-import { CONFIG } from '/@/stores/constant/cacheKey'
-import type { Lang, Layout, Site } from '/@/stores/interface/config'
-import { useMenu } from '/@/stores/menu'
 
 export const useConfig = defineStore(
     'config',

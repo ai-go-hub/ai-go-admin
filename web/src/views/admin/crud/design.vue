@@ -551,15 +551,6 @@
 </template>
 
 <script setup lang="ts">
-import { useTemplateRefsList } from '@vueuse/core'
-import type { FormItemRule, MessageHandler, TimelineItemProps } from 'element-plus'
-import { ElLoading, ElMessage, ElMessageBox, ElNotification } from 'element-plus'
-import { cloneDeep, isEmpty, range } from 'lodash-es'
-import pluralize from 'pluralize-esm'
-import type { SortableEvent } from 'sortablejs'
-import Sortable from 'sortablejs'
-import { nextTick, onMounted, reactive, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
 import {
     checkGenerate,
     crudLogListUrl,
@@ -570,16 +561,25 @@ import {
     modelListUrl,
     parseTableData,
     tableListUrl,
-} from '/@/api/admin/crud'
-import { ping } from '/@/api/common'
-import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
-import AgInput from '/@/components/agInput/index.vue'
-import { getArrayKey, parseStrAttr } from '/@/utils/common'
-import { uuid } from '/@/utils/random'
-import { buildValidatorRule, regularVarName } from '/@/utils/validate'
-import { reloadServer } from '/@/utils/vite'
-import type { FieldItem, TableDesignChange, TableDesignChangeType } from '/@/views/admin/crud/index'
-import { changeStep, state as crudState, designTypes, fieldItem, getTableAttr, tableFieldsKey } from '/@/views/admin/crud/index'
+} from '@/api/admin/crud'
+import { ping } from '@/api/common'
+import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'
+import AgInput from '@/components/agInput/index.vue'
+import { getArrayKey, parseStrAttr } from '@/utils/common'
+import { uuid } from '@/utils/random'
+import { buildValidatorRule, regularVarName } from '@/utils/validate'
+import { reloadServer } from '@/utils/vite'
+import type { FieldItem, TableDesignChange, TableDesignChangeType } from '@/views/admin/crud/index'
+import { changeStep, state as crudState, designTypes, fieldItem, getTableAttr, tableFieldsKey } from '@/views/admin/crud/index'
+import { useTemplateRefsList } from '@vueuse/core'
+import type { FormItemRule, MessageHandler, TimelineItemProps } from 'element-plus'
+import { ElLoading, ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+import { cloneDeep, isEmpty, range } from 'lodash-es'
+import pluralize from 'pluralize-esm'
+import type { SortableEvent } from 'sortablejs'
+import Sortable from 'sortablejs'
+import { nextTick, onMounted, reactive, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 let pingTimer: number
 let nameRepeatCount = 1

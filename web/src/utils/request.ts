@@ -1,10 +1,10 @@
+import i18n from '@/lang'
+import { adminBaseRoutePath } from '@/router/static/adminBase'
+import { useAdminInfo } from '@/stores/adminInfo'
+import { keysToCamelCase, keysToSnakeCase } from '@/utils/common'
 import type { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { ElLoading, ElMessage } from 'element-plus'
-import i18n from '/@/lang'
-import { adminBaseRoutePath } from '/@/router/static/adminBase'
-import { useAdminInfo } from '/@/stores/adminInfo'
-import { keysToCamelCase, keysToSnakeCase } from '/@/utils/common'
 
 // ==================== 类型定义 ====================
 

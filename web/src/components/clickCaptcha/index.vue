@@ -40,11 +40,11 @@
 </template>
 
 <script setup lang="ts">
+import { checkClickCaptcha, getClickCaptcha } from '@/api/common'
+import type { ClickPoint, ClickRequest, Props } from '@/components/clickCaptcha/index'
+import i18n from '@/lang'
+import { SYSTEM_ZINDEX } from '@/stores/constant/common'
 import { reactive, ref } from 'vue'
-import { checkClickCaptcha, getClickCaptcha } from '/@/api/common'
-import type { ClickPoint, ClickRequest, Props } from '/@/components/clickCaptcha/index'
-import i18n from '/@/lang'
-import { SYSTEM_ZINDEX } from '/@/stores/constant/common'
 
 const props = withDefaults(defineProps<Props>(), {
     class: '',

@@ -140,10 +140,10 @@
 </template>
 
 <script setup lang="ts">
+import ComSearch from '@/components/table/header/comSearch.vue'
 import { debounce } from 'lodash-es'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import ComSearch from '/@/components/table/header/comSearch.vue'
 
 const { t } = useI18n()
 const quickSearchKeywords = ref()

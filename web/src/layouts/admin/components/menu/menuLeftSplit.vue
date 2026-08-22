@@ -2,7 +2,7 @@
     <div class="left-split-menus">
         <div class="left-split-primary-menus-scrollbar-wrap">
             <div v-if="config.layout.menuTopBarLogo" class="logo-img">
-                <img src="/@/assets/logo.png" alt="logo" />
+                <img src="@/assets/logo.png" alt="logo" />
             </div>
             <el-scrollbar ref="layoutMenuScrollbarRef" class="left-split-primary-menus-scrollbar">
                 <el-menu
@@ -11,7 +11,7 @@
                     :unique-opened="config.layout.menuUniqueOpened"
                     :default-active="state.primaryDefaultActive"
                     :collapse="true"
-                    ref="layoutMenuRef"
+                    :ref="layoutMenuRef"
                 >
                     <el-menu-item
                         v-for="menu in menuStore.rawData"
@@ -45,16 +45,16 @@
 </template>
 
 <script setup lang="ts">
+import AsideFooterToolbar from '@/layouts/admin/components/aside/toolbar/footer.vue'
+import MenuLeftSplitTree from '@/layouts/admin/components/menu/menuLeftSplitTree.vue'
+import { useConfig } from '@/stores/config'
+import { useMenu } from '@/stores/menu'
+import { layoutMenuRef, layoutMenuScrollbarRef } from '@/stores/ref'
+import { getMenuDataByRoute } from '@/utils/common'
+import { getMenuKey, openMenu } from '@/utils/router'
 import type { MenuInstance, ScrollbarInstance } from 'element-plus'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { onBeforeRouteUpdate, RouteLocationNormalized, RouteRecordRaw, useRoute, type RouteLocationNormalizedLoaded } from 'vue-router'
-import AsideFooterToolbar from '/@/layouts/admin/components/aside/toolbar/footer.vue'
-import MenuLeftSplitTree from '/@/layouts/admin/components/menu/menuLeftSplitTree.vue'
-import { useConfig } from '/@/stores/config'
-import { useMenu } from '/@/stores/menu'
-import { layoutMenuRef, layoutMenuScrollbarRef } from '/@/stores/ref'
-import { getMenuDataByRoute } from '/@/utils/common'
-import { getMenuKey, openMenu } from '/@/utils/router'
 
 const route = useRoute()
 const config = useConfig()

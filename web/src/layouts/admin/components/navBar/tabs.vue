@@ -20,19 +20,19 @@
 </template>
 
 <script setup lang="ts">
+import Contextmenu from '@/components/contextmenu/index.vue'
+import type { ContextMenuItem, ContextMenuItemClickEmitArg } from '@/components/contextmenu/interface'
+import { useGlobalProperties } from '@/hooks/useGlobalProperties'
+import { adminBaseRoutePath } from '@/router/static/adminBase'
+import { useConfig } from '@/stores/config'
+import { useMenu } from '@/stores/menu'
+import { useNavTab } from '@/stores/navTab'
+import horizontalScroll from '@/utils/horizontalScroll'
+import { getFirstMenu } from '@/utils/router'
 import { useTemplateRefsList } from '@vueuse/core'
 import { nextTick, onMounted, reactive, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { onBeforeRouteUpdate, useRoute, useRouter, type RouteLocationNormalized } from 'vue-router'
-import Contextmenu from '/@/components/contextmenu/index.vue'
-import type { ContextMenuItem, ContextMenuItemClickEmitArg } from '/@/components/contextmenu/interface'
-import { useGlobalProperties } from '/@/hooks/useGlobalProperties'
-import { adminBaseRoutePath } from '/@/router/static/adminBase'
-import { useConfig } from '/@/stores/config'
-import { useMenu } from '/@/stores/menu'
-import { useNavTab } from '/@/stores/navTab'
-import horizontalScroll from '/@/utils/horizontalScroll'
-import { getFirstMenu } from '/@/utils/router'
 
 const { t } = useI18n()
 const route = useRoute()

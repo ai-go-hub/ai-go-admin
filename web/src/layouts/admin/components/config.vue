@@ -366,17 +366,17 @@
 </template>
 
 <script setup lang="ts">
+import IconSelect from '@/components/agInput/components/iconSelect.vue'
+import { useDark } from '@/hooks/useDark'
+import DarkSwitch from '@/layouts/common/components/darkSwitch.vue'
+import { useConfig } from '@/stores/config'
+import { BEFORE_RESIZE_LAYOUT, CONFIG } from '@/stores/constant/cacheKey'
+import type { Layout } from '@/stores/interface/config'
+import { useMenu } from '@/stores/menu'
+import { Local, Session } from '@/utils/storage'
 import { nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import IconSelect from '/@/components/agInput/components/iconSelect.vue'
-import { useDark } from '/@/hooks/useDark'
-import DarkSwitch from '/@/layouts/common/components/darkSwitch.vue'
-import { useConfig } from '/@/stores/config'
-import { BEFORE_RESIZE_LAYOUT, CONFIG } from '/@/stores/constant/cacheKey'
-import type { Layout } from '/@/stores/interface/config'
-import { useMenu } from '/@/stores/menu'
-import { Local, Session } from '/@/utils/storage'
 
 const { t } = useI18n()
 const menu = useMenu()

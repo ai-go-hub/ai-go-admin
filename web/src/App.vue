@@ -5,11 +5,11 @@
 </template>
 
 <script setup lang="ts">
+import { useConfig } from '@/stores/config'
+import { init as viteInit } from '@/utils/vite'
 import elEn from 'element-plus/es/locale/lang/en'
 import elZhCn from 'element-plus/es/locale/lang/zh-cn'
 import { computed, onMounted } from 'vue'
-import { useConfig } from '/@/stores/config'
-import { init as viteInit } from '/@/utils/vite'
 
 const config = useConfig()
 

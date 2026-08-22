@@ -115,14 +115,14 @@
 </template>
 
 <script setup lang="ts">
+import { checkLog, tableListUrl } from '@/api/admin/crud'
+import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'
+import { buildValidatorRule } from '@/utils/validate'
+import { changeStep, state as CRUDState } from '@/views/admin/crud/index'
+import CrudLog from '@/views/admin/crud/log.vue'
 import type { FormItemRule } from 'element-plus'
 import { reactive, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { checkLog, tableListUrl } from '/@/api/admin/crud'
-import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
-import { buildValidatorRule } from '/@/utils/validate'
-import { changeStep, state as CRUDState } from '/@/views/admin/crud/index'
-import CrudLog from '/@/views/admin/crud/log.vue'
 
 const { t } = useI18n()
 const formRef = useTemplateRef('formRef')

@@ -3,17 +3,17 @@
         <div v-if="config.layout.shrink && config.layout.menuCollapse" class="unfold">
             <Icon @click="onMenuCollapse" name="lucide-list-indent-increase" :color="config.getColorValue('menuActiveColor')" :size="18" />
         </div>
-        <NavTabs v-if="!config.layout.shrink" ref="layoutNavTabsRef" />
+        <NavTabs v-if="!config.layout.shrink" :ref="layoutNavTabsRef" />
         <NavMenu />
     </div>
 </template>
 
 <script setup lang="ts">
-import NavMenu from '/@/layouts/admin/components/navMenu.vue'
-import NavTabs from '/@/layouts/admin/components/navBar/tabs.vue'
-import { layoutNavTabsRef } from '/@/stores/ref'
-import { useConfig } from '/@/stores/config'
-import { showMask } from '/@/utils/mask'
+import NavTabs from '@/layouts/admin/components/navBar/tabs.vue'
+import NavMenu from '@/layouts/admin/components/navMenu.vue'
+import { useConfig } from '@/stores/config'
+import { layoutNavTabsRef } from '@/stores/ref'
+import { showMask } from '@/utils/mask'
 
 const config = useConfig()
 

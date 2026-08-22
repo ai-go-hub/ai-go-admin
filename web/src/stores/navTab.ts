@@ -1,11 +1,11 @@
+import i18n from '@/lang/index'
+import type { NavTab } from '@/stores/interface/index'
+import { layoutNavTabsRef } from '@/stores/ref'
+import { getMenuDataByRoute } from '@/utils/common'
 import { isEmpty } from 'lodash-es'
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 import type { RouteLocationNormalized } from 'vue-router'
-import i18n from '/@/lang/index'
-import type { NavTab } from '/@/stores/interface/index'
-import { layoutNavTabsRef } from '/@/stores/ref'
-import { getMenuDataByRoute } from '/@/utils/common'
 
 export const useNavTab = defineStore('navTab', () => {
     const state: NavTab = reactive({

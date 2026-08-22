@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { CellRendererProps } from '/@/components/table/types'
+import { CellRendererProps } from '@/components/table/types'
 
 const props = defineProps<CellRendererProps>()
 </script>

@@ -1,7 +1,7 @@
+import { DefaultOptButType } from '@/components/table/types'
+import i18n from '@/lang/index'
 import { TableColumnCtx } from 'element-plus'
 import { isUndefined } from 'lodash-es'
-import { DefaultOptButType } from '/@/components/table/types'
-import i18n from '/@/lang/index'
 
 /**
  * 获取单元格值

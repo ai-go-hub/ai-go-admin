@@ -121,11 +121,11 @@
 <script setup lang="ts">
 import { reactive, watch, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { regularPassword, buildValidatorRule } from '/@/utils/validate'
+import { regularPassword, buildValidatorRule } from '@/utils/validate'
 import type { FormItemRule } from 'element-plus'
-import { useConfig } from '/@/stores/config'
-import AgUpload from '/@/components/agInput/components/agUpload.vue'
-import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
+import { useConfig } from '@/stores/config'
+import AgUpload from '@/components/agInput/components/agUpload.vue'
+import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'
 
 interface Props {
     manager: TableManagerInstance

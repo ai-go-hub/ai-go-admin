@@ -222,7 +222,7 @@
 
 <script setup lang="ts">
 import { isArray, isEmpty, isUndefined } from 'lodash-es'
-import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
+import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'
 
 interface Props {
     manager: TableManagerInstance

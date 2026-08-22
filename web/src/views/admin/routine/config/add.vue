@@ -104,11 +104,11 @@ import type { FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash-es'
 import { reactive, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { TableManagerAPI } from '/@/api/table'
-import { inputTypes, dictRequiredTypes } from '/@/components/agInput/index'
-import { useConfig } from '/@/stores/config'
-import { parseStrAttr } from '/@/utils/common'
-import { buildValidatorRule, validatorType } from '/@/utils/validate'
+import { TableManagerAPI } from '@/api/table'
+import { inputTypes, dictRequiredTypes } from '@/components/agInput/index'
+import { useConfig } from '@/stores/config'
+import { parseStrAttr } from '@/utils/common'
+import { buildValidatorRule, validatorType } from '@/utils/validate'
 
 const config = useConfig()
 const api = new TableManagerAPI('/admin/routine/config/')

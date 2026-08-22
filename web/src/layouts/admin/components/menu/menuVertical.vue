@@ -6,7 +6,7 @@
             :unique-opened="config.layout.menuUniqueOpened"
             :default-active="state.defaultActive"
             :collapse="config.layout.menuCollapse"
-            ref="layoutMenuRef"
+            :ref="layoutMenuRef"
         >
             <MenuTree :menus="menu.rawData" />
         </el-menu>
@@ -14,14 +14,14 @@
 </template>
 
 <script setup lang="ts">
+import MenuTree from '@/layouts/admin/components/menu/menuTree.vue'
+import { useConfig } from '@/stores/config'
+import { useMenu } from '@/stores/menu'
+import { layoutMenuRef, layoutMenuScrollbarRef } from '@/stores/ref'
+import { getMenuDataByRoute } from '@/utils/common'
+import { getMenuKey } from '@/utils/router'
 import { computed, onMounted, reactive } from 'vue'
 import { onBeforeRouteUpdate, useRoute, type RouteLocationNormalizedLoaded } from 'vue-router'
-import MenuTree from '/@/layouts/admin/components/menu/menuTree.vue'
-import { useConfig } from '/@/stores/config'
-import { useMenu } from '/@/stores/menu'
-import { layoutMenuRef, layoutMenuScrollbarRef } from '/@/stores/ref'
-import { getMenuDataByRoute } from '/@/utils/common'
-import { getMenuKey } from '/@/utils/router'
 
 const menu = useMenu()
 const route = useRoute()

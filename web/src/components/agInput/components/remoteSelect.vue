@@ -55,13 +55,13 @@
 </template>
 
 <script lang="ts" setup>
+import { selectList } from '@/api/common'
+import { useConfig } from '@/stores/config'
+import { getArrayKey } from '@/utils/common'
+import { uuid } from '@/utils/random'
 import type { ElSelect, PaginationProps } from 'element-plus'
 import { debounce, isEmpty } from 'lodash-es'
 import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, reactive, ref, toRaw, useAttrs, useTemplateRef, watch } from 'vue'
-import { selectList } from '/@/api/common'
-import { useConfig } from '/@/stores/config'
-import { getArrayKey } from '/@/utils/common'
-import { uuid } from '/@/utils/random'
 
 const attrs = useAttrs()
 const config = useConfig()

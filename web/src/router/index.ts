@@ -1,11 +1,11 @@
+import i18n from '@/lang/index'
+import staticRoutes from '@/router/static'
+import { useConfig } from '@/stores/config'
+import { loading } from '@/utils/loading'
 import { useTitle } from '@vueuse/core'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import i18n from '/@/lang/index'
-import staticRoutes from '/@/router/static'
-import { useConfig } from '/@/stores/config'
-import { loading } from '/@/utils/loading'
 
 const router = createRouter({
     history: createWebHashHistory(),

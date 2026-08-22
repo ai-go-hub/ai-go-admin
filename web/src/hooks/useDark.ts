@@ -1,5 +1,5 @@
+import { useConfig } from '@/stores/config'
 import { useToggle, useDark as useVueUseDark } from '@vueuse/core'
-import { useConfig } from '/@/stores/config'
 
 /**
  * 更新 html 元素的 dark class

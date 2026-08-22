@@ -13,9 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import { invokeTableContextDataFun } from '/@/components/table/index'
-import { CellRendererProps } from '/@/components/table/types'
-import { fullURL } from '/@/utils/common'
+import { invokeTableContextDataFun } from '@/components/table/index'
+import { CellRendererProps } from '@/components/table/types'
+import { fullURL } from '@/utils/common'
 
 const props = defineProps<CellRendererProps>()
 </script>

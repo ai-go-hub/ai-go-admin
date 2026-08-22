@@ -1,5 +1,5 @@
-import type { ClickRequest } from '/@/components/clickCaptcha/index'
-import request from '/@/utils/request'
+import type { ClickRequest } from '@/components/clickCaptcha/index'
+import request from '@/utils/request'
 
 /**
  * 管理员登录请求参数

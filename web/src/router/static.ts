@@ -1,5 +1,5 @@
+import { adminBaseRoutePath } from '@/router/static/adminBase'
 import type { RouteRecordRaw } from 'vue-router'
-import { adminBaseRoutePath } from '/@/router/static/adminBase'
 
 /*
  * 静态路由（支持自动扩展）
@@ -11,7 +11,7 @@ const staticRoutes: Array<RouteRecordRaw> = [
         // 首页
         path: '/',
         name: '/',
-        component: () => import('/@/views/index.vue'),
+        component: () => import('@/views/index.vue'),
         meta: {
             title: `pageTitles.Home`,
         },
@@ -20,7 +20,7 @@ const staticRoutes: Array<RouteRecordRaw> = [
         // 管理员登录页 - 路由不放在 adminBaseRoute.children 因为登录页不需要使用后台的布局
         path: adminBaseRoutePath + '/login',
         name: 'adminLogin',
-        component: () => import('/@/views/admin/login.vue'),
+        component: () => import('@/views/admin/login.vue'),
         meta: {
             title: `pageTitles.Login`,
         },
@@ -33,7 +33,7 @@ const staticRoutes: Array<RouteRecordRaw> = [
         // 404
         path: '/404',
         name: 'notFound',
-        component: () => import('/@/views/common/error/404.vue'),
+        component: () => import('@/views/common/error/404.vue'),
         meta: {
             title: `pageTitles.NotFound`, // 页面不存在
         },

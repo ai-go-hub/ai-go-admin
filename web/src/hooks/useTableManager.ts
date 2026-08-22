@@ -1,11 +1,11 @@
+import { findIndexRow } from '@/components/table/index'
+import i18n from '@/lang/index'
+import { auth as authentication, getArrayKey } from '@/utils/common'
 import { dayjs, ElNotification, FormInstance } from 'element-plus'
 import { assign, cloneDeep, defaults, isArray, isEmpty } from 'lodash-es'
 import Sortable from 'sortablejs'
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
-import { findIndexRow } from '/@/components/table/index'
-import i18n from '/@/lang/index'
-import { auth as authentication, getArrayKey } from '/@/utils/common'
 
 /**
  * 表格管家工厂函数

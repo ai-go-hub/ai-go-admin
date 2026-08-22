@@ -1,8 +1,8 @@
+import { useConfig } from '@/stores/config'
 import { merge, set } from 'lodash-es'
 import type { App } from 'vue'
 import { createI18n } from 'vue-i18n'
 import { parse as parseYaml } from 'yaml'
-import { useConfig } from '/@/stores/config'
 
 /**
  * 支持的语言类型

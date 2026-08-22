@@ -24,10 +24,10 @@
 </template>
 
 <script setup lang="ts">
+import { SYSTEM_ZINDEX } from '@/stores/constant/common'
 import { useEventListener } from '@vueuse/core'
 import { reactive, toRaw } from 'vue'
 import type { Axis, ContextMenuItemClickEmitArg, Props } from './interface'
-import { SYSTEM_ZINDEX } from '/@/stores/constant/common'
 
 const props = withDefaults(defineProps<Props>(), {
     width: 150,

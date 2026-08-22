@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
+import { mainHeight as iframeStyle } from '@/utils/layout'
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { mainHeight as iframeStyle } from '/@/utils/layout'
 
 const router = useRouter()
 

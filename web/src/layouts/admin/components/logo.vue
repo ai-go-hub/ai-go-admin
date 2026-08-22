@@ -3,7 +3,7 @@
         <img
             v-if="config.layout.menuCollapse || config.layout.menuTopBarLogo"
             :class="config.layout.menuCollapse ? 'collapse' : ''"
-            src="/@/assets/logo.png"
+            src="@/assets/logo.png"
             class="logo-img"
             alt="logo"
         />
@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { useConfig } from '/@/stores/config'
+import { useConfig } from '@/stores/config'
 
 const config = useConfig()
 </script>

@@ -11,15 +11,15 @@
 </template>
 
 <script setup lang="ts">
+import AsideFooterToolbar from '@/layouts/admin/components/aside/toolbar/footer.vue'
+import Logo from '@/layouts/admin/components/logo.vue'
+import MenuLeftSplit from '@/layouts/admin/components/menu/menuLeftSplit.vue'
+import MenuVertical from '@/layouts/admin/components/menu/menuVertical.vue'
+import MenuVerticalChildren from '@/layouts/admin/components/menu/menuVerticalChildren.vue'
+import { useConfig } from '@/stores/config'
+import { SYSTEM_ZINDEX } from '@/stores/constant/common'
+import { useNavTab } from '@/stores/navTab'
 import { computed } from 'vue'
-import AsideFooterToolbar from '/@/layouts/admin/components/aside/toolbar/footer.vue'
-import Logo from '/@/layouts/admin/components/logo.vue'
-import MenuLeftSplit from '/@/layouts/admin/components/menu/menuLeftSplit.vue'
-import MenuVertical from '/@/layouts/admin/components/menu/menuVertical.vue'
-import MenuVerticalChildren from '/@/layouts/admin/components/menu/menuVerticalChildren.vue'
-import { useConfig } from '/@/stores/config'
-import { SYSTEM_ZINDEX } from '/@/stores/constant/common'
-import { useNavTab } from '/@/stores/navTab'
 
 defineOptions({
     name: 'layout/aside',

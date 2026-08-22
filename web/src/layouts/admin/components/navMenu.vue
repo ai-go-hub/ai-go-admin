@@ -143,21 +143,21 @@
 </template>
 
 <script lang="ts" setup>
+import { clearCache, logout } from '@/api/admin/index'
+import { langNames, setLang } from '@/lang'
+import router from '@/router'
+import { useAdminInfo } from '@/stores/adminInfo'
+import { useConfig } from '@/stores/config'
+import { ADMIN_INFO } from '@/stores/constant/cacheKey'
+import { auth, fullURL } from '@/utils/common'
+import { Local, Session } from '@/utils/storage'
+import { hotUpdateState, reloadServer } from '@/utils/vite'
 import { ElMessage } from 'element-plus'
 import { upperFirst } from 'lodash-es'
 import screenfull from 'screenfull'
 import { reactive, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Config from './config.vue'
-import { clearCache, logout } from '/@/api/admin/index'
-import { langNames, setLang } from '/@/lang'
-import router from '/@/router'
-import { useAdminInfo } from '/@/stores/adminInfo'
-import { useConfig } from '/@/stores/config'
-import { ADMIN_INFO } from '/@/stores/constant/cacheKey'
-import { auth, fullURL } from '/@/utils/common'
-import { Local, Session } from '/@/utils/storage'
-import { hotUpdateState, reloadServer } from '/@/utils/vite'
 
 const { t } = useI18n()
 

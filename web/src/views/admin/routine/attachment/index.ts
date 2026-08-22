@@ -1,5 +1,5 @@
+import { fullURL } from '@/utils/common'
 import { TableColumnCtx } from 'element-plus'
-import { fullURL } from '/@/utils/common'
 
 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico']
 

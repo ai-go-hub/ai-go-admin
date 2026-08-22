@@ -1,4 +1,4 @@
-import request from '/@/utils/request'
+import request from '@/utils/request'
 
 /**
  * 快速生成一个控制器的 增、删、改、查、排序 接口的请求方法；

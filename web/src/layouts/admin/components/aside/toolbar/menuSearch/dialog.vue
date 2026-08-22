@@ -30,15 +30,15 @@
 </template>
 
 <script setup lang="ts">
+import SelectOption from '@/layouts/admin/components/aside/toolbar/menuSearch/selectOption.vue'
+import { useConfig } from '@/stores/config'
+import { SYSTEM_ZINDEX } from '@/stores/constant/common'
+import { useMenu } from '@/stores/menu'
+import { getMenuDataByPath } from '@/utils/common'
+import { openMenu } from '@/utils/router'
 import { ElNotification } from 'element-plus'
 import { useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import SelectOption from '/@/layouts/admin/components/aside/toolbar/menuSearch/selectOption.vue'
-import { useConfig } from '/@/stores/config'
-import { SYSTEM_ZINDEX } from '/@/stores/constant/common'
-import { useMenu } from '/@/stores/menu'
-import { getMenuDataByPath } from '/@/utils/common'
-import { openMenu } from '/@/utils/router'
 
 const { t } = useI18n()
 const config = useConfig()

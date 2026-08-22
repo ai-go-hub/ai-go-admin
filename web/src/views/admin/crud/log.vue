@@ -10,14 +10,14 @@
 </template>
 
 <script setup lang="ts">
+import { TableManagerAPI } from '@/api/table'
+import TableHeader from '@/components/table/header/index.vue'
+import { getDefaultOptButtons } from '@/components/table/index'
+import Table from '@/components/table/index.vue'
+import { useTableManager } from '@/hooks/useTableManager'
+import { changeStep, state as CRUDState } from '@/views/admin/crud/index'
 import { reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { TableManagerAPI } from '/@/api/table'
-import TableHeader from '/@/components/table/header/index.vue'
-import { getDefaultOptButtons } from '/@/components/table/index'
-import Table from '/@/components/table/index.vue'
-import { useTableManager } from '/@/hooks/useTableManager'
-import { changeStep, state as CRUDState } from '/@/views/admin/crud/index'
 
 const { t } = useI18n()
 const model = defineModel<boolean>()

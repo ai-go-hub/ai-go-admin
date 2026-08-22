@@ -75,7 +75,7 @@
 
 ### 路径别名与入口
 
-- `/@/` → `src/`（tsconfig `paths` 与 vite `resolve.alias` 一致）。
+- `@/` → `src/`（tsconfig `paths` 与 vite `resolve.alias` 一致）。
 - 入口 `src/main.ts`：注册 pinia（带 `pinia-plugin-persistedstate`）、router、element-plus、i18n、全局 icon。
 - 路由用 **hash 模式**（`createWebHashHistory`）。
 
@@ -124,7 +124,7 @@ axios 实例 baseURL 取 `VITE_AXIOS_BASE_URL`。拦截器特性：
 </template>
 
 <script setup lang="ts">
-import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
+import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'
 </script>
 ```
 

@@ -159,10 +159,10 @@
 </template>
 
 <script setup lang="ts">
+import { useConfig } from '@/stores/config'
 import { ArrowDown, ArrowRight, Cpu, Plus, UserFilled } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useConfig } from '/@/stores/config'
 
 const { t } = useI18n()
 const config = useConfig()

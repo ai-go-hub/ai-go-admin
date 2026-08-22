@@ -1,7 +1,7 @@
+import { fieldData } from '@/components/agInput/helper'
+import i18n from '@/lang/index'
+import { validatorType } from '@/utils/validate'
 import { reactive } from 'vue'
-import { fieldData } from '/@/components/agInput/helper'
-import i18n from '/@/lang/index'
-import { validatorType } from '/@/utils/validate'
 
 export const state: {
     step: 'Start' | 'Design'

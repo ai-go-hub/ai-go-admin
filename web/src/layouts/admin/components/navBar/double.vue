@@ -11,7 +11,7 @@
                     '--el-menu-hover-text-color': config.getColorValue('headerBarTabColor'),
                 }"
                 popper-class="menu-horizontal-double-popper"
-                ref="layoutMenuRef"
+                :ref="layoutMenuRef"
                 class="menu-horizontal"
                 mode="horizontal"
                 :default-active="state.defaultActive"
@@ -24,16 +24,16 @@
 </template>
 
 <script setup lang="ts">
+import MenuTree from '@/layouts/admin/components/menu/menuTree.vue'
+import NavMenu from '@/layouts/admin/components/navMenu.vue'
+import { useConfig } from '@/stores/config'
+import { useMenu } from '@/stores/menu'
+import { layoutMenuRef, layoutMenuScrollbarRef } from '@/stores/ref'
+import { getMenuDataByRoute } from '@/utils/common'
+import horizontalScroll from '@/utils/horizontalScroll'
+import { getMenuKey } from '@/utils/router'
 import { onMounted, reactive } from 'vue'
 import { onBeforeRouteUpdate, useRoute, type RouteLocationNormalizedLoaded } from 'vue-router'
-import MenuTree from '/@/layouts/admin/components/menu/menuTree.vue'
-import NavMenu from '/@/layouts/admin/components/navMenu.vue'
-import { useConfig } from '/@/stores/config'
-import { useMenu } from '/@/stores/menu'
-import { layoutMenuRef, layoutMenuScrollbarRef } from '/@/stores/ref'
-import { getMenuDataByRoute } from '/@/utils/common'
-import horizontalScroll from '/@/utils/horizontalScroll'
-import { getMenuKey } from '/@/utils/router'
 
 const menu = useMenu()
 const route = useRoute()

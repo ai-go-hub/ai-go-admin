@@ -79,13 +79,13 @@
 </template>
 
 <script setup lang="ts">
+import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'
+import { useConfig } from '@/stores/config'
+import { buildValidatorRule } from '@/utils/validate'
 import type { FormItemRule } from 'element-plus'
 import type { Node as ElTreeNode } from 'element-plus/es/components/tree/src/model/node'
 import { reactive, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import RemoteSelect from '/@/components/agInput/components/remoteSelect.vue'
-import { useConfig } from '/@/stores/config'
-import { buildValidatorRule } from '/@/utils/validate'
 
 interface Props {
     manager: TableManagerInstance

@@ -1,11 +1,11 @@
+import router from '@/router/index'
+import { adminBaseRoutePath } from '@/router/static/adminBase'
+import { useConfig } from '@/stores/config'
+import { useMenu } from '@/stores/menu'
+import { getBaseURL } from '@/utils/request'
 import { FormInstance } from 'element-plus'
 import { camelCase, set, snakeCase, trimStart } from 'lodash-es'
 import { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
-import router from '/@/router/index'
-import { adminBaseRoutePath } from '/@/router/static/adminBase'
-import { useConfig } from '/@/stores/config'
-import { useMenu } from '/@/stores/menu'
-import { getBaseURL } from '/@/utils/request'
 
 /**
  * 获取资源完整地址

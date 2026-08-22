@@ -11,7 +11,7 @@ export const adminBaseRoutePath = '/admin'
 const adminBaseRoute: RouteRecordRaw = {
     path: adminBaseRoutePath,
     name: 'admin',
-    component: () => import('/@/layouts/admin/index.vue'),
+    component: () => import('@/layouts/admin/index.vue'),
     // 直接重定向到 loading 路由
     redirect: adminBaseRoutePath + '/loading',
     meta: {
@@ -21,7 +21,7 @@ const adminBaseRoute: RouteRecordRaw = {
         {
             path: 'loading/:to?',
             name: 'adminMainLoading',
-            component: () => import('/@/layouts/admin/loading.vue'),
+            component: () => import('@/layouts/admin/loading.vue'),
             meta: {
                 title: `common.loading`,
             },
