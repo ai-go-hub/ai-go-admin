@@ -6,7 +6,7 @@
                 <img
                     ref="captchaImgRef"
                     class="captcha-img"
-                    :src="state.captcha.imageBase64"
+                    :src="state.captcha.base64"
                     :alt="i18n.global.t('common.captchaLoadFailed')"
                     @click.prevent="onRecord($event)"
                 />
@@ -62,9 +62,9 @@ const state = reactive({
     captcha: {
         key: '',
         elements: [] as string[],
-        imageWidth: 350,
-        imageHeight: 200,
-        imageBase64: '',
+        width: 350,
+        height: 200,
+        base64: '',
     },
 })
 
@@ -99,8 +99,8 @@ const onRecord = (event: MouseEvent) => {
             const data: ClickRequest = {
                 key: state.captcha.key,
                 clicks: [...state.clicks],
-                renderedWidth: captchaImgRef.value!.width,
-                renderedHeight: captchaImgRef.value!.height,
+                width: captchaImgRef.value!.width,
+                height: captchaImgRef.value!.height,
             }
             checkClickCaptcha(data, props.apiBaseURL)
                 .then(() => {
@@ -138,8 +138,8 @@ load()
     background-color: var(--el-color-white);
     position: fixed;
     z-index: v-bind('SYSTEM_ZINDEX');
-    left: calc(50% - v-bind('state.captcha.imageWidth + 24') / 2 * 1px);
-    top: calc(50% - v-bind('state.captcha.imageHeight + 200') / 2 * 1px);
+    left: calc(50% - v-bind('state.captcha.width + 24') / 2 * 1px);
+    top: calc(50% - v-bind('state.captcha.height + 200') / 2 * 1px);
     border-radius: 10px;
     box-shadow:
         0 0 0 1px hsla(0, 0%, 100%, 0.3) inset,
@@ -153,8 +153,8 @@ load()
     .captcha-img-box {
         position: relative;
         .captcha-img {
-            width: v-bind('state.captcha.imageWidth') px;
-            height: v-bind('state.captcha.imageHeight') px;
+            width: v-bind('state.captcha.width') px;
+            height: v-bind('state.captcha.height') px;
             border: none;
             cursor: pointer;
         }

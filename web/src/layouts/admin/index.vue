@@ -52,6 +52,7 @@ onBeforeMount(() => {
 
 /**
  * 后台初始化请求，获取站点配置，动态路由等信息
+ * getInit 请求函数已配置响应 key 的命名方式自动转换 snake_case → camelCase
  */
 const init = () => {
     getInit().then((res) => {

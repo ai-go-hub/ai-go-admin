@@ -17,9 +17,9 @@ export interface ClickRequest {
     key: string
     clicks: ClickPoint[]
     // 渲染图片宽度
-    renderedWidth: number
+    width: number
     // 渲染图片高度
-    renderedHeight: number
+    height: number
 }
 
 /**

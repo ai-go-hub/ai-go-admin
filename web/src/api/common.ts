@@ -6,16 +6,11 @@ import type { AxiosRequestConfig } from 'axios'
 // ==================== 点选验证码 ====================
 
 export function getClickCaptcha(apiBaseURL?: string) {
-    return request(
-        {
-            url: '/common/captcha/create',
-            method: 'GET',
-            ...(apiBaseURL ? { baseURL: apiBaseURL } : {}),
-        },
-        {
-            convertCase: true,
-        }
-    )
+    return request({
+        url: '/common/captcha/create',
+        method: 'GET',
+        ...(apiBaseURL ? { baseURL: apiBaseURL } : {}),
+    })
 }
 
 export function checkClickCaptcha(data: ClickRequest, apiBaseURL?: string) {
@@ -27,7 +22,6 @@ export function checkClickCaptcha(data: ClickRequest, apiBaseURL?: string) {
             ...(apiBaseURL ? { baseURL: apiBaseURL } : {}),
         },
         {
-            convertCase: true,
             showErrorMessage: false,
         }
     )

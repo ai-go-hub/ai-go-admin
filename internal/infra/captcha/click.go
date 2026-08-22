@@ -65,19 +65,19 @@ func bootstrap() {
 
 // Result 创建验证码的返回结果
 type Result struct {
-	Key         string   `json:"key"`
-	Elements    []string `json:"elements"`
-	ImageWidth  int      `json:"image_width"`
-	ImageHeight int      `json:"image_height"`
-	ImageBase64 string   `json:"image_base64"`
+	Key      string   `json:"key"`
+	Elements []string `json:"elements"`
+	Width    int      `json:"width"`
+	Height   int      `json:"height"`
+	Base64   string   `json:"base64"`
 }
 
 // Request 用户点击验证请求
 type Request struct {
-	Key            string       `json:"key"`
-	Clicks         []ClickPoint `json:"clicks"`
-	RenderedWidth  int          `json:"rendered_width"`
-	RenderedHeight int          `json:"rendered_height"`
+	Key    string       `json:"key"`
+	Clicks []ClickPoint `json:"clicks"`
+	Width  int          `json:"width"`
+	Height int          `json:"height"`
 }
 
 // ClickPoint 用户点击坐标
@@ -187,11 +187,11 @@ func Create() (*Result, error) {
 	}
 
 	return &Result{
-		Key:         record.Key,
-		Elements:    correctValues,
-		ImageWidth:  bgW,
-		ImageHeight: bgH,
-		ImageBase64: "data:image/png;base64," + base64.StdEncoding.EncodeToString(buf.Bytes()),
+		Key:      record.Key,
+		Elements: correctValues,
+		Width:    bgW,
+		Height:   bgH,
+		Base64:   "data:image/png;base64," + base64.StdEncoding.EncodeToString(buf.Bytes()),
 	}, nil
 }
 
@@ -226,8 +226,8 @@ func Check(req Request, deleteOnSuccess bool) (bool, error) {
 		return false, fmt.Errorf("解析验证码坐标: %w", err)
 	}
 
-	scaleX := float64(req.RenderedWidth) / float64(info.ImageWidth)
-	scaleY := float64(req.RenderedHeight) / float64(info.ImageHeight)
+	scaleX := float64(req.Width) / float64(info.ImageWidth)
+	scaleY := float64(req.Height) / float64(info.ImageHeight)
 
 	const tolerance = 0
 	for i, click := range req.Clicks {

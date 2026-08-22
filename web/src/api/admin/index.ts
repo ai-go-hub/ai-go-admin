@@ -15,16 +15,11 @@ export interface AdminLoginParams {
  * 管理员登录请求
  */
 export function login(data: AdminLoginParams) {
-    return request(
-        {
-            url: '/admin/login',
-            method: 'POST',
-            data,
-        },
-        {
-            convertCase: true,
-        }
-    )
+    return request({
+        url: '/admin/login',
+        method: 'POST',
+        data,
+    })
 }
 
 /**
