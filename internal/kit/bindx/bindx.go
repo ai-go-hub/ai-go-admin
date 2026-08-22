@@ -3,9 +3,8 @@ package bindx
 import (
 	"encoding/json"
 	"reflect"
-	"strings"
-	"sync"
 
+	"github.com/ai-go-hub/ai-go-admin/pkg/structx"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/jinzhu/copier"
 )
@@ -52,44 +51,15 @@ func ShouldBindTri[T any](body []byte, tri *Tri[T]) error {
 	return nil
 }
 
-// bindField 结构体字段元数据
-type bindField struct {
-	idx int
-	key string
-}
-
-// bindFieldsCache 结构体字段缓存
-// map[reflect.Type][]bindField
-var bindFieldsCache sync.Map
-
-// StructToMap 由结构体类型化的字段值构建 map
+// StructToMap 使用结构体类型化的字段值构建 map
 func StructToMap(rv reflect.Value, present map[string]json.RawMessage) map[string]any {
-	rt := rv.Type()
-	fields, ok := bindFieldsCache.Load(rt)
-	if !ok {
-		var list []bindField
-		for i := 0; i < rt.NumField(); i++ {
-			sf := rt.Field(i)
-			if sf.PkgPath != "" {
-				continue
-			}
-			key := sf.Tag.Get("json")
-			if key == "" || key == "-" {
-				continue
-			}
-			if idx := strings.Index(key, ","); idx >= 0 {
-				key = key[:idx]
-			}
-			list = append(list, bindField{idx: i, key: key})
-		}
-		actual, _ := bindFieldsCache.LoadOrStore(rt, list)
-		fields = actual
-	}
-
 	entity := make(map[string]any, len(present))
-	for _, f := range fields.([]bindField) {
-		if _, ok := present[f.key]; ok {
-			entity[f.key] = rv.Field(f.idx).Interface()
+	for _, f := range structx.FieldsOf(rv.Type()) {
+		if f.Key == "" {
+			continue
+		}
+		if _, ok := present[f.Key]; ok {
+			entity[f.Key] = rv.Field(f.Index).Interface()
 		}
 	}
 	return entity
