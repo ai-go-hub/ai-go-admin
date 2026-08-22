@@ -16,7 +16,9 @@
         "paths": {
             "@/*": ["./src/*"]
         },
-        "types": ["vite/client", "element-plus/global"]
+        "types": ["vite/client", "element-plus/global"],
+        "allowImportingTsExtensions": true,
+        "noEmit": true
     },
     "include": ["src/**/*.ts", "src/**/*.vue", "types/**/*.d.ts", "vite.config.ts"]
 }

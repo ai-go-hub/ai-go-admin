@@ -2,8 +2,8 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import type { ConfigEnv, UserConfig } from 'vite'
 import { loadEnv } from 'vite'
-import { lucideIconSplitPlugin } from './src/components/icon/vitePlugin'
-import { customHotUpdate } from './src/utils/vite'
+import { lucideIconSplitPlugin } from './src/components/icon/vitePlugin.ts'
+import { customHotUpdate } from './src/utils/vite.ts'
 
 // https://vitejs.cn/config/
 const viteConfig = ({ mode }: ConfigEnv): UserConfig => {
@@ -14,7 +14,7 @@ const viteConfig = ({ mode }: ConfigEnv): UserConfig => {
         root: process.cwd(),
         resolve: {
             alias: {
-                '@': resolve(__dirname, 'src'),
+                '@': resolve(import.meta.dirname, 'src'),
             },
         },
         base: VITE_BASE_PATH,

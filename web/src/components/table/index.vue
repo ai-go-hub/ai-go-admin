@@ -71,15 +71,14 @@
 import { getCellValue } from '@/components/table/index'
 import { useConfig } from '@/stores/config'
 import { uuid } from '@/utils/random'
-import type { ElTable, Sort, TableColumnCtx } from 'element-plus'
+import type { Sort, TableColumnCtx, TableProps } from 'element-plus'
 import type { Component } from 'vue'
 import { computed, nextTick, useTemplateRef } from 'vue'
 
 const config = useConfig()
 const tableRef = useTemplateRef('tableRef')
-type ElTableProps = Partial<InstanceType<typeof ElTable>['$props']>
 
-interface Props extends /* @vue-ignore */ ElTableProps {
+interface Props extends Partial<TableProps> {
     manager: TableManagerInstance
     pagination?: boolean
 }
@@ -112,11 +111,11 @@ const onTableCurrentChange = (val: number) => {
     props.manager.handleEvent('current-page-change', { page: val })
 }
 
-const onSortChange = ({ order, prop }: { order: string; prop: string }) => {
+const onSortChange = ({ order, prop }: { order: string | null; prop: string | null }) => {
     props.manager.handleEvent('sort-change', { prop: prop, order: order ? (order == 'descending' ? 'desc' : 'asc') : '' })
 }
 
-const onTableDblclick = (row: TableRow, column: TableColumnCtx<TableRow>) => {
+const onTableDblclick = (row: TableRow, column: TableColumnCtx<TableRow> | null) => {
     props.manager.handleEvent('column-dblclick', { row, column })
 }
 

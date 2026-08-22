@@ -421,7 +421,7 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
             return
         }
 
-        const el = table.ref.getElTableRef()?.$el.querySelector('.el-table__body-wrapper .el-table__body tbody')
+        const el = (table.ref.getElTableRef() as any)?.$el.querySelector('.el-table__body-wrapper .el-table__body tbody')
         const disabledTip = table.column[buttonsKey].buttons![moveButton].disabledTip ? true : false
         Sortable.create(el, {
             animation: 200,

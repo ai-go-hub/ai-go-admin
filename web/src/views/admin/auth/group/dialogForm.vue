@@ -83,7 +83,7 @@ import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'
 import { useConfig } from '@/stores/config'
 import { buildValidatorRule } from '@/utils/validate'
 import type { FormItemRule } from 'element-plus'
-import type { Node as ElTreeNode } from 'element-plus/es/components/tree/src/model/node'
+import type ElTreeNode from 'element-plus/es/components/tree/src/model/node'
 import { reactive, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
