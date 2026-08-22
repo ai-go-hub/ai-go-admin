@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/ai-go-hub/ai-go-admin/pkg/structx"
+	"github.com/ai-go-hub/ai-go-admin/pkg/xss"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/jinzhu/copier"
 )
@@ -21,7 +22,7 @@ type Tri[T any] struct {
 //   - 绑定与校验目标为 DTO，未设置 DTO 时退化为绑定模型本身（适合无需 DTO 的场景）
 //   - 若设置了 DTO，模型值对 DTO 使用 copier.Copy 转换而来，按字段名拷贝值
 //   - Map 用于所见即所得的更新（排除结构体更新时的默认赋零值和自动跳过零值机制）
-//   - Map 赋值以 DTO 的 json tag 为准，值已类型化（如 jsonb 的 *datatypes.JSON）
+//   - Map 值以 DTO 的 json tag 映射关系直接从 DTO 绑定值 copy，值已类型化（如 jsonb 的 *datatypes.JSON）
 //
 // 仅返回 err
 func ShouldBindTri[T any](body []byte, tri *Tri[T]) error {
@@ -31,6 +32,11 @@ func ShouldBindTri[T any](body []byte, tri *Tri[T]) error {
 	}
 
 	if err := binding.JSON.BindBody(body, target); err != nil {
+		return err
+	}
+
+	// 反 XSS: 按结构体字段 xss tag 清洗
+	if err := xss.SanitizeStruct(target); err != nil {
 		return err
 	}
 
