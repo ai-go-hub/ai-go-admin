@@ -4,7 +4,7 @@
 <!-- 向本组件传递 name（文件名/编辑器名称）自动加载对应的编辑器进行渲染，编辑器自定义属性通过 attrs 传递 -->
 <template>
     <div>
-        <component v-bind="$attrs" :is="mixins[state.name]" />
+        <component v-bind="$attrs" :is="mixins[state.name]" :modelValue="model ?? ''" @update:modelValue="model = $event" />
     </div>
 </template>
 
@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
     name: 'default',
 })
 
+const model = defineModel<string | null>({ default: '' })
 const state = reactive({
     name: props.name,
 })
