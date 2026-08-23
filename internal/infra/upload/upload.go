@@ -179,7 +179,7 @@ func (s *Service) FormatFilename(tpl, filename, topic string, data []byte) strin
 }
 
 // unsafeRe 匹配文件名中不利于路径安全与 URL 传输的字符
-var unsafeRe = regexp.MustCompile(`[/\\:@#?&=]|\.\.`)
+var unsafeRe = regexp.MustCompile(`[/\\:@#?&=()\s]|\.\.`)
 
 // sanitize 清理文件名片段，避免路径穿越并保证 URL 安全
 func sanitize(s string) string {
