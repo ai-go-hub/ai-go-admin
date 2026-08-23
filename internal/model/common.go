@@ -23,6 +23,7 @@ func (Token) TableName() string {
 // Captcha 验证码模型
 type Captcha struct {
 	Key       string    `gorm:"comment:验证码查询键;type:varchar(64);primaryKey" json:"key"`
+	Type      string    `gorm:"comment:验证码类型;type:varchar(32);not null;default:''" json:"type"`
 	Code      string    `gorm:"comment:验证码值（加密后）;type:varchar(255)" json:"-"`
 	Info      string    `gorm:"comment:验证码详细信息;type:text" json:"-"`
 	CreatedAt time.Time `gorm:"comment:创建时间" json:"created_at"`

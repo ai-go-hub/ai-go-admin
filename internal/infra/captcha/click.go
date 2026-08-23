@@ -111,6 +111,11 @@ const (
 	elemIcon      elementType = "icon"
 )
 
+// 验证码类型常量
+const (
+	TypeClick = "click"
+)
+
 type captchaElement struct {
 	Type  elementType
 	Value string // 原始值，icon 为英文文件名，chinese/uppercase 为文字本身
@@ -176,6 +181,7 @@ func Create() (*Result, error) {
 
 	record := &model.Captcha{
 		Key:       uuid.New().String(),
+		Type:      TypeClick,
 		Code:      codeHash,
 		Info:      string(infoJSON),
 		ExpiredAt: time.Now().Add(time.Duration(captchaCfg.Expire) * time.Second),
@@ -205,6 +211,10 @@ func Check(req Request, deleteOnSuccess bool) (bool, error) {
 			return false, fmt.Errorf("验证码不存在或已过期")
 		}
 		return false, fmt.Errorf("查询验证码: %w", err)
+	}
+
+	if record.Type != TypeClick {
+		return false, fmt.Errorf("验证码类型错误")
 	}
 
 	if time.Now().After(record.ExpiredAt) {

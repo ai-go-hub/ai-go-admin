@@ -18,6 +18,7 @@ COMMENT ON COLUMN "__PREFIX__tokens"."expired_at" IS '过期时间';
 -- ===== captchas 验证码表 =====
 CREATE TABLE IF NOT EXISTS "__PREFIX__captchas" (
     "key"        varchar(64) PRIMARY KEY,
+    "type"       varchar(32) NOT NULL DEFAULT '',
     "code"       varchar(255),
     "info"       text,
     "created_at" timestamptz,
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS "__PREFIX__captchas" (
 );
 CREATE INDEX IF NOT EXISTS "__PREFIX__idx_captchas_expired_at" ON "__PREFIX__captchas" ("expired_at");
 COMMENT ON TABLE "__PREFIX__captchas" IS '验证码表';
+COMMENT ON COLUMN "__PREFIX__captchas"."type" IS '验证码类型';
 COMMENT ON COLUMN "__PREFIX__captchas"."key" IS '验证码查询键';
 COMMENT ON COLUMN "__PREFIX__captchas"."code" IS '验证码值（加密后）';
 COMMENT ON COLUMN "__PREFIX__captchas"."info" IS '验证码详细信息';
