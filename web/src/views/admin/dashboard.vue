@@ -7,7 +7,7 @@
                 <div class="welcome-content">
                     <div class="hello">{{ greeting }}，{{ adminInfo.nickname }} 👋</div>
                     <div class="tip">
-                        开源等于互助；需要大家一起来支持，比如使用、推荐、写教程、保护生态、贡献代码、回答问题、分享经验、打赏赞助等；欢迎您加入我们！
+                        {{ $t('dashboard.welcomeTip') }}
                     </div>
                     <div class="welcome-meta">
                         <div class="meta-item">
@@ -25,7 +25,7 @@
             <div class="welcome-timer">
                 <div class="timer-label">
                     <Icon :size="14" name="el-clock" />
-                    <span>您今天已工作了</span>
+                    <span>{{ $t('dashboard.workTimerLabel') }}</span>
                 </div>
                 <div class="timer-time" :class="{ paused: !working }">
                     <div v-for="(unit, idx) in workUnits" :key="unit.label" class="timer-group">
@@ -39,7 +39,7 @@
                 <button type="button" class="timer-btn" :class="{ resting: !working }" @click="toggleWork">
                     <Icon :size="14" v-if="working" name="el-coffee" />
                     <Icon :size="14" v-else name="el-video-play" />
-                    {{ working ? '休息片刻' : '继续工作' }}
+                    {{ working ? $t('dashboard.workRest') : $t('dashboard.workContinue') }}
                 </button>
             </div>
         </div>
@@ -59,7 +59,7 @@
                         <Icon :size="12" :name="item.trend > 0 ? 'el-caret-top' : 'el-caret-bottom'" />
                         {{ Math.abs(item.trend) }}%
                     </span>
-                    <span class="kpi-sub">较上周</span>
+                    <span class="kpi-sub">{{ $t('dashboard.vsLastWeek') }}</span>
                     <div :ref="(el) => setSparkRef(el as HTMLElement, item.key)" class="kpi-spark"></div>
                 </div>
             </div>
@@ -69,7 +69,7 @@
         <div class="chart-row">
             <div class="chart-card chart-card-span-2">
                 <div class="card-header">
-                    <div class="card-title">访问趋势</div>
+                    <div class="card-title">{{ $t('dashboard.accessTrend') }}</div>
                     <div class="trend-ranges">
                         <button
                             v-for="r in rangeList"
@@ -88,8 +88,8 @@
 
             <div class="chart-card">
                 <div class="card-header">
-                    <div class="card-title">流量来源</div>
-                    <el-tag size="small" round type="primary">今日</el-tag>
+                    <div class="card-title">{{ $t('dashboard.trafficSource') }}</div>
+                    <el-tag size="small" round type="primary">{{ $t('dashboard.today') }}</el-tag>
                 </div>
                 <div ref="sourceRef" class="chart-body chart-body-md"></div>
             </div>
@@ -99,24 +99,24 @@
         <div class="chart-row">
             <div class="chart-card">
                 <div class="card-header">
-                    <div class="card-title">分类销量对比</div>
-                    <el-tag size="small" round>本月</el-tag>
+                    <div class="card-title">{{ $t('dashboard.categorySales') }}</div>
+                    <el-tag size="small" round>{{ $t('dashboard.thisMonth') }}</el-tag>
                 </div>
                 <div ref="salesRef" class="chart-body chart-body-md"></div>
             </div>
 
             <div class="chart-card">
                 <div class="card-header">
-                    <div class="card-title">服务器负载</div>
-                    <el-tag size="small" round type="success">稳定</el-tag>
+                    <div class="card-title">{{ $t('dashboard.serverLoad') }}</div>
+                    <el-tag size="small" round type="success">{{ $t('dashboard.stable') }}</el-tag>
                 </div>
                 <div ref="gaugeRef" class="chart-body chart-body-md"></div>
             </div>
 
             <div class="chart-card">
                 <div class="card-header">
-                    <div class="card-title">能力雷达</div>
-                    <el-tag size="small" round type="warning">最新</el-tag>
+                    <div class="card-title">{{ $t('dashboard.capabilityRadar') }}</div>
+                    <el-tag size="small" round type="warning">{{ $t('dashboard.latest') }}</el-tag>
                 </div>
                 <div ref="radarRef" class="chart-body chart-body-md"></div>
             </div>
@@ -134,9 +134,11 @@ import type { ECharts, EChartsOption } from 'echarts'
 import * as echarts from 'echarts'
 import { debounce, padStart } from 'lodash-es'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const config = useConfig()
 const adminInfo = useAdminInfo()
+const { t } = useI18n()
 const workTimerKey = 'ai-go-dashboard-work-timer'
 
 // ==================== 工具函数 ====================
@@ -182,14 +184,21 @@ const withAlpha = (color: string, alpha: number) => {
 // ==================== 顶部欢迎条 ====================
 
 const nowTime = ref('')
-const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' })
+const today = computed(() =>
+    new Date().toLocaleDateString(config.lang.active === 'en' ? 'en-US' : 'zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        weekday: 'long',
+    })
+)
 const greeting = computed(() => {
     const h = new Date().getHours()
-    if (h < 6) return '夜深了'
-    if (h < 11) return '上午好'
-    if (h < 13) return '中午好'
-    if (h < 18) return '下午好'
-    return '晚上好'
+    if (h < 6) return t('dashboard.greetingNight')
+    if (h < 11) return t('dashboard.greetingMorning')
+    if (h < 13) return t('dashboard.greetingNoon')
+    if (h < 18) return t('dashboard.greetingAfternoon')
+    return t('dashboard.greetingEvening')
 })
 
 // ==================== 今日工作计时 ====================
@@ -219,9 +228,9 @@ const workState: WorkState = reactive(loadWorkState())
 const workSeconds = ref(0)
 const working = computed(() => workState.startAt !== null)
 const workUnits = computed(() => [
-    { label: '小时', value: Math.floor(workSeconds.value / 3600) },
-    { label: '分', value: Math.floor((workSeconds.value % 3600) / 60) },
-    { label: '秒', value: workSeconds.value % 60 },
+    { label: t('dashboard.hours'), value: Math.floor(workSeconds.value / 3600) },
+    { label: t('dashboard.minutes'), value: Math.floor((workSeconds.value % 3600) / 60) },
+    { label: t('dashboard.seconds'), value: workSeconds.value % 60 },
 ])
 
 const updateWorkTime = (now: Date) => {
@@ -270,10 +279,10 @@ type KpiItem = {
     icon: string
     spark: number[]
 }
-const kpiList: KpiItem[] = [
+const kpiList = computed<KpiItem[]>(() => [
     {
         key: 'user',
-        title: '总用户数',
+        title: t('dashboard.totalUsers'),
         value: '128,436',
         trend: 12.5,
         icon: 'el-user-filled',
@@ -281,7 +290,7 @@ const kpiList: KpiItem[] = [
     },
     {
         key: 'order',
-        title: '今日订单',
+        title: t('dashboard.todayOrders'),
         value: '1,286',
         trend: 8.2,
         icon: 'el-goods',
@@ -289,7 +298,7 @@ const kpiList: KpiItem[] = [
     },
     {
         key: 'sales',
-        title: '销售额（元）',
+        title: t('dashboard.salesAmount'),
         value: '86,540',
         trend: -3.1,
         icon: 'el-money',
@@ -297,13 +306,13 @@ const kpiList: KpiItem[] = [
     },
     {
         key: 'visit',
-        title: '页面访问',
+        title: t('dashboard.pageVisits'),
         value: '52,180',
         trend: 21.8,
         icon: 'el-trend-charts',
         spark: [20, 25, 30, 28, 35, 40, 38, 45, 50, 55, 60, 65],
     },
-]
+])
 
 // ==================== 图表实例统一管理 ====================
 
@@ -422,10 +431,10 @@ const buildAxis = (opt: { hideLine?: boolean } = {}) => ({
 // ==================== 访问趋势 ====================
 
 const trendRange = ref<'7' | '30'>('7')
-const rangeList = [
-    { value: '7' as const, label: '近 7 天' },
-    { value: '30' as const, label: '近 30 天' },
-]
+const rangeList = computed(() => [
+    { value: '7' as const, label: t('dashboard.last7Days') },
+    { value: '30' as const, label: t('dashboard.last30Days') },
+])
 const setRange = (v: '7' | '30') => {
     trendRange.value = v
     renderTrend()
@@ -506,36 +515,36 @@ const renderTrend = () => {
 const renderSource = () => {
     const chart = ensureChart('source')
     if (!chart) return
-    const t = theme.value
+    const themeTokens = theme.value
     chart.setOption({
         color: ['#409eff', '#6cb0ff', '#9dcbff', '#c8dfff', '#909399'],
         tooltip: buildTooltip({ trigger: 'item' }),
         legend: {
             bottom: 0,
             left: 'center',
-            textStyle: { color: t.textSecondary },
+            textStyle: { color: themeTokens.textSecondary },
             itemWidth: 10,
             itemHeight: 10,
         },
         series: [
             {
-                name: '流量来源',
+                name: t('dashboard.trafficSource'),
                 type: 'pie',
                 radius: ['48%', '72%'],
                 center: ['50%', '45%'],
                 avoidLabelOverlap: true,
-                itemStyle: { borderRadius: 8, borderColor: t.bg, borderWidth: 2 },
+                itemStyle: { borderRadius: 8, borderColor: themeTokens.bg, borderWidth: 2 },
                 label: { show: false, position: 'center' },
                 emphasis: {
-                    label: { show: true, fontSize: 18, fontWeight: 'bold', color: t.textPrimary },
+                    label: { show: true, fontSize: 18, fontWeight: 'bold', color: themeTokens.textPrimary },
                 },
                 labelLine: { show: false },
                 data: [
-                    { value: 4820, name: '搜索引擎' },
-                    { value: 3210, name: '直接访问' },
-                    { value: 2140, name: '社交媒体' },
-                    { value: 1580, name: '推荐链接' },
-                    { value: 980, name: '其他' },
+                    { value: 4820, name: t('dashboard.searchEngine') },
+                    { value: 3210, name: t('dashboard.directAccess') },
+                    { value: 2140, name: t('dashboard.socialMedia') },
+                    { value: 1580, name: t('dashboard.referralLink') },
+                    { value: 980, name: t('dashboard.other') },
                 ],
             },
         ],
@@ -545,17 +554,17 @@ const renderSource = () => {
 // ==================== 分类销量 ====================
 
 const SALES_ITEMS = [
-    { name: '数码', value: 520 },
-    { name: '服饰', value: 820 },
-    { name: '家居', value: 380 },
-    { name: '食品', value: 680 },
-    { name: '美妆', value: 240 },
-    { name: '图书', value: 560 },
+    { name: t('dashboard.digital'), value: 520 },
+    { name: t('dashboard.clothing'), value: 820 },
+    { name: t('dashboard.home'), value: 380 },
+    { name: t('dashboard.food'), value: 680 },
+    { name: t('dashboard.beauty'), value: 240 },
+    { name: t('dashboard.books'), value: 560 },
 ]
 const renderSales = () => {
     const chart = ensureChart('sales')
     if (!chart) return
-    const t = theme.value
+    const themeTokens = theme.value
     chart.setOption({
         tooltip: buildTooltip({ trigger: 'axis', axisPointer: { type: 'shadow' } }),
         grid: { top: 20, right: 16, bottom: 30, left: 50 },
@@ -570,7 +579,7 @@ const renderSales = () => {
                     borderRadius: [6, 6, 0, 0],
                 },
                 barWidth: 22,
-                label: { show: true, position: 'top', color: t.textSecondary, fontSize: 11 },
+                label: { show: true, position: 'top', color: themeTokens.textSecondary, fontSize: 11 },
             },
         ],
     })
@@ -581,7 +590,7 @@ const renderSales = () => {
 const renderGauge = () => {
     const chart = ensureChart('gauge')
     if (!chart) return
-    const t = theme.value
+    const themeTokens = theme.value
     chart.setOption({
         series: [
             {
@@ -616,9 +625,9 @@ const renderGauge = () => {
                     fontWeight: 700,
                     offsetCenter: [0, '-10%'],
                     formatter: '{value}%',
-                    color: t.textPrimary,
+                    color: themeTokens.textPrimary,
                 },
-                data: [{ value: 62, name: 'CPU 使用率' }],
+                data: [{ value: 62, name: t('dashboard.cpuUsage') }],
             },
         ],
     })
@@ -626,21 +635,27 @@ const renderGauge = () => {
 
 // ==================== 能力雷达 ====================
 
-const RADAR_INDICATORS = ['稳定性', '性能', '安全性', '易用性', '扩展性']
+const RADAR_INDICATORS = [
+    t('dashboard.stability'),
+    t('dashboard.performance'),
+    t('dashboard.security'),
+    t('dashboard.usability'),
+    t('dashboard.scalability'),
+]
 const renderRadar = () => {
     const chart = ensureChart('radar')
     if (!chart) return
-    const t = theme.value
+    const themeTokens = theme.value
     chart.setOption({
         tooltip: buildTooltip(),
         radar: {
             indicator: RADAR_INDICATORS.map((name) => ({ name, max: 100 })),
             radius: '65%',
             center: ['50%', '52%'],
-            splitLine: { lineStyle: { color: t.splitLine } },
-            splitArea: { areaStyle: { color: t.splitArea as string[] } },
-            axisLine: { lineStyle: { color: t.axisLine } },
-            axisName: { color: t.textSecondary, fontSize: 12 },
+            splitLine: { lineStyle: { color: themeTokens.splitLine } },
+            splitArea: { areaStyle: { color: themeTokens.splitArea as string[] } },
+            axisLine: { lineStyle: { color: themeTokens.axisLine } },
+            axisName: { color: themeTokens.textSecondary, fontSize: 12 },
         },
         series: [
             {
@@ -648,14 +663,14 @@ const renderRadar = () => {
                 data: [
                     {
                         value: [88, 82, 92, 76, 84],
-                        name: '当前版本',
+                        name: t('dashboard.currentVersion'),
                         lineStyle: { color: '#409eff', width: 2 },
                         itemStyle: { color: '#409eff' },
                         areaStyle: { color: withAlpha('#409eff', 0.25) },
                     },
                     {
                         value: [72, 66, 80, 82, 74],
-                        name: '上一版本',
+                        name: t('dashboard.previousVersion'),
                         lineStyle: { color: '#e6a23c', width: 2 },
                         itemStyle: { color: '#e6a23c' },
                         areaStyle: { color: withAlpha('#e6a23c', 0.18) },
@@ -674,7 +689,7 @@ const renderAll = () => {
     renderSales()
     renderGauge()
     renderRadar()
-    kpiList.forEach(renderSpark)
+    kpiList.value.forEach(renderSpark)
 }
 
 const resizeAll = () => {
@@ -711,7 +726,7 @@ onBeforeUnmount(() => {
 
 // 暗/亮模式切换
 watch(
-    () => config.layout.dark,
+    () => [config.layout.dark, config.lang.active],
     () => nextTick(renderAll)
 )
 </script>

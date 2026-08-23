@@ -1,0 +1,52 @@
+# Welcome bar
+welcomeTip: "Open source thrives on mutual aid — it needs everyone's support: using, recommending, writing tutorials, protecting the ecosystem, contributing code, answering questions, sharing experience, sponsoring, and more. Welcome to join us!"
+workTimerLabel: You have been working today for
+workRest: Take a break
+workContinue: Continue working
+hours: h
+minutes: m
+seconds: s
+greetingNight: Good night
+greetingMorning: Good morning
+greetingNoon: Good noon
+greetingAfternoon: Good afternoon
+greetingEvening: Good evening
+
+# KPI cards
+totalUsers: Total Users
+todayOrders: Today's Orders
+salesAmount: Sales
+pageVisits: Page Views
+vsLastWeek: vs last week
+
+# Charts
+accessTrend: Access Trend
+last7Days: Last 7 days
+last30Days: Last 30 days
+trafficSource: Traffic Sources
+today: Today
+searchEngine: Search Engine
+directAccess: Direct Access
+socialMedia: Social Media
+referralLink: Referral Links
+other: Other
+categorySales: Category Sales Comparison
+thisMonth: This month
+digital: Digital
+clothing: Apparel
+home: Home
+food: Food
+beauty: Beauty
+books: Books
+serverLoad: Server Load
+stable: Stable
+cpuUsage: CPU Usage
+capabilityRadar: Capability Radar
+latest: Latest
+stability: Stability
+performance: Performance
+security: Security
+usability: Usability
+scalability: Scalability
+currentVersion: Current Version
+previousVersion: Previous Version

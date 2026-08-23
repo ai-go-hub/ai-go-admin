@@ -1,0 +1,52 @@
+# 顶部欢迎条
+welcomeTip: 开源等于互助；需要大家一起来支持，比如使用、推荐、写教程、保护生态、贡献代码、回答问题、分享经验、打赏赞助等；欢迎您加入我们！
+workTimerLabel: 您今天已工作了
+workRest: 休息片刻
+workContinue: 继续工作
+hours: 小时
+minutes: 分
+seconds: 秒
+greetingNight: 夜深了
+greetingMorning: 上午好
+greetingNoon: 中午好
+greetingAfternoon: 下午好
+greetingEvening: 晚上好
+
+# KPI 指标
+totalUsers: 总用户数
+todayOrders: 今日订单
+salesAmount: 销售额（元）
+pageVisits: 页面访问
+vsLastWeek: 较上周
+
+# 图表
+accessTrend: 访问趋势
+last7Days: 近 7 天
+last30Days: 近 30 天
+trafficSource: 流量来源
+today: 今日
+searchEngine: 搜索引擎
+directAccess: 直接访问
+socialMedia: 社交媒体
+referralLink: 推荐链接
+other: 其他
+categorySales: 分类销量对比
+thisMonth: 本月
+digital: 数码
+clothing: 服饰
+home: 家居
+food: 食品
+beauty: 美妆
+books: 图书
+serverLoad: 服务器负载
+stable: 稳定
+cpuUsage: CPU 使用率
+capabilityRadar: 能力雷达
+latest: 最新
+stability: 稳定性
+performance: 性能
+security: 安全性
+usability: 易用性
+scalability: 扩展性
+currentVersion: 当前版本
+previousVersion: 上一版本
