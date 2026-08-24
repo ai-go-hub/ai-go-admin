@@ -135,3 +135,29 @@ COMMENT ON COLUMN "__PREFIX__crud_logs"."fields" IS '字段数据';
 COMMENT ON COLUMN "__PREFIX__crud_logs"."sql" IS '执行的SQL';
 COMMENT ON COLUMN "__PREFIX__crud_logs"."status" IS '状态:deleted=已删除,succeeded=成功,failed=失败,generating=生成中';
 COMMENT ON COLUMN "__PREFIX__crud_logs"."created_at" IS '创建时间';
+
+-- ===== samples CRUD 样品表 =====
+-- CRUD 表解析示例表，同时也是少量字段设计样品（example 太泛，又不想加 crud 前缀，就用了 sample）
+CREATE TABLE IF NOT EXISTS "__PREFIX__samples" (
+    "id"         bigserial PRIMARY KEY,
+    "image"      varchar(255) NOT NULL DEFAULT '',
+    "checkbox"   jsonb DEFAULT '["opt0", "opt1"]'::jsonb,
+    "string"     varchar(255) NOT NULL DEFAULT '',
+    "select"     varchar(64) NOT NULL DEFAULT 'opt0',
+    "datetime"   timestamptz,
+    "weigh"      bigint,
+    "remark"     text NOT NULL DEFAULT '',
+    "status"     boolean NOT NULL DEFAULT true,
+    "created_at" timestamptz
+);
+COMMENT ON TABLE "__PREFIX__samples" IS 'CRUD样品';
+COMMENT ON COLUMN "__PREFIX__samples"."id" IS 'ID';
+COMMENT ON COLUMN "__PREFIX__samples"."image" IS '图片';
+COMMENT ON COLUMN "__PREFIX__samples"."checkbox" IS '复选框:opt0=选项一,opt1=选项二';
+COMMENT ON COLUMN "__PREFIX__samples"."string" IS '字符串';
+COMMENT ON COLUMN "__PREFIX__samples"."select" IS '下拉框:opt0=选项一,opt1=选项二';
+COMMENT ON COLUMN "__PREFIX__samples"."datetime" IS '时间日期';
+COMMENT ON COLUMN "__PREFIX__samples"."weigh" IS '权重';
+COMMENT ON COLUMN "__PREFIX__samples"."remark" IS '备注';
+COMMENT ON COLUMN "__PREFIX__samples"."status" IS '状态';
+COMMENT ON COLUMN "__PREFIX__samples"."created_at" IS '创建时间';
