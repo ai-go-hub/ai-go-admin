@@ -2,6 +2,8 @@ package database
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
@@ -9,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"gorm.io/plugin/dbresolver"
 )
@@ -19,7 +22,18 @@ var db *gorm.DB
 func Init() error {
 	cfg := config.Get().Database
 
-	gormCfg := &gorm.Config{}
+	// 自定义 GORM logger: 忽略 ErrRecordNotFound 日志（仅日志层，程序行为不变）
+	newLogger := logger.New(
+		log.New(os.Stdout, "", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             200 * time.Millisecond,
+			LogLevel:                  logger.Warn,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  gin.Mode() == gin.DebugMode,
+		},
+	)
+
+	gormCfg := &gorm.Config{Logger: newLogger}
 	if cfg.Prefix != "" {
 		gormCfg.NamingStrategy = schema.NamingStrategy{
 			TablePrefix: cfg.Prefix,
