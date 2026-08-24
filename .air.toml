@@ -11,6 +11,9 @@ tmp_dir = "tmp"
   # 监听这些目录
   include_dir = ["cmd", "internal", "config"]
 
+  # 额外监听指定的文件
+  include_file = [".env.yaml"]
+
   # 忽略这些目录
   exclude_dir = ["tmp", "vendor", ".git", "node_modules", "web"]
 

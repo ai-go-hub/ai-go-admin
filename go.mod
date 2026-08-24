@@ -3,8 +3,8 @@ module github.com/ai-go-hub/ai-go-admin
 go 1.26.6
 
 require (
-	github.com/fsnotify/fsnotify v1.9.0
-	github.com/go-viper/mapstructure/v2 v2.4.0
+	github.com/fsnotify/fsnotify v1.9.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/spf13/viper v1.21.0
 	golang.org/x/sys v0.47.0
 	gorm.io/driver/postgres v1.6.0

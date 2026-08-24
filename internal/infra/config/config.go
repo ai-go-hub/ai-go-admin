@@ -2,13 +2,10 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"sync"
 
-	"github.com/fsnotify/fsnotify"
-	"github.com/go-viper/mapstructure/v2"
 	"github.com/spf13/viper"
 )
 
@@ -160,18 +157,6 @@ func Init() error {
 		if err := vip.Unmarshal(config); err != nil {
 			return fmt.Errorf("unmarshal config: %w", err)
 		}
-
-		// 监听配置改变
-		vip.OnConfigChange(func(e fsnotify.Event) {
-			mu.Lock()
-			defer mu.Unlock()
-			if err := vip.Unmarshal(config, func(c *mapstructure.DecoderConfig) {
-				c.ZeroFields = true
-			}); err != nil {
-				log.Printf("config reload failed: %v", err)
-			}
-		})
-		vip.WatchConfig()
 	}
 	return nil
 }

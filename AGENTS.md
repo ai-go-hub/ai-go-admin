@@ -35,7 +35,7 @@
 2. 根目录 `.env.yaml`（若存在，覆盖上述配置；**已 gitignore，不入库**）
 3. 环境变量（`AutomaticEnv`）
 
-支持配置热重载（`OnConfigChange` + `WatchConfig`），通过 `config.Get()` 取带读写锁的副本。`.env.yaml.example` 是环境配置模板；`config/config.yaml` 是默认配置。新增配置项需同步在 `Config` 结构体加字段。
+通过 `config.Get()` 取带读写锁的副本。`.env.yaml.example` 是环境配置模板；新增配置项需同步在 `Config` 结构体加字段。配置变更由 air 监听并自动重新编译。
 
 ### 路由自动注册
 
