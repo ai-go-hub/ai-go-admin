@@ -8,15 +8,15 @@ import (
 	"strings"
 )
 
-// root 本地磁盘存储根目录
-const root = "static"
-
 // Local 本地磁盘上传驱动
-type Local struct{}
+type Local struct {
+	dir       string // 磁盘存储根目录
+	urlPrefix string // 访问 URL 前缀
+}
 
 // NewLocal 创建本地磁盘驱动
-func NewLocal() *Local {
-	return &Local{}
+func NewLocal(dir, urlPrefix string) *Local {
+	return &Local{dir: dir, urlPrefix: urlPrefix}
 }
 
 // Save 保存文件，storedFilename 为 / 分隔的相对路径，所在目录不存在时自动创建
@@ -46,7 +46,7 @@ func (l *Local) Delete(storedFilename string) error {
 
 // Url 返回文件的访问地址
 func (l *Local) Url(storedFilename string) string {
-	return "/" + root + storedFilename
+	return l.urlPrefix + "/" + strings.TrimPrefix(storedFilename, "/")
 }
 
 // Exists 判断文件是否存在
@@ -57,7 +57,6 @@ func (l *Local) Exists(storedFilename string) bool {
 
 // FullPath 返回文件在磁盘上的完整存储路径
 func (l *Local) FullPath(path string) string {
-	// 先去掉可能存在的 root 目录前缀，避免重复拼接
-	clean := strings.TrimPrefix(path, "/"+root)
-	return filepath.Join(root, filepath.FromSlash(clean))
+	clean := strings.TrimPrefix(strings.TrimPrefix(path, l.urlPrefix), "/")
+	return filepath.Join(l.dir, filepath.FromSlash(clean))
 }

@@ -10,15 +10,16 @@ import (
 	"image"
 	"image/draw"
 	"image/png"
-	"os"
+	"io/fs"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
+	assets "github.com/ai-go-hub/ai-go-admin"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
-	"github.com/ai-go-hub/ai-go-admin/pkg/filesystem"
 	"github.com/ai-go-hub/ai-go-admin/pkg/random"
 
 	"github.com/google/uuid"
@@ -133,9 +134,16 @@ type iconMeta struct {
 func Create() (*Result, error) {
 	bootstrap()
 
-	bgPaths, err := filesystem.ReadDir(captchaCfg.BackgroundDir)
+	entries, err := fs.ReadDir(assets.FS, captchaCfg.BackgroundDir)
 	if err != nil {
 		return nil, fmt.Errorf("read background dir: %w", err)
+	}
+	bgPaths := make([]string, 0, len(entries))
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".png") {
+			continue
+		}
+		bgPaths = append(bgPaths, captchaCfg.BackgroundDir+"/"+e.Name())
 	}
 	if len(bgPaths) == 0 {
 		return nil, fmt.Errorf("no background images in %s", captchaCfg.BackgroundDir)
@@ -324,7 +332,7 @@ func formatElement(e captchaElement) string {
 }
 
 func loadImage(path string) (*image.RGBA, error) {
-	f, err := os.Open(path)
+	f, err := assets.FS.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -418,7 +426,7 @@ func drawIcon(bg *image.RGBA, elem captchaElement, bgW, bgH int, placed []image.
 		return elementInfo{}, image.Rectangle{}, fmt.Errorf("icon not found: %s", elem.Value)
 	}
 
-	f, err := os.Open(ic.Path)
+	f, err := assets.FS.Open(ic.Path)
 	if err != nil {
 		return elementInfo{}, image.Rectangle{}, err
 	}
@@ -473,7 +481,7 @@ func hasCollision(placed []image.Rectangle, r image.Rectangle, padding int) bool
 
 func getFontFace() (font.Face, error) {
 	fontOnce.Do(func() {
-		fontData, err := os.ReadFile(captchaCfg.FontPath)
+		fontData, err := assets.FS.ReadFile(captchaCfg.FontPath)
 		if err != nil {
 			fontErr = fmt.Errorf("read font: %w", err)
 			return

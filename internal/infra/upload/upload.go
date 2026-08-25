@@ -205,7 +205,8 @@ func Manager() *Service {
 func NewDriver(name string) (Driver, error) {
 	switch name {
 	case "local":
-		return driver.NewLocal(), nil
+		cfg := config.Get().Upload
+		return driver.NewLocal(cfg.Dir, cfg.URLPrefix), nil
 	default:
 		return nil, fmt.Errorf("不支持的上传驱动: %s", name)
 	}

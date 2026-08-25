@@ -1,11 +1,13 @@
 package config
 
 import (
+	"bytes"
 	"fmt"
+	"io/fs"
 	"os"
-	"path/filepath"
 	"sync"
 
+	assets "github.com/ai-go-hub/ai-go-admin"
 	"github.com/spf13/viper"
 )
 
@@ -93,6 +95,8 @@ type CDNConfig struct {
 
 // 上传配置
 type UploadConfig struct {
+	Dir         string   `mapstructure:"dir"`
+	URLPrefix   string   `mapstructure:"url_prefix"`
 	MaxSize     int      `mapstructure:"max_size"`
 	Filename    string   `mapstructure:"filename"`
 	AllowSuffix []string `mapstructure:"allow_suffix"`
@@ -128,24 +132,27 @@ var (
 func Init() error {
 	if vip == nil {
 		vip = viper.New()
+		vip.SetConfigType("yaml")
 
-		// 读取 config 目录下所有 yaml 文件
-		files, err := filepath.Glob(filepath.Join("./config", "*.yaml"))
+		// 从嵌入资源读取 config 目录下所有 yaml 文件
+		names, err := fs.Glob(assets.FS, "config/*.yaml")
 		if err != nil {
-			return fmt.Errorf("get config files: %w", err)
+			return fmt.Errorf("get embedded config files: %w", err)
 		}
-
-		for _, file := range files {
-			vip.SetConfigFile(file)
-			if err := vip.MergeInConfig(); err != nil {
-				return fmt.Errorf("merge config file %s: %w", file, err)
+		for _, name := range names {
+			data, err := fs.ReadFile(assets.FS, name)
+			if err != nil {
+				return fmt.Errorf("read embedded config file %s: %w", name, err)
+			}
+			if err := vip.MergeConfig(bytes.NewReader(data)); err != nil {
+				return fmt.Errorf("merge embedded config file %s: %w", name, err)
 			}
 		}
 
-		// 加载根目录 .env.yaml 文件（覆盖从 config 文件夹读取的配置）
-		if _, err := os.Stat(".env.yaml"); err == nil {
-			vip.SetConfigFile(".env.yaml")
-			if err := vip.MergeInConfig(); err != nil {
+		// 加载根目录 .env.yaml 环境配置文件（读取外置文件覆盖，并非嵌入了二进制的文件）
+		if f, err := os.Open(".env.yaml"); err == nil {
+			defer f.Close()
+			if err := vip.MergeConfig(f); err != nil {
 				return fmt.Errorf("merge config file .env.yaml: %w", err)
 			}
 		}
