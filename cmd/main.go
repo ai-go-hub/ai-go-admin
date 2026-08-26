@@ -1,6 +1,8 @@
 package main
 
 import (
+	_ "time/tzdata"
+
 	"fmt"
 	"os"
 
