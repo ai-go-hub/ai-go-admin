@@ -16,7 +16,7 @@ import { getDefaultOptButtons } from '@/components/table/index'
 import Table from '@/components/table/index.vue'
 import { useTableManager } from '@/hooks/useTableManager'
 import { copy } from '@/utils/common'
-import { changeStep, state as CRUDState } from '@/views/admin/crud/index'
+import { changeStep } from '@/views/admin/crud/index'
 import { ElMessage } from 'element-plus'
 import { reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -87,9 +87,7 @@ const optButtons: OptButton[] = [
             width: '220px',
         },
         click: (row) => {
-            CRUDState.log.id = row.id
-            CRUDState.log.type = 'local'
-            changeStep('log')
+            changeStep('log', { id: row.id })
             model.value = false
         },
     },

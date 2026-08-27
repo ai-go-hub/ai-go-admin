@@ -1,0 +1,9 @@
+reasoning: 思考过程
+copy: 复制
+startDesign: 开始设计
+stop: 停止
+placeholderDesign: 请输入设计要求
+placeholderModify: 请输入修改意见
+send: 发送
+confirmStartDesign: 确认开始可视化 CRUD 设计？
+designError: AI 返回的 JSON 格式经 {count} 次重试任不正确，已停止重试

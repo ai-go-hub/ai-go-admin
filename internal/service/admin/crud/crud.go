@@ -13,6 +13,7 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
+	repoCommon "github.com/ai-go-hub/ai-go-admin/internal/repository/common"
 	tbl "github.com/ai-go-hub/ai-go-admin/internal/service/admin/crud/table"
 	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 )
@@ -40,11 +41,14 @@ type ModelInfo struct {
 
 // Service 可视化 CRUD 服务
 type Service struct {
+	configRepo *repoCommon.ConfigRepository
 }
 
 // NewService 创建可视化 CRUD 服务实例
-func NewService() *Service {
-	return &Service{}
+func NewService(configRepo *repoCommon.ConfigRepository) *Service {
+	return &Service{
+		configRepo: configRepo,
+	}
 }
 
 // TableList 获取当前项目数据库中的数据表列表

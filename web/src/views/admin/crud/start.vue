@@ -3,19 +3,25 @@
         <div class="crud-title">{{ t('crud.index.start') }}</div>
         <div class="start-opt">
             <el-row :gutter="20">
-                <el-col :xs="24" :span="8">
+                <el-col :xs="24" :span="6">
                     <div @click="changeStep('create')" class="start-item suspension">
                         <div class="start-item-title">{{ t('crud.index.create') }}</div>
                         <div class="start-item-remark">{{ t('crud.index.createAnew') }}</div>
                     </div>
                 </el-col>
-                <el-col @click="onShowDialog('table')" :xs="24" :span="8">
+                <el-col @click="onShowDialog('ai')" :xs="24" :span="6">
+                    <div class="start-item suspension">
+                        <div class="start-item-title">{{ t('crud.index.ai') }}</div>
+                        <div class="start-item-remark">{{ t('crud.index.aiSubtitle') }}</div>
+                    </div>
+                </el-col>
+                <el-col @click="onShowDialog('table')" :xs="24" :span="6">
                     <div class="start-item suspension">
                         <div class="start-item-title">{{ t('crud.index.selectTable') }}</div>
                         <div class="start-item-remark">{{ t('crud.index.selectTableSubtitle') }}</div>
                     </div>
                 </el-col>
-                <el-col @click="onShowDialog('log')" :xs="24" :span="8">
+                <el-col @click="onShowDialog('log')" :xs="24" :span="6">
                     <div class="start-item suspension">
                         <div class="start-item-title">{{ t('crud.index.record') }}</div>
                         <div class="start-item-remark">{{ t('crud.index.recordContinue') }}</div>
@@ -65,12 +71,12 @@
                     @keyup.enter="onSubmitSelectTableForm()"
                     class="select-table-form"
                     ref="formRef"
-                    :model="CRUDState"
+                    :model="state"
                     :rules="rules"
                 >
                     <el-form-item :label-width="140" :label="t('crud.index.table')" prop="table">
                         <RemoteSelect
-                            v-model="CRUDState.table"
+                            v-model="state.table"
                             pk="table"
                             field="comment"
                             :remote-url="tableListUrl"
@@ -110,6 +116,8 @@
             </el-dialog>
 
             <CrudLog v-model="state.showLogDialog" />
+
+            <AIDialog v-model="state.showAIDialog" />
         </div>
     </div>
 </template>
@@ -118,7 +126,8 @@
 import { checkLog, tableListUrl } from '@/api/admin/crud'
 import RemoteSelect from '@/components/agInput/components/remoteSelect.vue'
 import { buildValidatorRule } from '@/utils/validate'
-import { changeStep, state as CRUDState } from '@/views/admin/crud/index'
+import AIDialog from '@/views/admin/crud/ai.vue'
+import { changeStep } from '@/views/admin/crud/index'
 import CrudLog from '@/views/admin/crud/log.vue'
 import type { FormItemRule } from 'element-plus'
 import { reactive, useTemplateRef } from 'vue'
@@ -128,19 +137,23 @@ const { t } = useI18n()
 const formRef = useTemplateRef('formRef')
 
 const state = reactive({
+    table: '',
     loading: false,
     successRecord: 0,
+    showAIDialog: false,
     showLogDialog: false,
     showSelectTableDialog: false,
 })
 
-const onShowDialog = (type: 'table' | 'log') => {
+const onShowDialog = (type: 'table' | 'log' | 'ai') => {
     if (type == 'table') {
-        CRUDState.table = ''
+        state.table = ''
         state.successRecord = 0
         state.showSelectTableDialog = true
     } else if (type == 'log') {
         state.showLogDialog = true
+    } else if (type == 'ai') {
+        state.showAIDialog = true
     }
 }
 
@@ -151,16 +164,16 @@ const rules: Partial<Record<string, FormItemRule[]>> = {
 const onSubmitSelectTableForm = () => {
     formRef.value?.validate((valid) => {
         if (valid) {
-            changeStep('table')
+            changeStep('table', { table: state.table })
         }
     })
 }
 
 const onTableStartChange = () => {
-    if (CRUDState.table) {
+    if (state.table) {
         // 检查是否有CRUD记录
         state.loading = true
-        checkLog(CRUDState.table)
+        checkLog(state.table)
             .then((res) => {
                 state.successRecord = res.data.data.id
             })
@@ -172,9 +185,7 @@ const onTableStartChange = () => {
 
 const onLogStart = () => {
     if (state.successRecord) {
-        CRUDState.log.id = state.successRecord
-        CRUDState.log.type = 'local'
-        changeStep('log')
+        changeStep('log', { id: state.successRecord })
     }
 }
 
@@ -221,7 +232,7 @@ const isDev = () => {
 }
 .start-opt {
     display: block;
-    width: 60%;
+    width: 70%;
     margin: 40px auto;
 }
 .start-item {

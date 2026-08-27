@@ -18,3 +18,4 @@ deleteConfigurationConfirm: Are you sure to delete the configuration item?
 configurationUpdated: Configuration updated successfully
 configurationAdded: Added successfully
 areYouSureToDelete: Are you sure to delete the configuration item?
+defaultModel: Default model

@@ -72,3 +72,13 @@ export function clearCache(type: string) {
         }
     )
 }
+
+/**
+ * 获取 AI 配置
+ */
+export function getAIConfig() {
+    return request({
+        url: '/admin/ai-config',
+        method: 'GET',
+    })
+}

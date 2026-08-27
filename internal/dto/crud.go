@@ -75,3 +75,17 @@ type CrudLogData struct {
 	Sql    *string      // 执行的 SQL
 	Status string       // 状态: generating/succeeded/failed/deleted
 }
+
+// ChatMessage AI 对话消息
+type ChatMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+// ChatRequest AI 对话请求
+type ChatRequest struct {
+	Model       string        `json:"model" binding:"required"` // 模型名
+	Messages    []ChatMessage `json:"messages"`                 // 对话上下文
+	Temperature *float64      `json:"temperature"`              // 温度参数
+	TopP        *float64      `json:"top_p"`                    // 核采样参数
+}

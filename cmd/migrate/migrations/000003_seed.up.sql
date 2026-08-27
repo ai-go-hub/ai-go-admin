@@ -1,7 +1,7 @@
 -- 初始化系统配置预设数据
 -- ON CONFLICT DO NOTHING: 兼容重复执行（按 id 主键或 name 唯一索引冲突时跳过）
 INSERT INTO "__PREFIX__configs" ("id", "name", "group", "title", "tip", "type", "value", "dict", "rule", "input_extend", "allow_del", "weigh") VALUES
-	(1,  'config_group',         'basic',          '配置分组',         NULL,                                   'array',    '[{"key":"basic","value":"基础配置"},{"key":"mail","value":"邮件配置"},{"key":"quick_entrance","value":"快捷配置入口"}]', NULL,    'required', NULL,  0, -1),
+	(1,  'config_group',         'basic',          '配置分组',         NULL,                                   'array',    '[{"key":"basic","value":"基础配置"},{"key":"mail","value":"邮件配置"},{"key":"ai","value":"AI 配置"},{"key":"quick_entrance","value":"快捷配置入口"}]', NULL,    'required', NULL,  0, -1),
 	(2,  'name',                 'basic',          '站点名称',         NULL,                                   'string',   'AI GO ADMIN',                                                                                                    NULL,    'required', NULL,  0, 99),
 	(3,  'record_number',        'basic',          '域名备案号',       NULL,                                   'string',   '渝ICP备8888888号-1',                                                                                              NULL,    NULL,         NULL,  0, 98),
 	(4,  'version',              'basic',          '系统版本号',       NULL,                                   'string',   'v1.0.0',                                                                                                          NULL,    'required', NULL,  0, 97),
@@ -12,7 +12,11 @@ INSERT INTO "__PREFIX__configs" ("id", "name", "group", "title", "tip", "type", 
 	(9,  'smtp_pass',            'mail',           'SMTP 密码',        NULL,                                   'string',   NULL,                                                                                                              NULL,    NULL,         NULL,  0, 96),
 	(10, 'smtp_verification',    'mail',           'SMTP 验证方式',    NULL,                                   'select',   'SSL',                                                                                                           '{"SSL":"SSL","TLS":"TLS"}', NULL, NULL,  0, 95),
 	(11, 'smtp_sender_mail',     'mail',           'SMTP 发件人邮箱',  NULL,                                   'string',    NULL,                                                                                                             NULL,    'email',    NULL,  0, 94),
-	(12, 'quick_entrance',       'quick_entrance', '快捷配置入口',     NULL,                                   'array',     '[{"key":"个人资料","value":"routine/profile"}]',                                                                  NULL,    NULL,         NULL,  0, 0)
+	(12, 'quick_entrance',       'quick_entrance', '快捷配置入口',     NULL,                                   'array',     '[{"key":"个人资料","value":"routine/profile"}]',                                                                  NULL,    NULL,         NULL,  0, 0),
+	(13, 'ai_api_url',           'ai',             'API URL',        '请填写 OpenAI Responses API 兼容的 URL，如: https://api.deepseek.com/responses', 'string', '',                                                                          NULL,    'required', NULL,  0, 99),
+	(14, 'ai_api_key',           'ai',             'API Key',         NULL,                                   'password',  '',                                                                                                               NULL,    'required', '{"showPassword": true}',  0, 98),
+	(15, 'ai_model_list',        'ai',             '可用模型列表',     NULL,                                   'array',    '[{"key":"DeepSeek V4 Pro","value":"deepseek-v4-pro"}]',                                                           NULL,    'required', '{"keyTitle":"模型显示名","valueTitle":"模型请求名"}', 0, 97),
+	(16, 'ai_default_model',     'ai',             '默认托底模型',     NULL,                                   'hidden',   'deepseek-v4-pro',                                                                                                 NULL,    'required', NULL,  0, 96)
 ON CONFLICT DO NOTHING;
 
 -- 初始化权限规则数据

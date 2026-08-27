@@ -10,6 +10,7 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	"github.com/ai-go-hub/ai-go-admin/internal/middleware"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
+	repoCommon "github.com/ai-go-hub/ai-go-admin/internal/repository/common"
 	svcAdmin "github.com/ai-go-hub/ai-go-admin/internal/service/admin"
 
 	"github.com/gin-gonic/gin"
@@ -18,14 +19,16 @@ import (
 // AdminHandler 管理员控制器，嵌入通用控制器并扩展自定义方法
 type AdminHandler struct {
 	*handler.Handler[model.Admin]
-	svc *svcAdmin.AdminService
+	svc        *svcAdmin.AdminService
+	configRepo *repoCommon.ConfigRepository
 }
 
 // NewAdminHandler 创建管理员控制器实例
-func NewAdminHandler(svc *svcAdmin.AdminService) *AdminHandler {
+func NewAdminHandler(svc *svcAdmin.AdminService, configRepo *repoCommon.ConfigRepository) *AdminHandler {
 	return &AdminHandler{
-		Handler: handler.NewHandler(svc),
-		svc:     svc,
+		Handler:    handler.NewHandler(svc),
+		svc:        svc,
+		configRepo: configRepo,
 	}
 }
 
@@ -113,6 +116,26 @@ func (h *AdminHandler) Init(c *gin.Context) {
 	httpx.Success(c, httpx.WithData(result))
 }
 
+// AIConfig 获取 AI 配置
+func (h *AdminHandler) AIConfig(c *gin.Context) {
+	cfg, err := h.configRepo.GetConfigsByGroup(c.Request.Context(), "ai")
+	if err != nil {
+		httpx.Fail(c, httpx.WithMessage("获取 AI 配置失败: "+err.Error()))
+		return
+	}
+
+	configured := true
+	if cfg["ai_api_url"] == "" || cfg["ai_api_key"] == "" {
+		configured = false
+	}
+
+	httpx.Success(c, httpx.WithData(gin.H{
+		"configured":    configured,
+		"model_list":    cfg["ai_model_list"],
+		"default_model": cfg["ai_default_model"],
+	}))
+}
+
 // RegisterRoutes 注册路由
 func (h *AdminHandler) RegisterRoutes(group *gin.RouterGroup) {
 	// 只注册自定义路由
@@ -123,4 +146,5 @@ func (h *AdminHandler) RegisterRoutes(group *gin.RouterGroup) {
 
 	group.GET("/init", middleware.AdminAuth(), h.Init)
 	group.POST("/clear-cache", middleware.AdminAuth(), h.ClearCache)
+	group.GET("/ai-config", middleware.AdminAuth(), h.AIConfig)
 }

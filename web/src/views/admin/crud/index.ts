@@ -3,33 +3,30 @@ import i18n from '@/lang/index'
 import { validatorType } from '@/utils/validate'
 import { reactive } from 'vue'
 
+interface DesignStartData {
+    id?: number
+    table?: string
+    comment?: string
+    fields?: FieldItem[]
+}
+
 export const state: {
-    step: 'Start' | 'Design'
     type: string
-    table: string
-    log: {
-        id: number | null
-        type: string
-    }
+    step: 'Start' | 'Design'
+    design: DesignStartData
 } = reactive({
-    step: 'Start',
     type: '',
-    table: '',
-    log: {
-        id: null,
-        type: '',
-    },
+    step: 'Start',
+    design: {},
 })
 
-export const changeStep = (type: string) => {
+export const changeStep = (type: string, designStartData: DesignStartData = {}) => {
     state.type = type
+    state.design = designStartData
     if (type == 'start') {
+        state.design = {}
         state.step = 'Start'
-        state.table = ''
-        state.log.id = null
-        state.log.type = ''
     } else {
-        // 打开设计器
         state.step = 'Design'
     }
 }

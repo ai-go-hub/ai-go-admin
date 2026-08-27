@@ -51,7 +51,7 @@
                                     </el-form-item>
 
                                     <!-- 其他 -->
-                                    <el-form-item v-else :label="item.title" :prop="item.name" :key="'other-' + item.id">
+                                    <el-form-item v-else-if="item.type != 'hidden'" :label="item.title" :prop="item.name" :key="'other-' + item.id">
                                         <AgInput
                                             :type="item.type"
                                             v-model="state.form[item.name]"
@@ -78,9 +78,28 @@
                                     </div>
                                 </template>
                             </div>
+
+                            <!-- ==================== 特例 ==================== -->
+
+                            <!-- 邮件发送测试 -->
                             <div v-if="group.name == 'mail'" class="send-test-mail">
                                 <el-button @click="onTestSendMail()">{{ t('routine.config.testMailSending') }}</el-button>
                             </div>
+                            <!-- AI 配置 -->
+                            <div v-if="group.name == 'ai'" class="config-form-item">
+                                <el-form-item :label="t('routine.config.defaultModel')" prop="ai_default_model">
+                                    <AgInput
+                                        :key="JSON.stringify(state.form['ai_model_list'])"
+                                        type="select"
+                                        v-model="state.form['ai_default_model']"
+                                        :placeholder="t('common.pleaseSelect', { field: t('routine.config.defaultModel') })"
+                                        :attr="{
+                                            dict: getModelListDict(),
+                                        }"
+                                    />
+                                </el-form-item>
+                            </div>
+
                             <el-button type="primary" @click="onSubmit()">{{ t('common.save') }}</el-button>
                         </el-tab-pane>
                         <el-tab-pane
@@ -134,7 +153,7 @@ const api = new TableManagerAPI('/admin/routine/config/')
 
 const state: {
     loading: boolean
-    config: AnyObj
+    config: AnyObj[]
     configGroup: AnyObj
     activeTab: string
     showAddForm: boolean
@@ -176,12 +195,12 @@ const getData = () => {
 
             state.configGroup = res.data.data.configGroup
             state.quickEntrance = res.data.data.quickEntrance
-            if (!state.activeTab) {
-                for (const key in state.configGroup) {
-                    state.activeTab = key
-                    break
-                }
+
+            // 选择 list 的第一个 tab
+            if (!state.activeTab && state.config.length) {
+                state.activeTab = state.config[0].name
             }
+
             let formNames: AnyObj = {}
             let rules: Partial<Record<string, FormItemRule[]>> = {}
             for (const key in state.config) {
@@ -303,6 +322,16 @@ const onTestSendMail = () => {
             }
         },
     })
+}
+
+const getModelListDict = () => {
+    const modelList: AnyObj = {}
+    for (const key in state.form['ai_model_list']) {
+        if (state.form['ai_model_list'][key]['key'] && state.form['ai_model_list'][key]['value']) {
+            modelList[state.form['ai_model_list'][key]['value']] = state.form['ai_model_list'][key]['key']
+        }
+    }
+    return modelList
 }
 
 onMounted(() => {

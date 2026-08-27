@@ -1,0 +1,9 @@
+reasoning: Thinking
+copy: Copy
+startDesign: Start Design
+stop: Stop
+placeholderDesign: Enter design requirements
+placeholderModify: Enter modification suggestions
+send: Send
+confirmStartDesign: Confirm to start the visual CRUD design?
+designError: The AI returned invalid JSON format after {count} retries. Stopped.

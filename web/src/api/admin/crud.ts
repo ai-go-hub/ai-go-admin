@@ -1,9 +1,11 @@
-import request from '@/utils/request'
+import { adminBaseRoutePath } from '@/router/static/adminBase'
+import request, { getBaseURL } from '@/utils/request'
 
 export const url = '/admin/crud/'
 export const tableListUrl = url + 'table-list'
 export const modelListUrl = url + 'model-list'
 export const crudLogListUrl = url + 'log/list'
+export const crudAIStreamURL = getBaseURL() + adminBaseRoutePath + '/crud/ai/stream'
 
 export function getTableFieldList(table: string) {
     return request({

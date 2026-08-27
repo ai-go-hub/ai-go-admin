@@ -18,3 +18,4 @@ deleteConfigurationConfirm: 确定删除该配置项吗？
 configurationUpdated: 当前页面配置项更新成功
 configurationAdded: 新增成功
 areYouSureToDelete: 确定要删除配置项吗？
+defaultModel: 默认托底模型

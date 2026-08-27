@@ -1,6 +1,8 @@
 package crud
 
 import (
+	"bufio"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
@@ -50,6 +52,8 @@ func (h *Handler) RegisterRoutes(group *gin.RouterGroup) {
 	group.POST("/table-list", middleware.AdminAuth(), h.TableList)
 	group.POST("/check-generate", middleware.AdminAuth(), h.CheckGenerate)
 	group.POST("/generate", middleware.AdminAuth(), h.Generate)
+
+	group.POST("/ai/stream", middleware.AdminAuth(), h.ChatStream)
 }
 
 // TableList 数据表列表
@@ -461,6 +465,64 @@ func (h *Handler) Generate(c *gin.Context) {
 		"req":                   req,
 		"generateFileBasicData": generateFileBasicData,
 	}))
+}
+
+// ChatStream AI 对话流式输出
+// 转发上游 OpenAI Responses 兼容接口的 SSE 事件流给前端
+func (h *Handler) ChatStream(c *gin.Context) {
+	if !h.checkPermission(c, []string{"crud/crud/create"}) {
+		return
+	}
+	var req dto.ChatRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Fail(c, httpx.WithMessage("参数错误: "+err.Error()))
+		return
+	}
+
+	// SSE 流式响应头: 正常输出与错误事件均以 SSE 形式下发
+	c.Header("Content-Type", "text/event-stream; charset=utf-8")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+	c.Header("X-Accel-Buffering", "no")
+
+	body, err := h.svc.Stream(c.Request.Context(), &req)
+	if err != nil {
+		payload, _ := json.Marshal(map[string]any{
+			"type":    "error",
+			"message": err.Error(),
+		})
+		_, _ = c.Writer.WriteString("event: error\n")
+		_, _ = c.Writer.WriteString("data: " + string(payload) + "\n\n")
+		c.Writer.Flush()
+		return
+	}
+	defer body.Close()
+
+	// 默认 ScanLines 按行切分，正好对应 SSE 的 event/data 行（\n 与 \r\n 均兼容）
+	scanner := bufio.NewScanner(body)
+	scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" {
+			// 事件间空行，转发以分隔事件
+			if _, err := c.Writer.WriteString("\n"); err != nil {
+				return
+			}
+			c.Writer.Flush()
+			continue
+		}
+		// 仅转发 event/data 行，其余（如注释行）忽略
+		if strings.HasPrefix(line, "event:") || strings.HasPrefix(line, "data:") {
+			if _, err := c.Writer.WriteString(line + "\n"); err != nil {
+				return
+			}
+			c.Writer.Flush()
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		// 上游流读取出错（如连接中断），流式输出到此结束
+		return
+	}
 }
 
 // checkPermission 校验 CRUD 权限节点，无权限时返回 false（内部已输出响应）

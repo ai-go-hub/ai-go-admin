@@ -1205,13 +1205,62 @@ const onFieldCommentChange = (comment: string) => {
 
 const loadData = () => {
     tableDesignChangeInit()
-    if (!['table', 'log'].includes(crudState.type)) return
+    if (!['table', 'log', 'json'].includes(crudState.type)) return
 
     state.loading.init = true
 
+    // 从 JSON 数据开始
+    if (crudState.type == 'json') {
+        const designFields = crudState.design.fields ?? []
+        for (const key in designFields) {
+            const field = handleFieldAttr(designFields[key])
+
+            // 默认值和默认值类型分析
+            if (typeof field.defaultType == 'undefined') {
+                if (field.default && ['none', 'null', 'empty string'].includes(field.default)) {
+                    field.defaultType = field.default.toUpperCase() as 'EMPTY STRING' | 'NULL' | 'NONE'
+                    field.default = ''
+                } else {
+                    field.defaultType = 'INPUT'
+                }
+            }
+            // 缺失的长度/精度兜底
+            field.length = field.length ?? 0
+            field.precision = field.precision ?? 0
+
+            // 表单/表格字段归类
+            if (!['id', 'updated_at', 'created_at', 'deleted_at'].includes(field.name)) {
+                state.table.formFields.push(field.uuid!)
+            }
+            if (!['textarea', 'file', 'files', 'editor', 'password', 'array'].includes(field.designType)) {
+                state.table.columnFields.push(field.uuid!)
+            }
+            if (field.designType == 'pk') {
+                state.table.defaultSortField = field.uuid!
+                state.table.quickSearchField.push(field.uuid!)
+            }
+            if (field.designType == 'weigh') {
+                state.table.defaultSortField = field.uuid!
+            }
+
+            state.fields.push(field)
+        }
+
+        // 表数据
+        state.table.rebuild = 'Yes'
+        state.table.name = crudState.design.table ?? ''
+        state.table.comment = crudState.design.comment ?? ''
+        if (crudState.design.table) {
+            onTableChange(crudState.design.table)
+        }
+
+        state.loading.init = false
+        return
+    }
+
     // 从历史记录开始
     if (crudState.type == 'log') {
-        logStart(crudState.log.id!, crudState.log.type)
+        logStart(crudState.design.id!, 'local')
             .then((res) => {
                 // 字段数据
                 const fields = res.data.data.fields
@@ -1266,7 +1315,7 @@ const loadData = () => {
 
     // 从数据表或sql开始
     parseTableData({
-        table: crudState.table,
+        table: crudState.design.table,
     })
         .then((res) => {
             let fields = []
@@ -1292,9 +1341,9 @@ const loadData = () => {
             if (res.data.data.empty) {
                 state.table.rebuild = 'Yes'
             }
-            if (crudState.type == 'table' && crudState.table) {
-                state.table.name = crudState.table
-                onTableChange(crudState.table)
+            if (crudState.type == 'table' && crudState.design.table) {
+                state.table.name = crudState.design.table
+                onTableChange(crudState.design.table)
             }
         })
         .finally(() => {

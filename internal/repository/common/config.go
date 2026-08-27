@@ -50,3 +50,19 @@ func (r *ConfigRepository) GetConfigGroups(ctx context.Context) ([]ConfigGroupIt
 	items := jsonx.UnmarshalSafe[[]ConfigGroupItem]([]byte(value))
 	return items, nil
 }
+
+// GetConfigsByGroup 获取指定分组的配置
+func (r *ConfigRepository) GetConfigsByGroup(ctx context.Context, group string) (map[string]string, error) {
+	list, err := gorm.G[model.Config](r.DB()).
+		Where(`"group" = ?`, group).
+		Find(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := make(map[string]string, len(list))
+	for _, item := range list {
+		cfg[item.Name] = util.FromPtr(item.Value)
+	}
+	return cfg, nil
+}
