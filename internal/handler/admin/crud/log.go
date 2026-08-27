@@ -18,6 +18,9 @@ import (
 type CrudLogListItem struct {
 	model.CrudLog
 	Label           string                        `json:"label"`
+	LangBasicData   dto.GenerateFileBasicDataInfo `json:"lang_basic_data"`
+	ViewsBasicData  dto.GenerateFileBasicDataInfo `json:"views_basic_data"`
+	ModelBasicData  dto.GenerateFileBasicDataInfo `json:"model_basic_data"`
 	RouterBasicData dto.GenerateFileBasicDataInfo `json:"router_basic_data"`
 }
 
@@ -43,9 +46,14 @@ func NewCrudLogHandler(svc *svcCrud.CrudLogService) *CrudLogHandler {
 					for _, item := range items {
 						var tableData dto.CRUDTable
 						_ = json.Unmarshal(item.Table, &tableData)
+
+						viewsBasicData := svcCrud.ParseGenerateFileBasicData("views", tableData.WebViewsDir)
 						result = append(result, CrudLogListItem{
 							CrudLog:         item,
 							Label:           item.Name + " - " + item.Comment,
+							LangBasicData:   svcCrud.GenerateFileBasicData("lang", viewsBasicData.Path, viewsBasicData.App),
+							ViewsBasicData:  viewsBasicData,
+							ModelBasicData:  svcCrud.ParseGenerateFileBasicData("model", tableData.ModelFile),
 							RouterBasicData: svcCrud.ParseGenerateFileBasicData("router", tableData.RouterFile),
 						})
 					}
