@@ -1,0 +1,11 @@
+comment: Comment
+statusGenerating: Generating
+statusSucceeded: Succeeded
+statusFailed: Failed
+statusDeleted: Deleted
+deleteRecords: Delete the generated CRUD code?
+logStartTip: Start CRUD design from this record?
+continue: Copy or continue design
+delete: Delete CRUD code
+copySql: Copy alter-table SQL
+copyContext: Copy context

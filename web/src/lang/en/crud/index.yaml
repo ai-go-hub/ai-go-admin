@@ -1,0 +1,153 @@
+weigh: Weight (drag to sort)
+remark: Remark
+primaryKey: Primary Key
+remoteSelect: Remote Select (related table)
+remoteSelects: Remote Multi-select (related table)
+radio: 'Radio:opt0=Option 1,opt1=Option 2'
+checkbox: 'Checkbox:opt0=Option 1,opt1=Option 2'
+select: 'Select:opt0=Option 1,opt1=Option 2'
+disableSearch: Disable Search
+validateMessage: Leave blank to auto-fill the validator title attribute (if you do not understand it, fill in the full error message)
+remoteSelectRequestTip: The remote select component will request this URL to fetch option data
+start: Start
+create: Create
+createAnew: Create backend CRUD from scratch
+selectTable: Select Table
+selectTableSubtitle: Select a designed table from the database
+record: CRUD Records
+recordContinue: Continue from previously generated CRUD code
+ai: AI Table Design
+aiSubtitle: Describe your requirements in conversation; the LLM designs and fills them into the CRUD designer
+quickExperience: Quick Experience
+experience11: Prepare
+experience12: Development Environment
+experience13: 'Site port: 1818'
+experience21: Click
+experience22: Select Table
+experience23: ' (you can select the samples table)'
+experience31: Click
+experience32: Generate CRUD Code
+experience33: then click
+experience34: Continue Generating
+experience41: 'You are not in the development environment. Please '
+experience42: set up the development environment
+experience43: or recompile after generating the code
+or: or
+table: Table
+generatedTip: The selected table already has a successful record. It is recommended to start from the history~
+recordStart: Start from History
+tableName: Table Name
+tableNameTip: Table name (use plural noun form; does not affect the model name)
+tableComment: Table Comment
+tableCommentPlaceholder: 'e.g.: members (will be generated as member management)'
+sortMethod: Sort Method
+commonFields: Common Fields
+baseFields: Base Fields
+advancedFields: Advanced Fields
+advancedConfiguration: Advanced Configuration
+common: Common
+fieldName: Field Name
+fieldComment: Field Comment
+fieldCommentsCrudDictionary: Field Comment (CRUD Dictionary)
+fieldType: Field Type
+length: Length
+decimalPoint: Decimal Places
+fieldDefaults: Field Default Value
+pleaseInputTheDefaultValue: Please enter the default value
+autoIncrement: Auto Increment
+always: Always
+generatedByDefault: Only when not provided
+unique: Unique
+allowNull: Allow NULL
+fieldProperties: Field Properties
+fieldFormProperties: Field Form Properties
+fieldTableProperties: Field Table Properties
+generateType: Generate Type
+fieldsAsTableColumns: Fields as Table Columns
+fieldsAsFormItems: Fields as Form Items
+tableQuickSearchFields: Table Quick Search Fields
+tableDefaultSortFields: Table Default Sort Fields
+selectFieldFirstTip: Please select a field from the left first
+fieldsDisplayedInTheTable: Fields Displayed in the Table
+remoteSelectInfo: Remote Select Related Info
+associatedDataTable: Associated Data Table
+apiUrl: Data API URL
+apiUrlExample: 'e.g.: /admin/user/list'
+dropDownValueField: Dropdown value field
+dropDownLabelField: Dropdown label field
+valueFieldPlaceholder: Please select the value field of the select component
+labelFieldPlaceholder: Please select the label field of the select component
+tableFieldsPlaceholder: Please select the fields to display in the table
+remoteUrl: Remote select data API URL
+remoteTable: Associated Data Table
+dataSourceConfigurationType: Data Source Configuration Type
+quickConfig: Auto-configure by selecting a historical CRUD record
+customConfiguration: Custom Configuration
+generatedHandlerLocation: Generated Handler Location
+generatedDataModelLocation: Generated Data Model Location
+generatedRepositoryLocation: Generated Repository Location
+generatedServiceLocation: Generated Service Location
+generatedRouterLocation: Generated Router Location
+webEndViewDirectory: Web View Directory
+routePath: Frontend/Backend Route Path
+theRelativePathToTheGeneratedCode: Relative location of generated code
+codeLocationTip: 'Assemble the code generation locations quickly. Fill in relative paths, e.g.: user/group, user_group'
+commonRepository: Common Repository
+confirmCrudCodeGeneration: Confirm CRUD code generation
+continueBuilding: Continue Generating
+tableDesignChange: Table Design Changes
+dataTableDesignChangesPreview: Data Table Design Changes Preview
+designChangeTips: After unchecking, the change will not be synced to the table (usually used when the table structure has been manually modified)
+tableReBuild: Drop and Rebuild Table
+tableReBuildBlockHelp: Do not adjust the table structure; directly drop the existing table and rebuild it. This ensures the CRUD code/records match the table structure
+addField: Add Field
+deleteField: Delete Field
+modifyFieldName: Modify Field Name
+modifyFieldOrder: Modify Field Order
+modifyFieldProperties: Modify Field Properties
+firstField: First Field
+after: After
+generateCrudCode: Generate CRUD Code
+giveUp: Give Up
+yes: Yes
+no: No
+pleaseEnterTheDataTableName: Please enter the table name!
+pleaseEnterTheCorrectTableName: Please enter a valid table name!
+tableNameFormatTip: Use lowercase with underscores for the table name, starting with a lowercase letter; digits are allowed
+pleaseDesignThePrimaryKeyField: Please design a primary key field!
+thereCanOnlyBeOnePrimaryKeyField: There can only be one primary key field.
+fieldNameDuplication: 'Field name {field} is duplicated!'
+invalidFieldName: 'Field name {field} is invalid. It must start with a letter or underscore and contain only letters, digits, and underscores'
+giveUpConfirm: Giving up is irreversible. Are you sure you want to give up?
+tableExistsTip: The table already exists. Continuing will automatically drop the old table and create a new one (the table is empty or you have checked drop-and-rebuild)!
+handlerExistsTip: The handler already exists. Continuing will automatically overwrite the existing code!
+menuRuleExistsTip: A menu rule with the same name already exists. This generation will not create the menu and permission nodes!
+fieldCommentTip: The field comment will be used as the CRUD dictionary. The part before the colon is the field title, and the part after is the data dictionary
+resetGenerateTypeAttr: The field generate type has changed. Reset the field design (except the field name) to the new type preset?
+viteHotWarning: Vite hot update service not found. Please generate code in the development environment, or recompile to use new features
+dragToDesign: Drag the left elements here to start designing CRUD
+designEfficiency: Confirm the design validity by yourself
+emptyString: Empty String
+noDefaultValue: No Default Value
+width: Table Column Width
+sortable: Field Sort
+operator: Common Search Operator
+comSearchRender: Common Search Input Render
+comSearchInputAttr: Common Search Input Extra Attributes
+render: Render
+step: Step Value
+rows: Rows
+remotePk: Remote Select value field
+remoteField: Remote Select label field
+remoteModelFile: Related Model Location
+remoteModelName: Related Model Name
+remoteModelPackage: Related Model Package
+remoteCrudLog: CRUD Record
+relationFields: Related Table Display Fields
+imageMultiple: Multiple Image Upload
+fileMultiple: Multiple File Upload
+selectMultiple: Multiple Select
+validator: Validation Rules
+validatorMsg: Validation Error Message
+joinTableTip: Remote select is unrelated to the model; these configs are to automatically complete the model-level relation definition
+serverRestarting: Waiting for API server to restart...
