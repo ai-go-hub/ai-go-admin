@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"strings"
 	"sync"
 
 	assets "github.com/ai-go-hub/ai-go-admin"
@@ -158,6 +159,7 @@ func Init() error {
 		}
 
 		// 支持环境变量覆盖
+		vip.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
 		vip.AutomaticEnv()
 
 		// 解析到结构体
