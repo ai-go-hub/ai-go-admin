@@ -28,7 +28,7 @@ func NewAuthAdminGroupHandler(svc *svcAuth.AuthAdminGroupService) *AuthAdminGrou
 				}
 			}),
 			handler.WithOmitFields(handler.ActionFields{
-				Update: []string{"id"},
+				Update: []string{"id", "children"},
 			}),
 		),
 		svc: svc,

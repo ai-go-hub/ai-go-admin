@@ -50,7 +50,7 @@ func NewAuthAdminRuleHandler(svc *svcAuth.AuthAdminRuleService) *AuthAdminRuleHa
 				}
 			}),
 			handler.WithOmitFields(handler.ActionFields{
-				Update: []string{"id"},
+				Update: []string{"id", "children"},
 			}),
 		),
 		svc: svc,
