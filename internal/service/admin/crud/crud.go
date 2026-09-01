@@ -15,7 +15,6 @@ import (
 	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
 	repoCommon "github.com/ai-go-hub/ai-go-admin/internal/repository/common"
 	tbl "github.com/ai-go-hub/ai-go-admin/internal/service/admin/crud/table"
-	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 )
 
 // TableInfo 数据表信息
@@ -254,7 +253,7 @@ func CreateMenuRule(ctx context.Context, repoAuth *repoAuth.AdminRuleRepository,
 			ruleType = "menu"
 			title = table.Comment + "管理"
 			ruleComponent = &component
-			ruleOpenType = util.ToPtr("tab")
+			ruleOpenType = new("tab")
 		}
 		rule := &model.AdminRule{
 			Type:      ruleType,

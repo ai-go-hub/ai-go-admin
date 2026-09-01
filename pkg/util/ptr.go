@@ -18,8 +18,3 @@ func PtrIsZero[T comparable](v *T) bool {
 func PtrNotZero[T comparable](v *T) bool {
 	return v != nil && FromPtr(v) != *new(T)
 }
-
-// ToPtr 快速构造指针
-func ToPtr[T any](v T) *T {
-	return &v
-}

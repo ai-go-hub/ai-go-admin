@@ -121,7 +121,7 @@ func (s *AdminService) Init(ctx context.Context, adminSession *dto.AdminSession)
 
 	// 2. 当前管理员拥有的权限规则（菜单）列表
 	perm := permission.New()
-	rules, err := perm.GetRules(ctx, adminSession.ID, util.ToPtr(permission.RuleStatusEnabled))
+	rules, err := perm.GetRules(ctx, adminSession.ID, new(permission.RuleStatusEnabled))
 	if err != nil {
 		return nil, err
 	}

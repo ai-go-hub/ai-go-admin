@@ -55,7 +55,7 @@ func (s *AuthAdminGroupService) Create(ctx context.Context, tri *bindx.Tri[model
 		return err
 	}
 	if hasAll {
-		tri.Model.Rules = util.ToPtr("*")
+		tri.Model.Rules = new("*")
 	}
 
 	// 权限规则校验
@@ -89,7 +89,7 @@ func (s *AuthAdminGroupService) Update(ctx context.Context, tri *bindx.Tri[model
 		tri.Map["rules"] = "*"
 
 		// 用于后续权限规则校验
-		tri.Model.Rules = util.ToPtr("*")
+		tri.Model.Rules = new("*")
 	}
 
 	// 权限规则校验
@@ -235,7 +235,7 @@ func (s *AuthAdminGroupService) StripParentRuleIDs(ctx context.Context, entity *
 		}
 		kept = append(kept, strconv.FormatUint(uint64(id), 10))
 	}
-	return util.ToPtr(strings.Join(kept, ",")), nil
+	return new(strings.Join(kept, ",")), nil
 }
 
 // BuildRulesTitles 为分组列表构建 rules 字段的摘要文本

@@ -9,7 +9,6 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
-	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 
 	"gorm.io/gorm"
 )
@@ -126,7 +125,7 @@ func (p *Permission) Check(ctx context.Context, adminId uint, ruleNames []string
 		return true, nil
 	}
 
-	ruleIDs, err := p.ruleIdsFromGroups(ctx, groups, util.ToPtr(RuleStatusEnabled))
+	ruleIDs, err := p.ruleIdsFromGroups(ctx, groups, new(RuleStatusEnabled))
 	if err != nil {
 		return false, err
 	}
