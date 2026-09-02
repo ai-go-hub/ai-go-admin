@@ -190,6 +190,9 @@ func (h *Handler) CheckLog(c *gin.Context) {
 
 // CheckGenerate 生成前检查
 func (h *Handler) CheckGenerate(c *gin.Context) {
+	if !h.checkPermission(c, []string{"crud/crud/create"}) {
+		return
+	}
 	var req struct {
 		Table       string `json:"table"`
 		HandlerFile string `json:"handler"`
@@ -311,6 +314,9 @@ func (h *Handler) LogStart(c *gin.Context) {
 
 // Generate 生成 CRUD 代码
 func (h *Handler) Generate(c *gin.Context) {
+	if !h.checkPermission(c, []string{"crud/crud/create"}) {
+		return
+	}
 	var req struct {
 		Type   string           `json:"type"`
 		Table  dto.CRUDTable    `json:"table"`
