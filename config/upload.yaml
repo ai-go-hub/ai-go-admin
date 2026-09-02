@@ -15,7 +15,6 @@ upload:
     - jpeg
     - gif
     - webp
-    - svg
     - avif
     - zip
     - rar

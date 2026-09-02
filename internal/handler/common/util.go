@@ -10,6 +10,7 @@ import (
 
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	repoCommon "github.com/ai-go-hub/ai-go-admin/internal/repository/common"
+	"github.com/ai-go-hub/ai-go-admin/pkg/xss"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,6 +40,10 @@ func (h *UtilHandler) RegisterRoutes(group *gin.RouterGroup) {
 
 // buildSuffixSvg 构建文件后缀的 SVG 图片
 func buildSuffixSvg(suffix, background string) string {
+	// 清理 XSS
+	suffix = xss.TextPolicySanitize(suffix)
+	background = xss.TextPolicySanitize(background)
+
 	suffix = strings.ToUpper(suffix)
 	if len(suffix) > 4 {
 		suffix = suffix[:4]
