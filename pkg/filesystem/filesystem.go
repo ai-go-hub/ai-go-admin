@@ -12,7 +12,7 @@ import (
 
 // Dir 返回路径所在目录（统一 / 分隔）
 func Dir(path string) string {
-	return filepath.ToSlash(filepath.Dir(filepath.ToSlash(path)))
+	return filepath.ToSlash(filepath.Dir(strings.ReplaceAll(path, `\`, `/`)))
 }
 
 // FormatGoFile 对 Go 文件执行 go fmt 格式化命令
