@@ -111,6 +111,20 @@ type DatabaseConfig struct {
 	Read   ReadConfig
 }
 
+// 接口节流配置
+type ThrottleConfig struct {
+	Enabled            bool                `mapstructure:"enabled"`
+	Max                float64             `mapstructure:"max"`
+	Burst              int                 `mapstructure:"burst"`
+	ExpirationTTL      int                 `mapstructure:"expiration_ttl"`
+	IgnoreURL          bool                `mapstructure:"ignore_url"`
+	Methods            []string            `mapstructure:"methods"`
+	Headers            map[string][]string `mapstructure:"headers"`
+	StatusCode         int                 `mapstructure:"status_code"`
+	Message            string              `mapstructure:"message"`
+	MessageContentType string              `mapstructure:"message_content_type"`
+}
+
 // 聚合配置
 type Config struct {
 	App      App
@@ -121,6 +135,7 @@ type Config struct {
 	Database DatabaseConfig
 	Upload   UploadConfig
 	CDN      CDNConfig
+	Throttle ThrottleConfig
 }
 
 var (

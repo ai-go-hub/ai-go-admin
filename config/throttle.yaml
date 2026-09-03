@@ -1,0 +1,23 @@
+# 接口节流配置
+# 客户端 IP 解析直接使用 Gin ClientIP（遵循 server.trusted_proxies 可信代理配置）
+throttle:
+  # 是否启用全局接口节流功能
+  enabled: true
+  # 令牌补充速率（每秒向桶里补 N 个令牌）
+  max: 10
+  # 桶容量（桶最多存 N 个令牌，允许瞬间连续请求 N 次）
+  burst: 10
+  # 过期时间（秒）: 统一作用于令牌桶、Header 等条目
+  expiration_ttl: 3600
+  # 限流 key 是否忽略 URL（若设为 true 则仅按 IP 限流，同时应调高 max；可用于区分 `全局防刷` 还是 `逐接口保护`）
+  ignore_url: false
+  # 需要限流的 HTTP 方法，空列表表示限制全部方法
+  methods: []
+  # 按请求头限流: 键为请求头名，值为触发限流的取值列表（空列表表示存在该请求头即限流）
+  headers: {}
+  # 超限响应状态码
+  status_code: 429
+  # 超限响应内容
+  message: "请求频繁，请稍后再试"
+  # 超限响应 Content-Type
+  message_content_type: "application/json; charset=utf-8"

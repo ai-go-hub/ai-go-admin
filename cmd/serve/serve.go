@@ -53,6 +53,9 @@ func Run(cmd *cobra.Command, args []string) error {
 	// 注册跨域中间件
 	engine.Use(middleware.CORS())
 
+	// 注册全局接口节流中间件
+	engine.Use(middleware.Throttle())
+
 	// 注册数据库中间件
 	engine.Use(database.Middleware())
 
