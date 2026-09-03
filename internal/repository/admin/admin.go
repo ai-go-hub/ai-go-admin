@@ -44,11 +44,24 @@ func (r *AdminRepository) UpdateLoginInfo(ctx context.Context, id uint, loginIP 
 	return err
 }
 
-// IncrementLoginFailure 增加登录失败次数
-func (r *AdminRepository) IncrementLoginFailure(ctx context.Context, id uint) error {
-	_, err := gorm.G[model.Admin](r.DB()).
-		Where("id = ?", id).
-		Update(ctx, "login_failure", gorm.Expr("login_failure + ?", 1))
+// RecordLoginFailure 记录一次登录失败，失败计数与时间锚点同步刷新。
+// 仅在未达到失败阈值时生效：达到阈值后锚点即被冻结，作为锁定起始时刻不再变动。
+func (r *AdminRepository) RecordLoginFailure(ctx context.Context, id uint, loginIP string, maxFailures int) error {
+	_, err := gorm.G[map[string]any](r.DB()).Table(model.Admin{}.TableName()).
+		Where("id = ? AND login_failure < ?", id, maxFailures).
+		Updates(ctx, map[string]any{
+			"login_failure": gorm.Expr("login_failure + ?", 1),
+			"last_login_at": gorm.Expr("NOW()"),
+			"last_login_ip": loginIP,
+		})
+	return err
+}
+
+// ResetLoginFailure 清零登录失败计数，用于失败窗口过期后重新计数
+func (r *AdminRepository) ResetLoginFailure(ctx context.Context, id uint) error {
+	_, err := gorm.G[map[string]any](r.DB()).Table(model.Admin{}.TableName()).
+		Where("id = ? AND login_failure > 0", id).
+		Update(ctx, "login_failure", 0)
 	return err
 }
 

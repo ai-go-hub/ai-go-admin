@@ -37,6 +37,17 @@ func NewAdminService(repo *repoAdmin.AdminRepository) *AdminService {
 	}
 }
 
+// errWrongCredentials 统一的登录失败文案: 用户名不存在、密码错误均返回同一错误，避免用户名枚举
+var errWrongCredentials = errors.New("用户名或密码错误")
+
+// 管理员登录安全参数
+const (
+	// maxLoginFailures 连续登录失败次数阈值，达到后锁定账号
+	maxLoginFailures = 10
+	// loginLockDuration 连续登录失败的累计窗口，同时也是账号锁定时长
+	loginLockDuration = 24 * time.Hour
+)
+
 // Login 管理员登录
 func (s *AdminService) Login(ctx context.Context, req *dto.LoginRequest, clientIP string) (*dto.LoginResponse, error) {
 	if config.Get().Captcha.Switches.AdminLogin {
@@ -48,19 +59,39 @@ func (s *AdminService) Login(ctx context.Context, req *dto.LoginRequest, clientI
 	// 根据用户名查询管理员
 	admin, err := s.repo.FindByUsername(ctx, req.Username)
 	if err != nil {
-		return nil, errors.New("用户名或密码错误")
+		// 用户名不存在时也执行一次等价开销的 bcrypt 运算，抹平与真实密码比对的响应时间差异。
+		// cost 与创建密码时一致；bcrypt 仅处理前 72 字节，超长部分截断，
+		// 否则 GenerateFromPassword 对超长密码会直接报错跳过运算，时间差异重现
+		password := []byte(req.Password)
+		if len(password) > 72 {
+			password = password[:72]
+		}
+		_, _ = bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+		return nil, errWrongCredentials
+	}
+
+	// 失败窗口过期判断：距上次登录尝试超过锁定时长则清零失败计数重新累计
+	if admin.LoginFailure > 0 && admin.LastLoginAt != nil && time.Since(*admin.LastLoginAt) > loginLockDuration {
+		_ = s.repo.ResetLoginFailure(ctx, admin.ID)
+		admin.LoginFailure = 0
+	}
+
+	// 锁定中直接拒绝：不校验密码、不写库，时间锚点保持冻结，锁定时长固定为 loginLockDuration；
+	// 窗口过期后上方已清零计数，自然放行。
+	if admin.LoginFailure >= maxLoginFailures {
+		return nil, errors.New("请求频繁，请改天再试")
+	}
+
+	// 验证密码
+	if err := bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(req.Password)); err != nil {
+		// 记录失败次数并刷新时间锚点，达到阈值后锚点冻结，账号进入锁定
+		_ = s.repo.RecordLoginFailure(ctx, admin.ID, clientIP, maxLoginFailures)
+		return nil, errWrongCredentials
 	}
 
 	// 检查账号状态
 	if admin.Status == "disable" {
 		return nil, errors.New("账号已被禁用")
-	}
-
-	// 验证密码
-	if err := bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(req.Password)); err != nil {
-		// 增加登录失败次数
-		_ = s.repo.IncrementLoginFailure(ctx, admin.ID)
-		return nil, errors.New("用户名或密码错误")
 	}
 
 	// 更新登录信息
