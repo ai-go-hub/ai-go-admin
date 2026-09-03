@@ -30,9 +30,8 @@ func NewAdminLogHandler(svc *svcAdmin.AdminLogService) *AdminLogHandler {
 	}
 }
 
-// RegisterRoutes 注册路由，日志只读，仅注册 List 和 Get
+// RegisterRoutes 注册路由，日志只读，仅注册 List
 // 无需验权，列表只会读取当前管理员的日志记录，同时菜单规则管理内保留下级 read 权限节点，用于决定菜单是否显示
 func (h *AdminLogHandler) RegisterRoutes(group *gin.RouterGroup) {
 	group.POST("/list", middleware.AdminAuth(), h.List)
-	group.GET("/get/:pk", middleware.AdminAuth(), h.Get)
 }
