@@ -33,6 +33,7 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 	admin := middleware.GetAdmin(c)
 	if admin == nil {
 		httpx.Fail(c, httpx.WithMessage("请先登录"))
+		return
 	}
 
 	// 上传用户信息
