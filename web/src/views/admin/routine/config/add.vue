@@ -7,6 +7,7 @@
             <div class="ag-operate-form ag-add-form" :style="config.layout.shrink ? '' : 'width: calc(100% - ' + state.labelWidth / 2 + 'px)'">
                 <el-form
                     ref="formRef"
+                    @submit.prevent=""
                     @keyup.enter="onAddSubmit()"
                     :rules="rules"
                     :model="state.addConfig"

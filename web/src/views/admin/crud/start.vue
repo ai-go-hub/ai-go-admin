@@ -68,6 +68,7 @@
             >
                 <el-form
                     :label-width="140"
+                    @submit.prevent=""
                     @keyup.enter="onSubmitSelectTableForm()"
                     class="select-table-form"
                     ref="formRef"

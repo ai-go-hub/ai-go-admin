@@ -93,7 +93,7 @@
                     <p>{{ $t('login.welcomePrompt', { siteName: config.site.name }) }}</p>
                 </div>
 
-                <el-form ref="formRef" :model="loginForm" :rules="rules" size="large" @keyup.enter="onSubmit">
+                <el-form @submit.prevent="" ref="formRef" :model="loginForm" :rules="rules" size="large" @keyup.enter="onSubmit">
                     <el-form-item prop="username">
                         <el-input
                             ref="usernameInputRef"

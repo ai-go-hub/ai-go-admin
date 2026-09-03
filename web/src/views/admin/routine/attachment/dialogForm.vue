@@ -21,6 +21,7 @@
             >
                 <el-form
                     ref="formRef"
+                    @submit.prevent=""
                     @keyup.enter="manager.submitForm(formRef)"
                     :model="formItems"
                     :label-position="config.layout.shrink ? 'top' : 'right'"

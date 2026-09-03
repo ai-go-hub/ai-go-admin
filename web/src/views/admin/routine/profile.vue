@@ -33,6 +33,7 @@
 
                     <div class="admin-info-form">
                         <el-form
+                            @submit.prevent=""
                             @keyup.enter="onSubmit(formRef)"
                             :key="state.formKey"
                             label-position="top"

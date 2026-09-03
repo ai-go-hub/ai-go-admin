@@ -207,7 +207,7 @@
                         {{ t('crud.index.selectFieldFirstTip') }}
                     </div>
                     <div v-else :key="'activate-field-' + state.activateField">
-                        <el-form label-position="top">
+                        <el-form @submit.prevent="" label-position="top">
                             <el-divider content-position="left">{{ t('crud.index.common') }}</el-divider>
                             <el-form-item :label="t('crud.index.generateType')">
                                 <el-select
@@ -352,6 +352,7 @@
                 <div class="ag-operate-form" :style="'width: calc(100% - 80px)'">
                     <el-form
                         ref="formRef"
+                        @submit.prevent=""
                         :model="state.remoteSelectPre.form"
                         :rules="remoteSelectPreFormRules"
                         v-loading="state.remoteSelectPre.loading"
