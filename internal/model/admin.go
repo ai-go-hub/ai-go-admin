@@ -170,9 +170,9 @@ func (l *AdminLog) BeforeCreate(tx *gorm.DB) error {
 	}
 
 	// 脱敏敏感字段
-	for _, field := range []string{"password", "salt", "token"} {
-		if _, ok := data[field]; ok {
-			data[field] = "******"
+	for key := range data {
+		if isSensitiveLogField(key) {
+			data[key] = "******"
 		}
 	}
 
@@ -192,4 +192,18 @@ func (l *AdminLog) BeforeCreate(tx *gorm.DB) error {
 	maskedStr := string(masked)
 	l.Data = &maskedStr
 	return nil
+}
+
+// isSensitiveLogField 判断日志字段是否需要脱敏
+func isSensitiveLogField(field string) bool {
+	name := strings.ToLower(strings.TrimSpace(field))
+	switch name {
+	case "password", "salt", "token", "secret":
+		return true
+	}
+	return strings.HasSuffix(name, "_key") ||
+		strings.HasSuffix(name, "_secret") ||
+		strings.HasSuffix(name, "_password") ||
+		strings.HasSuffix(name, "_pass") ||
+		strings.HasSuffix(name, "_token")
 }
