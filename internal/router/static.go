@@ -18,7 +18,24 @@ import (
 func init() {
 	registry.Register(func(r *gin.Engine) {
 		// 静态资源合并托管: 嵌入资源优先，其余回退磁盘
-		r.StaticFS("/static", http.FS(staticFS{}))
+		g := r.Group("/static")
+		// 禁止浏览器对响应做 MIME 嗅探，避免上传的伪装文件被当可执行内容渲染
+		g.Use(func(c *gin.Context) {
+			c.Header("X-Content-Type-Options", "nosniff")
+			c.Next()
+		})
+
+		// 禁止目录列表的静态文件服务器
+		fileServer := http.StripPrefix("/static", http.FileServer(noListFS{http.FS(staticFS{})}))
+		handler := func(c *gin.Context) {
+			// 直接全部标记 404
+			c.Status(http.StatusNotFound)
+
+			// 存在的文件会被 http.FileServer 用 200 覆盖
+			fileServer.ServeHTTP(c.Writer, c.Request)
+		}
+		g.GET("/*filepath", handler)
+		g.HEAD("/*filepath", handler)
 
 		// 自定义上传文件的存储路径后，或许不能再为其提供静态服务
 		if prefix := config.Get().Upload.URLPrefix; prefix != "" && !strings.HasPrefix(prefix, "/static") {
@@ -67,4 +84,29 @@ func uploadFilePath(name string) (string, bool) {
 		return rest, true
 	}
 	return "", false
+}
+
+// noListFS 包装 http.FileSystem，
+// 使目录的 Readdir 返回空，从而禁止 http.FileServer 输出目录列表
+type noListFS struct {
+	fs http.FileSystem
+}
+
+// Open 打开文件，目录返回禁止列表的文件
+func (n noListFS) Open(name string) (http.File, error) {
+	f, err := n.fs.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	return noListFile{f}, nil
+}
+
+// noListFile 包装 http.File，覆盖 Readdir 使目录列表为空
+type noListFile struct {
+	http.File
+}
+
+// Readdir 返回空列表，禁止目录列举
+func (f noListFile) Readdir(int) ([]fs.FileInfo, error) {
+	return nil, nil
 }
