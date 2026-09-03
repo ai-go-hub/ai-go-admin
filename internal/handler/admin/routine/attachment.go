@@ -19,7 +19,8 @@ func NewAttachmentHandler(svc *svcRoutine.AttachmentService) *AttachmentHandler 
 	return &AttachmentHandler{
 		Handler: handler.NewHandler(svc,
 			handler.WithOmitFields(handler.ActionFields{
-				Update: []string{"id"},
+				Create: []string{"id", "url", "driver"},
+				Update: []string{"id", "url", "driver"},
 			}),
 		),
 		svc: svc,

@@ -33,7 +33,7 @@ type Driver interface {
 	// Exists 判断文件是否存在
 	Exists(storedFilename string) bool
 	// FullPath 返回文件在磁盘上的完整存储路径
-	FullPath(storedFilename string) string
+	FullPath(storedFilename string) (string, error)
 }
 
 // Result 上传结果

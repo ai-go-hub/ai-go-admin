@@ -62,7 +62,7 @@
                     </el-form-item>
 
                     <el-form-item :label="t('routine.attachment.driver')">
-                        <el-input v-model="formItems.driver" type="string"></el-input>
+                        <el-input v-model="formItems.driver" type="string" disabled></el-input>
                     </el-form-item>
 
                     <el-form-item :label="t('routine.attachment.sha1')">
