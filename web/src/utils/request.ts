@@ -1,4 +1,5 @@
 import i18n from '@/lang'
+import router from '@/router/index'
 import { adminBaseRoutePath } from '@/router/static/adminBase'
 import { useAdminInfo } from '@/stores/adminInfo'
 import { keysToCamelCase, keysToSnakeCase } from '@/utils/common'
@@ -13,7 +14,7 @@ export interface RequestOptions {
     loading?: boolean
     // 是否自动取消重复请求，默认 true
     cancelDuplicate?: boolean
-    // 是否显示操作成功提示，默认 false
+    // 是否显示操作成功提示（code === 0），默认 false
     showSuccessMessage?: boolean
     // 是否显示业务错误提示（code !== 0），默认 true
     showErrorMessage?: boolean
@@ -191,6 +192,13 @@ instance.interceptors.response.use(
         if (response.data.code !== 0) {
             if (opts.showErrorMessage !== false) {
                 ElMessage.error(response.data.message || i18n.global.t('common.operationFailed'))
+            }
+
+            // 需要身份认证（鉴权失败也是 401 但无 type）
+            if (response.data.code === 401 && response.data.data && response.data.data.type == 'need_login') {
+                const adminInfo = useAdminInfo()
+                adminInfo.removeToken()
+                router.push({ name: 'admin/login' })
             }
             return Promise.reject(response)
         }

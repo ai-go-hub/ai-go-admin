@@ -535,7 +535,7 @@ func (h *Handler) ChatStream(c *gin.Context) {
 func (h *Handler) checkPermission(c *gin.Context, node []string) bool {
 	admin := middleware.GetAdmin(c)
 	if admin == nil {
-		httpx.Fail(c, httpx.WithCode(http.StatusUnauthorized), httpx.WithMessage("未登录"))
+		httpx.Fail(c, httpx.WithCode(http.StatusUnauthorized), httpx.WithData(gin.H{"type": middleware.FlagNeedLogin}), httpx.WithMessage("未登录"))
 		return false
 	}
 
