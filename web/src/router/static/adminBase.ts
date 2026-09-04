@@ -20,7 +20,7 @@ const adminBaseRoute: RouteRecordRaw = {
     children: [
         {
             path: 'loading/:to?',
-            name: 'adminMainLoading',
+            name: 'admin/main-loading',
             component: () => import('@/layouts/admin/loading.vue'),
             meta: {
                 title: `common.loading`,

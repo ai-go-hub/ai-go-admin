@@ -38,7 +38,7 @@ const state = reactive({
 
 onMounted(() => {
     if (!adminInfo.token) {
-        return router.push({ name: 'adminLogin' })
+        return router.push({ name: 'admin/login' })
     }
 
     init()
