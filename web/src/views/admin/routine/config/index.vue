@@ -98,6 +98,9 @@
                                         }"
                                     />
                                 </el-form-item>
+
+                                <div class="config-form-item-name">$ai_default_model</div>
+                                <div class="del-config-form-item"></div>
                             </div>
 
                             <el-button type="primary" @click="onSubmit()">{{ t('common.save') }}</el-button>
