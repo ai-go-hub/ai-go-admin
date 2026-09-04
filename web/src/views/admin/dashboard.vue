@@ -1215,6 +1215,22 @@ html.dark {
     }
     .welcome-timer {
         min-height: 120px;
+        background: #e1eaf9;
+        box-shadow: 0 2px 12px rgba(64, 158, 255, 0.08);
+        padding: 14px 28px;
+        border-radius: 12px;
+        transition:
+            box-shadow 0.35s ease,
+            transform 0.35s ease;
+        flex-direction: row;
+        justify-content: space-evenly;
+        .timer-time .num {
+            font-size: 50px;
+        }
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(64, 158, 255, 0.16);
+        }
     }
 }
 @media (max-width: 640px) {
@@ -1229,6 +1245,11 @@ html.dark {
     }
     .welcome-illustration {
         display: none;
+    }
+    .welcome-timer {
+        flex-direction: column;
+        justify-content: center;
+        padding: 20px 0;
     }
     .timer-time .num {
         font-size: 26px;

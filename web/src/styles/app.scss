@@ -123,3 +123,15 @@ body,
         transform: rotate(360deg);
     }
 }
+
+// ==================== 自适应 ====================
+@media screen and (max-width: 768px) {
+    .xs-hidden {
+        display: none;
+    }
+}
+@media screen and (max-width: 1024px) {
+    .ag-operate-dialog {
+        width: 96%;
+    }
+}
