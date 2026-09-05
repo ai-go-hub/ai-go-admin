@@ -206,12 +206,13 @@
                     <el-col :xs="24" :sm="6">
                         <div class="com-search-col pl-20">
                             <el-button
+                                v-blur
                                 @click="props.manager.handleEvent('com-search', { event: 'submit-com-search-form', data: comSearch.form })"
                                 type="primary"
                             >
                                 {{ $t('common.search') }}
                             </el-button>
-                            <el-button @click="onResetForm()">{{ $t('common.reset') }}</el-button>
+                            <el-button v-blur @click="onResetForm()">{{ $t('common.reset') }}</el-button>
                         </div>
                     </el-col>
                 </el-row>

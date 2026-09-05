@@ -107,9 +107,11 @@
                 </el-form>
                 <template #footer>
                     <div :style="{ width: 'calc(100% * 0.9)' }">
-                        <el-button @click="state.showSelectTableDialog = false">{{ $t('common.cancel') }}</el-button>
-                        <el-button :loading="state.loading" @click="onSubmitSelectTableForm()" type="primary">{{ t('common.confirm') }}</el-button>
-                        <el-button v-if="state.successRecord" @click="onLogStart" type="success">
+                        <el-button v-blur @click="state.showSelectTableDialog = false">{{ $t('common.cancel') }}</el-button>
+                        <el-button v-blur :loading="state.loading" @click="onSubmitSelectTableForm()" type="primary">
+                            {{ t('common.confirm') }}
+                        </el-button>
+                        <el-button v-blur v-if="state.successRecord" @click="onLogStart" type="success">
                             {{ t('crud.index.recordStart') }}
                         </el-button>
                     </div>

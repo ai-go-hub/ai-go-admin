@@ -73,8 +73,8 @@
         </el-scrollbar>
         <template #footer>
             <div :style="'width: calc(100% - ' + manager.form.labelWidth! / 1.8 + 'px)'">
-                <el-button @click="manager.toggleForm()">{{ t('common.cancel') }}</el-button>
-                <el-button :loading="manager.form.submitLoading" @click="manager.submitForm(formRef)" type="primary">
+                <el-button v-blur @click="manager.toggleForm()">{{ t('common.cancel') }}</el-button>
+                <el-button v-blur :loading="manager.form.submitLoading" @click="manager.submitForm(formRef)" type="primary">
                     {{ manager.form.operatePKs && manager.form.operatePKs.length > 1 ? t('common.saveAndContinue') : t('common.save') }}
                 </el-button>
             </div>

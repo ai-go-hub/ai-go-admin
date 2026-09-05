@@ -2,7 +2,7 @@
     <div>
         <el-input :model-value="props.cellValue" :placeholder="$t('common.url')">
             <template #append>
-                <el-button @click="openURL(props.cellValue)">
+                <el-button v-blur @click="openURL(props.cellValue)">
                     <Icon size="16" color="#606266" name="el-position" />
                 </el-button>
             </template>

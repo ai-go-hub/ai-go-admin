@@ -74,10 +74,10 @@
                                 />
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" :loading="state.buttonLoading" @click="onSubmit(formRef)">
+                                <el-button v-blur type="primary" :loading="state.buttonLoading" @click="onSubmit(formRef)">
                                     {{ t('common.save') }}
                                 </el-button>
-                                <el-button @click="resetForm(formRef)">{{ t('common.reset') }}</el-button>
+                                <el-button v-blur @click="resetForm(formRef)">{{ t('common.reset') }}</el-button>
                             </el-form-item>
                         </el-form>
                     </div>

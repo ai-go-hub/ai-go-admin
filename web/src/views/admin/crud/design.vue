@@ -16,10 +16,10 @@
                         <el-link v-if="crudState.type != 'create'" @click="state.showDesignChangeLog = true" class="design-change-log" type="primary">
                             {{ t('crud.index.tableDesignChange') }}
                         </el-link>
-                        <el-button type="primary" :loading="state.loading.generate" @click="onGenerate">
+                        <el-button v-blur type="primary" :loading="state.loading.generate" @click="onGenerate">
                             {{ t('crud.index.generateCrudCode') }}
                         </el-button>
-                        <el-button @click="onAbandonDesign" type="danger">{{ t('crud.index.giveUp') }}</el-button>
+                        <el-button v-blur @click="onAbandonDesign" type="danger">{{ t('crud.index.giveUp') }}</el-button>
                     </div>
                 </div>
             </el-row>
@@ -183,6 +183,7 @@
                         </div>
                         <div class="design-field-right">
                             <el-button
+                                v-blur
                                 v-if="['remoteSelect', 'remoteSelects'].includes(field.designType)"
                                 @click.stop="onEditField(index, field)"
                                 type="primary"
@@ -191,7 +192,7 @@
                             >
                                 <Icon color="var(--el-color-white)" size="15" name="lucide-pencil" />
                             </el-button>
-                            <el-button @click.stop="onDelField(index)" type="danger" size="small" circle>
+                            <el-button v-blur @click.stop="onDelField(index)" type="danger" size="small" circle>
                                 <Icon color="var(--el-color-white)" size="15" name="lucide-trash'" />
                             </el-button>
                         </div>
@@ -481,8 +482,8 @@
             </el-scrollbar>
             <template #footer>
                 <div :style="'width: calc(100% - 88px)'">
-                    <el-button @click="onCancelRemoteSelect">{{ $t('common.cancel') }}</el-button>
-                    <el-button @click="onSaveRemoteSelect" type="primary">
+                    <el-button v-blur @click="onCancelRemoteSelect">{{ $t('common.cancel') }}</el-button>
+                    <el-button v-blur @click="onSaveRemoteSelect" type="primary">
                         {{ $t('common.save') }}
                     </el-button>
                 </div>
@@ -501,8 +502,8 @@
             </div>
             <template #footer>
                 <div class="confirm-generate-dialog-footer">
-                    <el-button @click="closeConfirmGenerate">{{ $t('common.cancel') }}</el-button>
-                    <el-button :loading="state.loading.generate" @click="startGenerate" type="primary">
+                    <el-button v-blur @click="closeConfirmGenerate">{{ $t('common.cancel') }}</el-button>
+                    <el-button v-blur :loading="state.loading.generate" @click="startGenerate" type="primary">
                         {{ t('crud.index.continueBuilding') }}
                     </el-button>
                 </div>
@@ -542,7 +543,7 @@
             </el-scrollbar>
             <template #footer>
                 <div class="confirm-generate-dialog-footer">
-                    <el-button @click="state.showDesignChangeLog = false">
+                    <el-button v-blur @click="state.showDesignChangeLog = false">
                         {{ t('common.confirm') }}
                     </el-button>
                 </div>

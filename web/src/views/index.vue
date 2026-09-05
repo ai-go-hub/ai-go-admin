@@ -30,8 +30,8 @@
                 </h1>
                 <p class="hero-desc">{{ $t('index.heroDesc') }}</p>
                 <div class="hero-actions">
-                    <el-button size="large" type="primary" round @click="$router.push('/admin')"> {{ $t('index.enterAdmin') }} </el-button>
-                    <el-button size="large" round @click="scrollToTech"> {{ $t('index.learnTech') }} </el-button>
+                    <el-button v-blur size="large" type="primary" round @click="$router.push('/admin')"> {{ $t('index.enterAdmin') }} </el-button>
+                    <el-button v-blur size="large" round @click="scrollToTech"> {{ $t('index.learnTech') }} </el-button>
                 </div>
             </div>
             <div class="scroll-hint" @click="scrollToTech">

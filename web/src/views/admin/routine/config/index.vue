@@ -83,7 +83,7 @@
 
                             <!-- 邮件发送测试 -->
                             <div v-if="group.name == 'mail'" class="send-test-mail">
-                                <el-button @click="onTestSendMail()">{{ t('routine.config.testMailSending') }}</el-button>
+                                <el-button v-blur @click="onTestSendMail()">{{ t('routine.config.testMailSending') }}</el-button>
                             </div>
                             <!-- AI 配置 -->
                             <div v-if="group.name == 'ai'" class="config-form-item">
@@ -103,7 +103,7 @@
                                 <div class="del-config-form-item"></div>
                             </div>
 
-                            <el-button type="primary" @click="onSubmit()">{{ t('common.save') }}</el-button>
+                            <el-button v-blur type="primary" @click="onSubmit()">{{ t('common.save') }}</el-button>
                         </el-tab-pane>
                         <el-tab-pane
                             name="add_config"
@@ -115,7 +115,7 @@
             </el-col>
             <el-col :xs="24" :sm="8">
                 <el-card :header="t('routine.config.quickConfigurationEntry')">
-                    <el-button v-for="(item, idx) in state.quickEntrance" class="quick_entrance" :key="idx">
+                    <el-button v-blur v-for="(item, idx) in state.quickEntrance" class="quick_entrance" :key="idx">
                         <div @click="router.push({ name: item['value'] })">{{ item['key'] }}</div>
                     </el-button>
                 </el-card>

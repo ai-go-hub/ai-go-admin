@@ -12,12 +12,12 @@
                 <el-input v-model="item.value"></el-input>
             </el-col>
             <el-col :span="4">
-                <el-button @click="onDelArrayItem(idx)" size="small" icon="el-icon-delete" circle />
+                <el-button v-blur @click="onDelArrayItem(idx)" size="small" icon="el-icon-delete" circle />
             </el-col>
         </el-row>
         <el-row :gutter="10">
             <el-col :span="10" :offset="10">
-                <el-button class="ag-add-array-item" @click="onAddArrayItem" icon="el-icon-plus">{{ t('common.add') }}</el-button>
+                <el-button v-blur class="ag-add-array-item" @click="onAddArrayItem" icon="el-icon-plus">{{ t('common.add') }}</el-button>
             </el-col>
         </el-row>
     </div>

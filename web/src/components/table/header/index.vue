@@ -18,6 +18,7 @@
 
         <el-tooltip v-if="props.buttons.includes('refresh')" :content="t('common.refresh')" placement="top">
             <el-button
+                v-blur
                 @click="props.manager.handleEvent('refresh', { event: 'header-btn' })"
                 color="#40485b"
                 class="table-header-operate btns-ml-12"
@@ -30,7 +31,12 @@
         <slot name="refreshAppend"></slot>
 
         <el-tooltip v-if="props.buttons.includes('add') && props.manager.auth('create')" :content="t('common.add')" placement="top">
-            <el-button @click="props.manager.handleEvent('add', { event: 'header-btn' })" class="table-header-operate btns-ml-12" type="primary">
+            <el-button
+                v-blur
+                @click="props.manager.handleEvent('add', { event: 'header-btn' })"
+                class="table-header-operate btns-ml-12"
+                type="primary"
+            >
                 <Icon size="16" :stroke-width="3" name="lucide-plus" color="#ffffff" />
                 <span class="table-header-operate-text">{{ t('common.add') }}</span>
             </el-button>
@@ -38,6 +44,7 @@
 
         <el-tooltip v-if="props.buttons.includes('edit') && props.manager.auth('update')" :content="t('common.editSelection')" placement="top">
             <el-button
+                v-blur
                 @click="props.manager.handleEvent('edit-selected', { event: 'header-btn' })"
                 :disabled="!enableBatchOpt"
                 class="table-header-operate btns-ml-12"
@@ -60,7 +67,7 @@
             <template #reference>
                 <div class="btns-ml-12">
                     <el-tooltip :content="t('common.deleteSelection')" placement="top">
-                        <el-button :disabled="!enableBatchOpt" class="table-header-operate" type="danger">
+                        <el-button v-blur :disabled="!enableBatchOpt" class="table-header-operate" type="danger">
                             <Icon size="16" name="lucide-trash" color="#ffffff" />
                             <span class="table-header-operate-text">{{ t('common.delete') }}</span>
                         </el-button>
@@ -75,6 +82,7 @@
             placement="top"
         >
             <el-button
+                v-blur
                 @click="props.manager.handleEvent('toggle-expansion', { expanded: !props.manager.table.expandAll })"
                 class="table-header-operate btns-ml-12"
                 :type="props.manager.table.expandAll ? 'danger' : 'warning'"

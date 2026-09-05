@@ -91,6 +91,7 @@
                             </template>
                         </el-dropdown>
                         <el-button
+                            v-blur
                             type="primary"
                             :disabled="state.aiOutputMessageKey != null"
                             :loading="state.aiOutputMessageKey != null"

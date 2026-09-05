@@ -7,7 +7,7 @@
             class="default-main ag-flex-center ag-main-loading"
         ></div>
         <div v-if="state.showReload" class="ag-flex-center">
-            <el-button @click="refresh" type="warning">{{ $t('common.reload') }}</el-button>
+            <el-button v-blur @click="refresh" type="warning">{{ $t('common.reload') }}</el-button>
         </div>
     </div>
 </template>

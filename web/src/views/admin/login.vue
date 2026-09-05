@@ -127,7 +127,7 @@
                     </div>
 
                     <el-form-item>
-                        <el-button size="large" type="primary" :loading="submitLoading" class="submit-btn" @click="onSubmit">
+                        <el-button v-blur size="large" type="primary" :loading="submitLoading" class="submit-btn" @click="onSubmit">
                             {{ submitLoading ? t('login.loggingIn') : t('login.login') }}
                         </el-button>
                     </el-form-item>

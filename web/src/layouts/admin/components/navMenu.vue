@@ -18,8 +18,8 @@
                     </p>
                     <p>{{ t('layouts.reloadHotServerTips3') }}</p>
                     <div class="reload-hot-server-buttons">
-                        <el-button @click="onHotServerOpt('cancel')">{{ t('layouts.later') }}</el-button>
-                        <el-button @click="onHotServerOpt('reload')" type="primary">{{ t('layouts.restartHotUpdate') }}</el-button>
+                        <el-button v-blur @click="onHotServerOpt('cancel')">{{ t('layouts.later') }}</el-button>
+                        <el-button v-blur @click="onHotServerOpt('reload')" type="primary">{{ t('layouts.restartHotUpdate') }}</el-button>
                     </div>
                 </div>
             </div>
@@ -121,6 +121,7 @@
                 </div>
                 <div class="admin-info-footer">
                     <el-button
+                        v-blur
                         v-if="auth({ name: '/admin/routine/profile', subNodeName: '/admin/routine/profile/read' })"
                         @click="onAdminInfo"
                         type="primary"
@@ -128,7 +129,7 @@
                     >
                         {{ t('layouts.profile') }}
                     </el-button>
-                    <el-button @click="onLogout" type="danger" plain>{{ t('layouts.logout') }}</el-button>
+                    <el-button v-blur @click="onLogout" type="danger" plain>{{ t('layouts.logout') }}</el-button>
                 </div>
             </div>
         </el-popover>

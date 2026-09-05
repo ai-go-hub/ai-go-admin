@@ -29,11 +29,11 @@
 
             <!-- ==================== 操作 ==================== -->
             <div class="error-actions">
-                <el-button type="primary" size="large" round @click="goHome">
+                <el-button v-blur type="primary" size="large" round @click="goHome">
                     <Icon name="lucide-house" :size="16" class="btn-icon" />
                     <span>{{ $t('common.error.404.backHome') }}</span>
                 </el-button>
-                <el-button size="large" round @click="goBack">
+                <el-button v-blur size="large" round @click="goBack">
                     <Icon name="el-back" :size="16" class="btn-icon" />
                     <span>{{ $t('common.error.404.goBack') }}</span>
                 </el-button>

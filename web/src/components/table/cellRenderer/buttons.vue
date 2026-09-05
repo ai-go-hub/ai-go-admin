@@ -4,6 +4,7 @@
             <template v-if="btn.display ? btn.display(row, columnConfig) : true">
                 <!-- 常规按钮 -->
                 <el-button
+                    v-blur
                     v-if="btn.render == 'basic'"
                     @click="onButtonClick(btn)"
                     :class="btn.class"
@@ -27,6 +28,7 @@
                     v-bind="invokeTableContextDataFun(columnConfig.customRenderAttr?.tooltip, { row, columnConfig, column, cellValue: btn, index })"
                 >
                     <el-button
+                        v-blur
                         @click="onButtonClick(btn)"
                         :class="btn.class"
                         size="small"
@@ -65,6 +67,7 @@
                                 "
                             >
                                 <el-button
+                                    v-blur
                                     :class="btn.class"
                                     size="small"
                                     class="ag-table-render-buttons-item"
@@ -90,6 +93,7 @@
                     v-bind="invokeTableContextDataFun(columnConfig.customRenderAttr?.tooltip, { row, columnConfig, column, cellValue: btn, index })"
                 >
                     <el-button
+                        v-blur
                         :class="btn.class"
                         size="small"
                         class="ag-table-render-buttons-item move-button buttons-ml-6"

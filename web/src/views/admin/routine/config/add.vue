@@ -93,8 +93,8 @@
         </el-scrollbar>
         <template #footer>
             <div :style="'width: calc(100% - ' + state.labelWidth / 1.8 + 'px)'">
-                <el-button @click="closeForm">{{ t('common.cancel') }}</el-button>
-                <el-button :loading="state.submitLoading" @click="onAddSubmit()" type="primary"> {{ t('common.add') }} </el-button>
+                <el-button v-blur @click="closeForm">{{ t('common.cancel') }}</el-button>
+                <el-button v-blur :loading="state.submitLoading" @click="onAddSubmit()" type="primary"> {{ t('common.add') }} </el-button>
             </div>
         </template>
     </el-dialog>

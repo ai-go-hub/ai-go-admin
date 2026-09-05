@@ -55,7 +55,7 @@
                             @dragleave.prevent="onDragLeave"
                             @drop.prevent="onDrop"
                         >
-                            <el-button type="primary">
+                            <el-button v-blur type="primary">
                                 <Icon name="el-plus" color="#ffffff" />
                                 <span>{{ t('common.upload') }}</span>
                             </el-button>

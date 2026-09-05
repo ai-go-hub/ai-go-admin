@@ -354,7 +354,7 @@
                         <el-popconfirm @confirm="restoreDefault" :title="t('layouts.restoreConfigConfirm')">
                             <template #reference>
                                 <div class="ag-flex-center">
-                                    <el-button class="w90" type="info">{{ t('layouts.restoreDefault') }}</el-button>
+                                    <el-button v-blur class="w90" type="info">{{ t('layouts.restoreDefault') }}</el-button>
                                 </div>
                             </template>
                         </el-popconfirm>
