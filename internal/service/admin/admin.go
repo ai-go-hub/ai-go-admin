@@ -134,7 +134,7 @@ func (s *AdminService) Logout(ctx context.Context, tokenStr string) error {
 // Init 后台初始化数据聚合
 func (s *AdminService) Init(ctx context.Context, adminSession *dto.AdminSession) (*dto.InitResponse, error) {
 	// 1. 站点配置
-	configSiteNames := []string{"name", "record_number", "version"}
+	configSiteNames := []string{"name", "record_number", "ps_record_number", "version"}
 	siteConfig := make(map[string]string, len(configSiteNames)+3)
 
 	configs, err := gorm.G[model.Config](database.DB()).

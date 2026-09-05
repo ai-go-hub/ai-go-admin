@@ -26,6 +26,7 @@ export const useConfig = defineStore(
             version: '',
             timezone: '',
             recordNumber: '',
+            psRecordNumber: '',
             cdnUrlParams: '',
             initialized: false,
         })

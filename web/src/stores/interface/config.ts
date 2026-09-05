@@ -16,6 +16,7 @@ export interface Site {
     version: string
     timezone: string
     recordNumber: string
+    psRecordNumber: string
     cdnUrlParams: string
     initialized: boolean
 }
