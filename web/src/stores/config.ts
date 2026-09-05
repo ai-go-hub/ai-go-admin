@@ -49,7 +49,7 @@ export const useConfig = defineStore(
             menuActiveColor: ['#409eff', '#3375b9'],
             menuHoverBackground: ['#ecf5ff', '#18222c'],
             menuWidth: 260,
-            menuDefaultIcon: 'lucide-circle-small',
+            menuDefaultIcon: 'lucide-circle-dot-dashed',
             menuCollapse: false,
             menuUniqueOpened: false,
             menuShowTopBar: true,

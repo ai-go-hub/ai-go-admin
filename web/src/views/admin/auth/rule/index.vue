@@ -37,7 +37,7 @@ import DialogForm from './dialogForm.vue'
 const { t } = useI18n()
 const config = useConfig()
 const tableRef = useTemplateRef('tableRef')
-const defaultIcon = 'lucide-circle-small'
+const defaultIcon = 'lucide-circle'
 
 /**
  * 内存缓存表格的一些状态数据，供数据刷新后恢复

@@ -118,7 +118,7 @@ const state: {
     loading: false,
     inputValue: '',
     prependIcon: props.modelValue,
-    defaultModelValue: props.modelValue || 'lucide-circle-small',
+    defaultModelValue: props.modelValue || 'lucide-circle',
     iconKey: 0, // 给 icon 标签准备个key，以随时使用 h 函数重新生成元素
 })
 

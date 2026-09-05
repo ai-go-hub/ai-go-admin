@@ -103,7 +103,7 @@
                     </template>
 
                     <el-form-item v-if="formItems.type !== 'node'" :label="t('common.icon')" prop="icon">
-                        <IconSelect v-model="formItems.icon" />
+                        <IconSelect :show-icon-name="true" v-model="formItems.icon" />
                     </el-form-item>
 
                     <el-form-item :label="t('common.weigh')" prop="weigh">
