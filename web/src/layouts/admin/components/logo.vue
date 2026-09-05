@@ -1,12 +1,9 @@
 <template>
-    <div class="layout-title-bar" :class="config.layout.menuTopBarCenter ? 'layout-title-bar-center' : ''">
-        <img
-            v-if="config.layout.menuCollapse || config.layout.menuTopBarLogo"
-            :class="config.layout.menuCollapse ? 'collapse' : ''"
-            src="@/assets/logo.png"
-            class="logo-img"
-            alt="logo"
-        />
+    <div
+        class="layout-title-bar"
+        :class="[config.layout.menuTopBarCenter ? 'layout-title-bar-center' : '', config.layout.menuCollapse ? 'collapse' : '']"
+    >
+        <img v-if="config.layout.menuCollapse || config.layout.menuTopBarLogo" src="@/assets/logo.png" class="logo-img" alt="logo" />
         <div v-if="!config.layout.menuCollapse" class="website-name">{{ config.site.name }}</div>
     </div>
 </template>
@@ -32,7 +29,12 @@ const config = useConfig()
 }
 .logo-img {
     width: 26px;
-    &.collapse {
+}
+.collapse {
+    &.layout-title-bar {
+        padding: 10px 0;
+    }
+    .logo-img {
         margin: 0 auto;
     }
 }
