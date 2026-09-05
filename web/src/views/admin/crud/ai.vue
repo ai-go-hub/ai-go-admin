@@ -14,25 +14,32 @@
                             <div class="record-content-container">
                                 <div class="chat-record-nickname">{{ item.nickname }}</div>
                                 <div class="record-content" :id="`content-${idx}`">
-                                    <div class="record-reasoning" v-if="item.type == 'you' && item.reasoning && item.reasoning.trim()">
-                                        <div
-                                            class="record-reasoning-header"
-                                            :class="{ 'is-collapsed': !item.reasoningShow }"
-                                            @click="item.reasoningShow = !item.reasoningShow"
-                                        >
-                                            <span>{{ t('crud.ai.reasoning') }}</span>
-                                            <Icon name="el-arrow-down" size="12" />
+                                    <template v-if="item.type == 'you'">
+                                        <!-- 思考过程 -->
+                                        <div class="record-reasoning" v-if="item.reasoning && item.reasoning.trim()">
+                                            <div
+                                                class="record-reasoning-header"
+                                                :class="{ 'is-collapsed': !item.reasoningShow }"
+                                                @click="item.reasoningShow = !item.reasoningShow"
+                                            >
+                                                <span>{{ t('crud.ai.reasoning') }}</span>
+                                                <Icon name="el-arrow-down" size="12" />
+                                            </div>
+                                            <div class="record-reasoning-content" v-show="item.reasoningShow">
+                                                {{ item.reasoning }}
+                                            </div>
                                         </div>
-                                        <div class="record-reasoning-content" v-show="item.reasoningShow">
-                                            {{ item.reasoning }}
-                                        </div>
-                                    </div>
-                                    <pre
-                                        v-if="item.designData"
-                                        class="json-view language-json"
-                                        v-html="Prism.highlight(JSON.stringify(item.designData, null, 4), Prism.languages.json, 'json')"
-                                    ></pre>
-                                    <template v-else>{{ item.content }}</template>
+
+                                        <pre
+                                            v-if="item.designData"
+                                            class="json-view language-json"
+                                            v-html="Prism.highlight(JSON.stringify(item.designData, null, 4), Prism.languages.json, 'json')"
+                                        ></pre>
+                                        <template v-else>{{ item.content || '...' }}</template>
+                                    </template>
+                                    <template v-else>
+                                        {{ item.content }}
+                                    </template>
                                 </div>
                                 <div class="content-tags">
                                     <el-tooltip v-if="!item.loading" effect="dark" :content="t('crud.ai.copy')" placement="bottom">
