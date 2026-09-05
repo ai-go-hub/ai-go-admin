@@ -24,6 +24,22 @@ func NewConfigRepository() *ConfigRepository {
 	}
 }
 
+// GetConfigs 获取指定名称的配置
+func (r *ConfigRepository) GetConfigs(ctx context.Context, names []string) (map[string]string, error) {
+	list, err := gorm.G[model.Config](r.DB()).
+		Where("name IN ?", names).
+		Find(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := make(map[string]string, len(list))
+	for _, item := range list {
+		cfg[item.Name] = util.FromPtr(item.Value)
+	}
+	return cfg, nil
+}
+
 // ConfigGroupItem 配置分组项
 type ConfigGroupItem struct {
 	Key   string

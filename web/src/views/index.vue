@@ -146,11 +146,23 @@
                     <span class="footer-tagline">{{ $t('index.footerTagline') }}</span>
                 </div>
                 <div class="footer-links">
-                    <a href="https://github.com/ai-go-hub/ai-go-admin" target="_blank">GitHub</a>
+                    <a href="https://github.com/ai-go-hub/ai-go-admin" rel="noreferrer" target="_blank">GitHub</a>
                     <span class="footer-divider">·</span>
-                    <a href="https://gitee.com/ai-go-hub/ai-go-admin" target="_blank">Gitee</a>
-                    <span class="footer-divider">·</span>
-                    <a href="http://beian.miit.gov.cn/" target="_blank">{{ config.site.recordNumber }}</a>
+                    <a href="https://gitee.com/ai-go-hub/ai-go-admin" rel="noreferrer" target="_blank">Gitee</a>
+                    <template v-if="config.site.recordNumber">
+                        <span class="footer-divider">·</span>
+                        <a href="http://beian.miit.gov.cn/" rel="noreferrer" target="_blank">{{ config.site.recordNumber }}</a>
+                    </template>
+                    <template v-if="config.site.psRecordNumber">
+                        <span class="footer-divider">·</span>
+                        <a
+                            :href="`https://beian.mps.gov.cn/#/query/webSearch?code=${config.site.psRecordNumber.replace(/\D/g, '')}`"
+                            rel="noreferrer"
+                            target="_blank"
+                        >
+                            {{ config.site.psRecordNumber }}
+                        </a>
+                    </template>
                 </div>
                 <p class="footer-copy">&copy; {{ new Date().getFullYear() }} {{ config.site.name }}. All rights reserved.</p>
             </div>
@@ -159,6 +171,7 @@
 </template>
 
 <script setup lang="ts">
+import { getSiteConfig } from '@/api/common'
 import { useConfig } from '@/stores/config'
 import { ArrowDown, ArrowRight, Cpu, Plus, UserFilled } from '@element-plus/icons-vue'
 import { ref } from 'vue'
@@ -218,6 +231,11 @@ const techStack: TechItem[] = [
         gradient: 'linear-gradient(135deg, #D97706, #D97706cc)',
     },
 ]
+
+getSiteConfig().then((res) => {
+    config.siteDataFill(res.data.data)
+    config.setSiteInitStatus(true)
+})
 </script>
 
 <style scoped lang="scss">

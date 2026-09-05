@@ -9,31 +9,31 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/captcha"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
-	"github.com/ai-go-hub/ai-go-admin/internal/infra/database"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/token"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
+	repoCommon "github.com/ai-go-hub/ai-go-admin/internal/repository/common"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 	"github.com/ai-go-hub/ai-go-admin/pkg/tree"
-	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 // AdminService 管理员服务，嵌入通用服务接口并扩展自定义方法
 type AdminService struct {
 	service.IService[model.Admin]
-	repo *repoAdmin.AdminRepository
+	repo       *repoAdmin.AdminRepository
+	configRepo *repoCommon.ConfigRepository
 }
 
 // NewAdminService 创建管理员服务实例
-func NewAdminService(repo *repoAdmin.AdminRepository) *AdminService {
+func NewAdminService(repo *repoAdmin.AdminRepository, configRepo *repoCommon.ConfigRepository) *AdminService {
 	return &AdminService{
-		IService: service.NewService(repo),
-		repo:     repo,
+		IService:   service.NewService(repo),
+		repo:       repo,
+		configRepo: configRepo,
 	}
 }
 
@@ -135,16 +135,9 @@ func (s *AdminService) Logout(ctx context.Context, tokenStr string) error {
 func (s *AdminService) Init(ctx context.Context, adminSession *dto.AdminSession) (*dto.InitResponse, error) {
 	// 1. 站点配置
 	configSiteNames := []string{"name", "record_number", "ps_record_number", "version"}
-	siteConfig := make(map[string]string, len(configSiteNames)+3)
-
-	configs, err := gorm.G[model.Config](database.DB()).
-		Where("name IN ?", configSiteNames).
-		Find(ctx)
+	siteConfig, err := s.configRepo.GetConfigs(ctx, configSiteNames)
 	if err != nil {
 		return nil, err
-	}
-	for _, cfg := range configs {
-		siteConfig[cfg.Name] = util.FromPtr(cfg.Value)
 	}
 	siteConfig["timezone"] = config.Get().App.Timezone
 	siteConfig["cdn_url"] = config.Get().CDN.URL

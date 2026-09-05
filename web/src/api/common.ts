@@ -105,6 +105,23 @@ export function selectList(listURL: string, data: AnyObj = {}) {
     })
 }
 
+// ==================== 站点配置 ====================
+
+/**
+ * 获取站点基础配置数据
+ */
+export function getSiteConfig() {
+    return request(
+        {
+            url: '/common/site-config',
+            method: 'GET',
+        },
+        {
+            convertCase: true,
+        }
+    )
+}
+
 // ==================== ping ====================
 
 export function ping() {

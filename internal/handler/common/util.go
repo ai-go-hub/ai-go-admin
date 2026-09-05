@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/httpx"
 	repoCommon "github.com/ai-go-hub/ai-go-admin/internal/repository/common"
 	"github.com/ai-go-hub/ai-go-admin/pkg/xss"
@@ -25,17 +26,38 @@ func FileSvg(c *gin.Context) {
 }
 
 // UtilHandler 工具控制器
-type UtilHandler struct{}
+type UtilHandler struct {
+	configRepo *repoCommon.ConfigRepository
+}
 
 // NewUtilHandler 创建工具控制器实例
 func NewUtilHandler() *UtilHandler {
-	return &UtilHandler{}
+	return &UtilHandler{
+		configRepo: repoCommon.NewConfigRepository(),
+	}
 }
 
 // RegisterRoutes 注册工具路由
 func (h *UtilHandler) RegisterRoutes(group *gin.RouterGroup) {
 	group.GET("/area", Area)
 	group.GET("/file-svg", FileSvg)
+	group.GET("/site-config", h.SiteConfig)
+}
+
+// SiteConfig 获取站点配置数据
+func (h *UtilHandler) SiteConfig(c *gin.Context) {
+	siteConfigNames := []string{"name", "record_number", "ps_record_number", "version"}
+	result, err := h.configRepo.GetConfigs(c.Request.Context(), siteConfigNames)
+	if err != nil {
+		httpx.Fail(c, httpx.WithMessage("获取站点配置失败: "+err.Error()))
+		return
+	}
+
+	result["timezone"] = config.Get().App.Timezone
+	result["cdn_url"] = config.Get().CDN.URL
+	result["cdn_url_params"] = config.Get().CDN.URLParams
+
+	httpx.Success(c, httpx.WithData(result))
 }
 
 // buildSuffixSvg 构建文件后缀的 SVG 图片
