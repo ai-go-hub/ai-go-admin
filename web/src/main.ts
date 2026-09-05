@@ -3,6 +3,7 @@ import { registerIcons } from '@/components/icon/index.js'
 import { setupI18n } from '@/lang/index'
 import router from '@/router/index'
 import pinia from '@/stores/index'
+import { registerDirectives } from '@/utils/directive'
 import elementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import 'element-plus/theme-chalk/display.css'
@@ -21,6 +22,7 @@ async function start() {
 
     // 全局注册
     registerIcons(app) // icon
+    registerDirectives(app) // 指令
 
     app.mount('#app')
 
