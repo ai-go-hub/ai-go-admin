@@ -93,7 +93,6 @@
                     v-bind="invokeTableContextDataFun(columnConfig.customRenderAttr?.tooltip, { row, columnConfig, column, cellValue: btn, index })"
                 >
                     <el-button
-                        v-blur
                         :class="btn.class"
                         size="small"
                         class="ag-table-render-buttons-item move-button buttons-ml-6"
