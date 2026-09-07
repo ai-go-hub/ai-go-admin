@@ -732,8 +732,6 @@ watch(
 </script>
 
 <style scoped lang="scss">
-$card-radius: 12px;
-
 .dashboard {
     display: flex;
     flex-direction: column;
@@ -763,7 +761,7 @@ $card-radius: 12px;
     min-width: 0;
     min-height: 160px;
     padding: 14px 28px;
-    border-radius: $card-radius;
+    border-radius: var(--el-border-radius-base);
     background: #e1eaf9;
     color: var(--el-text-color-primary);
     box-shadow: 0 2px 12px rgba(64, 158, 255, 0.08);
@@ -1025,7 +1023,7 @@ $card-radius: 12px;
     position: relative;
     padding: 18px 20px;
     background: var(--el-bg-color-overlay);
-    border-radius: $card-radius;
+    border-radius: var(--el-border-radius-base);
     overflow: hidden;
     transition:
         transform 0.25s ease,
@@ -1052,7 +1050,7 @@ $card-radius: 12px;
     font-size: 16px;
     color: var(--el-color-primary);
     background: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
-    border-radius: 8px;
+    border-radius: var(--el-border-radius-base);
 }
 .kpi-value {
     margin: 10px 0 6px;
@@ -1076,7 +1074,7 @@ $card-radius: 12px;
         flex-shrink: 0;
         padding: 2px 6px;
         font-weight: 600;
-        border-radius: 4px;
+        border-radius: var(--el-border-radius-base);
 
         &.up {
             color: var(--el-color-success);
@@ -1112,7 +1110,7 @@ $card-radius: 12px;
 .chart-card {
     padding: 16px 18px;
     background: var(--el-bg-color-overlay);
-    border-radius: $card-radius;
+    border-radius: var(--el-border-radius-base);
     transition: box-shadow 0.25s ease;
 
     &:hover {
@@ -1157,7 +1155,7 @@ $card-radius: 12px;
     display: inline-flex;
     padding: 2px;
     background: var(--el-fill-color-light);
-    border-radius: 8px;
+    border-radius: var(--el-border-radius-base);
 }
 .range-chip {
     padding: 4px 12px;
@@ -1165,7 +1163,7 @@ $card-radius: 12px;
     color: var(--el-text-color-secondary);
     background: transparent;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--el-border-radius-base);
     outline: none;
     cursor: pointer;
     transition:
@@ -1218,7 +1216,7 @@ html.dark {
         background: #e1eaf9;
         box-shadow: 0 2px 12px rgba(64, 158, 255, 0.08);
         padding: 14px 28px;
-        border-radius: 12px;
+        border-radius: var(--el-border-radius-base);
         transition:
             box-shadow 0.35s ease,
             transform 0.35s ease;
