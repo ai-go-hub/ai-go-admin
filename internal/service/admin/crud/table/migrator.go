@@ -178,6 +178,10 @@ func findFieldByName(fields []dto.CRUDFields, name string) (dto.CRUDFields, bool
 
 // buildDDLType 生成列类型
 func buildDDLType(f dto.CRUDFields) string {
+	if f.DataType != "" {
+		return f.DataType
+	}
+
 	switch f.Type {
 	case "varchar", "char":
 		if f.Length > 0 {
