@@ -7,6 +7,7 @@
     <a href="https://www.ai-go-hub.com/" target="_blank">文档</a> |
     <a href="https://doc.ai-go-hub.com/senior/wechat.html" target="_blank">加群</a> |
     <a href="https://juejin.cn/column/7654319240119369737" target="_blank">开发手记</a> |
+    <a href="https://atomgit.com/ai-go-hub/ai-go-admin" target="_blank">AtomGit 仓库</a> |
     <a href="https://gitee.com/ai-go-hub/ai-go-admin" target="_blank">Gitee 仓库</a> |
     <a href="https://github.com/ai-go-hub/ai-go-admin" target="_blank">GitHub 仓库</a>
 </div>
