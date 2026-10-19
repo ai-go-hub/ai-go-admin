@@ -1189,6 +1189,12 @@ html.dark {
     .welcome-bar {
         background: var(--ag-bg-color-overlay);
     }
+    .meta-item {
+        background: rgba(255, 255, 255, 0.08);
+        &:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+    }
 }
 
 // ============================================================
@@ -1229,6 +1235,9 @@ html.dark {
             transform: translateY(-2px);
             box-shadow: 0 6px 18px rgba(64, 158, 255, 0.16);
         }
+    }
+    html.dark .welcome-timer {
+        background: var(--ag-bg-color-overlay);
     }
 }
 @media (max-width: 640px) {
