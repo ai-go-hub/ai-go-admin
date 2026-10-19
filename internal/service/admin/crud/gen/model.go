@@ -204,7 +204,7 @@ func isIntegerType(dbType string) bool {
 func buildGormTag(f dto.CRUDFields) string {
 	parts := make([]string, 0, 6)
 	if f.Comment != "" {
-		parts = append(parts, "comment:"+f.Comment)
+		parts = append(parts, "comment:"+strings.ReplaceAll(f.Comment, "`", "'"))
 	}
 	if typ := buildDBType(f); typ != "" {
 		parts = append(parts, "type:"+typ)
