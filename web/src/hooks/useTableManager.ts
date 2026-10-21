@@ -479,8 +479,10 @@ export function useTableManager(opts: UseTableManagerOptions): TableManagerInsta
      * 设置 getData 请求时的过滤条件数据
      * 整体覆盖，调用方如需保留旧条件，请先读 table.filter.wheres 后再拼
      * @param groups Where 分组数组
+     * @param page 新的表格页码，默认将置为 1，若需使用当前页码可传递 table.filter!.page 变量
      */
-    const setFilterWheres = (groups: WhereGroup[]) => {
+    const setFilterWheres = (groups: WhereGroup[], page = 1) => {
+        table.filter!.page = page
         table.filter!.wheres = groups
     }
 
