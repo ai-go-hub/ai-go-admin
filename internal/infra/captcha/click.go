@@ -254,6 +254,13 @@ func Check(req Request, deleteOnSuccess bool) (bool, error) {
 	scaleX := float64(req.Width) / float64(info.ImageWidth)
 	scaleY := float64(req.Height) / float64(info.ImageHeight)
 
+	// 校验缩放比例，防止客户端提交极端尺寸使期望坐标塌缩
+	const minScale = 0.6
+	if scaleX < minScale || scaleY < minScale {
+		_ = repo.DeleteByKey(context.Background(), record.Key)
+		return false, fmt.Errorf("验证码尺寸不正确")
+	}
+
 	const tolerance = 0
 	for i, click := range req.Clicks {
 		ei := findElement(info.Elements, click.Element)
