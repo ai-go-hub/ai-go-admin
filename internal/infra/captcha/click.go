@@ -282,7 +282,14 @@ func Check(req Request, deleteOnSuccess bool) (bool, error) {
 	}
 
 	if deleteOnSuccess {
-		_ = repo.DeleteByKey(context.Background(), record.Key)
+		// 原子消费，并发重复校验时仅第一路删除命中，其余视为已消费直接返回 false
+		rows, err := repo.DeleteByKeyCounted(context.Background(), record.Key, TypeClick)
+		if err != nil {
+			return false, fmt.Errorf("删除验证码: %w", err)
+		}
+		if rows == 0 {
+			return false, fmt.Errorf("验证码不存在或已过期")
+		}
 	}
 
 	return true, nil

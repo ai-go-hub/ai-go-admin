@@ -37,6 +37,15 @@ func (r *CaptchaRepository) DeleteByKey(ctx context.Context, key string) error {
 	return err
 }
 
+// DeleteByKeyCounted 根据 key 删除验证码记录，返回实际删除的行数
+func (r *CaptchaRepository) DeleteByKeyCounted(ctx context.Context, key, captchaType string) (int, error) {
+	return gorm.G[model.Captcha](r.DB()).
+		Where("key = ?", key).
+		Where("type = ?", captchaType).
+		Where("expired_at > ?", time.Now()).
+		Delete(ctx)
+}
+
 // Save 保存验证码记录
 func (r *CaptchaRepository) Save(ctx context.Context, record *model.Captcha) error {
 	return gorm.G[model.Captcha](r.DB()).Create(ctx, record)
