@@ -40,7 +40,11 @@ func (s *AttachmentService) Delete(ctx context.Context, opts service.Options) er
 		}},
 	}}
 
-	attachments, err := s.IService.List(ctx, service.Options{Wheres: wheres})
+	// 显式传递 Limit，避免通用列表默认的 limit=10 截断，导致超出部分物理文件不会被删，成为孤儿
+	attachments, err := s.IService.List(ctx, service.Options{
+		Wheres: wheres,
+		Limit:  len(opts.PrimaryKeyValues),
+	})
 	if err != nil {
 		return err
 	}
