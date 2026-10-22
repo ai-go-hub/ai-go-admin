@@ -65,6 +65,19 @@ func (r *AdminRepository) ResetLoginFailure(ctx context.Context, id uint) error 
 	return err
 }
 
+// GroupIDsByUIDs 查询一组管理员所属的分组 ID
+func (r *AdminRepository) GroupIDsByUIDs(ctx context.Context, uids []uint) ([]uint, error) {
+	accesses, err := gorm.G[model.AdminGroupAccess](r.DB()).Where("uid IN ?", uids).Find(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]uint, 0, len(accesses))
+	for _, acc := range accesses {
+		ids = append(ids, acc.GroupID)
+	}
+	return ids, nil
+}
+
 // DeleteGroupAccesses 删除管理员的所有分组关联
 func (r *AdminRepository) DeleteGroupAccesses(ctx context.Context, uid uint) error {
 	_, err := gorm.G[model.AdminGroupAccess](r.DB()).Where("uid = ?", uid).Delete(ctx)

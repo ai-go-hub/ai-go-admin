@@ -11,7 +11,6 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/bindx"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	repoAdmin "github.com/ai-go-hub/ai-go-admin/internal/repository/admin"
-	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 
 	"golang.org/x/crypto/bcrypt"
@@ -26,16 +25,14 @@ type AuthAdminExtension struct {
 // AuthAdminService 管理员账号管理服务
 type AuthAdminService struct {
 	service.IService[model.Admin]
-	repo      *repoAdmin.AdminRepository
-	groupRepo *repoAuth.AdminGroupRepository
+	repo *repoAdmin.AdminRepository
 }
 
 // NewAuthAdminService 创建管理员账号管理服务实例
-func NewAuthAdminService(repo *repoAdmin.AdminRepository, groupRepo *repoAuth.AdminGroupRepository) *AuthAdminService {
+func NewAuthAdminService(repo *repoAdmin.AdminRepository) *AuthAdminService {
 	return &AuthAdminService{
-		IService:  service.NewService(repo),
-		repo:      repo,
-		groupRepo: groupRepo,
+		IService: service.NewService(repo),
+		repo:     repo,
 	}
 }
 
@@ -72,6 +69,11 @@ func (s *AuthAdminService) Update(ctx context.Context, tri *bindx.Tri[model.Admi
 	pk, err := strconv.ParseUint(opts.PrimaryKeyValue, 10, 32)
 	if err != nil {
 		return errors.New("主键值错误")
+	}
+
+	// 校验目标管理员是否在操作者可见范围内，防止低权账号操作更高权限账号
+	if err := s.ensureTargetsVisible(ctx, []uint{uint(pk)}, opts); err != nil {
+		return err
 	}
 
 	// 用户名唯一校验
@@ -125,13 +127,23 @@ func (s *AuthAdminService) Delete(ctx context.Context, opts service.Options) err
 		return errors.New("请选择要删除的记录")
 	}
 
-	// 先删除分组关联
+	uids := make([]uint, 0, len(opts.PrimaryKeyValues))
 	for _, pk := range opts.PrimaryKeyValues {
 		uid, err := strconv.ParseUint(pk, 10, 32)
 		if err != nil {
 			return errors.New("主键值错误")
 		}
-		if err := s.repo.DeleteGroupAccesses(ctx, uint(uid)); err != nil {
+		uids = append(uids, uint(uid))
+	}
+
+	// 校验目标管理员是否在操作者可见范围内，防止低权账号删除更高权限账号
+	if err := s.ensureTargetsVisible(ctx, uids, opts); err != nil {
+		return err
+	}
+
+	// 删除分组关联
+	for _, uid := range uids {
+		if err := s.repo.DeleteGroupAccesses(ctx, uid); err != nil {
 			return err
 		}
 	}
@@ -139,7 +151,45 @@ func (s *AuthAdminService) Delete(ctx context.Context, opts service.Options) err
 	return s.IService.Delete(ctx, opts)
 }
 
-// validateGroupAccesses 校验分组权限: 操作管理员必须拥有待分配分组的全部权限规则
+// ensureTargetsVisible 校验目标管理员的分组规则是否全部在操作者可见范围内
+func (s *AuthAdminService) ensureTargetsVisible(ctx context.Context, uids []uint, opts service.Options) error {
+	ext, ok := opts.Extension.(*AuthAdminExtension)
+	if !ok || ext.AdminSession == nil {
+		return errors.New("参数错误，缺少 AdminSession 扩展数据")
+	}
+	session := ext.AdminSession
+
+	perm := permission.New()
+	super, err := perm.IsSuperAdmin(ctx, session.ID)
+	if err != nil {
+		return err
+	}
+	if super {
+		return nil
+	}
+
+	visible, err := perm.GetVisibleGroupIDs(ctx, session.ID, nil)
+	if err != nil {
+		return err
+	}
+	visibleSet := make(map[uint]struct{}, len(visible))
+	for _, id := range visible {
+		visibleSet[id] = struct{}{}
+	}
+
+	targetGroupIDs, err := s.repo.GroupIDsByUIDs(ctx, uids)
+	if err != nil {
+		return err
+	}
+	for _, gid := range targetGroupIDs {
+		if _, ok := visibleSet[gid]; !ok {
+			return errors.New("无权操作该管理员")
+		}
+	}
+	return nil
+}
+
+// validateGroupAccesses 校验分组权限，待分配分组必须全部在操作者可见范围内
 func (s *AuthAdminService) validateGroupAccesses(ctx context.Context, accesses []model.AdminGroupAccess, opts service.Options) error {
 	if len(accesses) == 0 {
 		return nil
@@ -160,44 +210,19 @@ func (s *AuthAdminService) validateGroupAccesses(ctx context.Context, accesses [
 		return nil
 	}
 
-	// 获取当前管理员的全部规则 ID
-	myRuleIDs, err := perm.GetRuleIds(ctx, session.ID, nil)
+	visible, err := perm.GetVisibleGroupIDs(ctx, session.ID, nil)
 	if err != nil {
 		return err
 	}
-	myRuleSet := make(map[uint]struct{}, len(myRuleIDs))
-	for _, id := range myRuleIDs {
-		myRuleSet[id] = struct{}{}
+	visibleSet := make(map[uint]struct{}, len(visible))
+	for _, id := range visible {
+		visibleSet[id] = struct{}{}
 	}
 
-	// 收集待分配的分组 ID
-	groupIDs := make([]uint, len(accesses))
-	for i, acc := range accesses {
-		groupIDs[i] = acc.GroupID
-	}
-
-	groups, err := s.groupRepo.FindByIDs(ctx, groupIDs)
-	if err != nil {
-		return err
-	}
-
-	for _, group := range groups {
-		if group.Rules == nil || *group.Rules == "" {
-			continue
-		}
-		if *group.Rules == "*" {
-			return fmt.Errorf("无权分配超级管理员分组 '%s'", group.Name)
-		}
-		groupRuleIDs, err := parseRuleIDs(group.Rules)
-		if err != nil {
-			return err
-		}
-		for _, rid := range groupRuleIDs {
-			if _, ok := myRuleSet[rid]; !ok {
-				return fmt.Errorf("无权分配分组 '%s'，您缺少该分组的部分权限", group.Name)
-			}
+	for _, acc := range accesses {
+		if _, ok := visibleSet[acc.GroupID]; !ok {
+			return errors.New("无权分配该分组")
 		}
 	}
-
 	return nil
 }

@@ -67,6 +67,16 @@ func (s *AuthAdminGroupService) Create(ctx context.Context, tri *bindx.Tri[model
 
 // Update 覆写通用更新方法
 func (s *AuthAdminGroupService) Update(ctx context.Context, tri *bindx.Tri[model.AdminGroup], opts service.Options) error {
+	pk, err := strconv.ParseUint(opts.PrimaryKeyValue, 10, 32)
+	if err != nil {
+		return errors.New("主键值错误")
+	}
+
+	// 校验目标分组是否在操作者可见范围内，防止低权账号操作更高权限分组
+	if err := s.ensureVisible(ctx, []uint{uint(pk)}, opts); err != nil {
+		return err
+	}
+
 	// 分组基本信息校验
 	if err := s.validateGroup(ctx, &tri.Model, opts); err != nil {
 		return err
@@ -74,7 +84,7 @@ func (s *AuthAdminGroupService) Update(ctx context.Context, tri *bindx.Tri[model
 
 	// 不允许将分组挂到自身的后代分组下，避免形成环
 	if pid := util.FromPtr(tri.Model.Pid); pid != 0 {
-		if err := s.ensurePidNotDescendant(ctx, opts.PrimaryKeyValue, pid); err != nil {
+		if err := s.ensurePidNotDescendant(ctx, uint(pk), pid); err != nil {
 			return err
 		}
 	}
@@ -117,6 +127,11 @@ func (s *AuthAdminGroupService) Delete(ctx context.Context, opts service.Options
 		pkSet[uint(id)] = struct{}{}
 	}
 
+	// 校验待删分组是否在操作者可见范围内，防止低权账号删除更高权限分组
+	if err := s.ensureVisible(ctx, pks, opts); err != nil {
+		return err
+	}
+
 	// 查询 pid 的直接子级 id
 	childIDs, err := s.repo.ChildIDsByPids(ctx, pks)
 	if err != nil {
@@ -151,7 +166,7 @@ func (s *AuthAdminGroupService) List(ctx context.Context, opts service.Options) 
 
 	// 非超管，需要限定到读取 `自身所属分组 + 其后代分组` 的规则
 	if !super {
-		visibleIDs, err := s.visibleGroupIDs(ctx, extension.AdminSession.ID)
+		visibleIDs, err := perm.GetVisibleGroupIDs(ctx, extension.AdminSession.ID, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -188,7 +203,7 @@ func (s *AuthAdminGroupService) Count(ctx context.Context, opts service.Options)
 	}
 
 	if !super {
-		visibleIDs, err := s.visibleGroupIDs(ctx, extension.AdminSession.ID)
+		visibleIDs, err := perm.GetVisibleGroupIDs(ctx, extension.AdminSession.ID, nil)
 		if err != nil {
 			return 0, err
 		}
@@ -347,69 +362,36 @@ func (s *AuthAdminGroupService) validateRules(ctx context.Context, entity *model
 	return nil
 }
 
-// visibleGroupIDs 返回当前管理员可见的分组 ID
-func (s *AuthAdminGroupService) visibleGroupIDs(ctx context.Context, adminID uint) ([]uint, error) {
+// ensureVisible 校验目标分组是否全部在操作者可见范围内
+func (s *AuthAdminGroupService) ensureVisible(ctx context.Context, groupIDs []uint, opts service.Options) error {
+	extension, ok := opts.Extension.(*AuthAdminGroupExtension)
+	if !ok || extension.AdminSession == nil {
+		return errors.New("参数错误，缺少 AdminSession 扩展数据")
+	}
+
 	perm := permission.New()
-
-	// 一般超管不会再进入此方法，此处加入 super 相关逻辑仅为托底（所以不为超管写单独的短路条件）
-	super, err := perm.IsSuperAdmin(ctx, adminID)
+	super, err := perm.IsSuperAdmin(ctx, extension.AdminSession.ID)
 	if err != nil {
-		return nil, err
+		return err
+	}
+	if super {
+		return nil
 	}
 
-	// 拿到当前管理员的规则 ID 集合
-	ownedIDs, err := perm.GetRuleIds(ctx, adminID, nil)
+	visible, err := perm.GetVisibleGroupIDs(ctx, extension.AdminSession.ID, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if len(ownedIDs) == 0 {
-		return nil, nil
+	visibleSet := make(map[uint]struct{}, len(visible))
+	for _, id := range visible {
+		visibleSet[id] = struct{}{}
 	}
-
-	var ownedSet map[uint]struct{}
-	ownedSet = make(map[uint]struct{}, len(ownedIDs))
-	for _, id := range ownedIDs {
-		ownedSet[id] = struct{}{}
-	}
-
-	all, err := s.repo.FindAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	// isSubset 判断 ids <= ownedSet（范围）
-	isSubset := func(ids []uint) bool {
-		for _, id := range ids {
-			if _, ok := ownedSet[id]; !ok {
-				return false
-			}
-		}
-		return true
-	}
-
-	result := make([]uint, 0, len(all))
-	for _, g := range all {
-		if super {
-			result = append(result, g.ID)
-			continue
-		}
-
-		// 超管级分组: 非超管一律不可见
-		if util.FromPtr(g.Rules) == "*" {
-			continue
-		}
-
-		ruleIDs, err := parseRuleIDs(g.Rules)
-		if err != nil {
-			// 无法解析视为不可见
-			continue
-		}
-
-		if isSubset(ruleIDs) {
-			result = append(result, g.ID)
+	for _, id := range groupIDs {
+		if _, ok := visibleSet[id]; !ok {
+			return errors.New("无权操作该分组或分组不存在")
 		}
 	}
-	return result, nil
+	return nil
 }
 
 // firstMenuTitle 按 ids 传入顺序找出首个 type=menu|dir 节点的 title
@@ -440,18 +422,14 @@ func (s *AuthAdminGroupService) firstMenuTitle(ctx context.Context, ids []uint) 
 }
 
 // ensurePidNotDescendant 校验新的 pid 不是当前分组的后代分组
-func (s *AuthAdminGroupService) ensurePidNotDescendant(ctx context.Context, pk string, pid uint) error {
+func (s *AuthAdminGroupService) ensurePidNotDescendant(ctx context.Context, pk uint, pid uint) error {
 	all, err := s.repo.FindAll(ctx)
 	if err != nil {
 		return err
 	}
-	selfID, err := strconv.ParseUint(pk, 10, 32)
-	if err != nil {
-		return errors.New("主键值错误")
-	}
 
 	// 收集所有子级分组 ID
-	descendants := descendantIDs(all, uint(selfID))
+	descendants := descendantIDs(all, pk)
 	if slices.Contains(descendants, pid) {
 		return errors.New("上级分组不能是当前分组的下级")
 	}

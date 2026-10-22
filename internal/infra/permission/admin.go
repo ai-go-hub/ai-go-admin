@@ -2,6 +2,7 @@ package permission
 
 import (
 	"context"
+	"errors"
 	"slices"
 	"strconv"
 	"strings"
@@ -226,4 +227,79 @@ func BuildCheckPath(fullPath string) string {
 		}
 	}
 	return strings.Join(filtered, "/")
+}
+
+// GetVisibleGroupIDs 返回管理员可见的分组 ID
+// 超管可见全部分组；非超管仅可见其规则子集分组
+func (p *Permission) GetVisibleGroupIDs(ctx context.Context, adminID uint, ruleStatus *uint8) ([]uint, error) {
+	super, err := p.IsSuperAdmin(ctx, adminID)
+	if err != nil {
+		return nil, err
+	}
+
+	ownedIDs, err := p.GetRuleIds(ctx, adminID, ruleStatus)
+	if err != nil {
+		return nil, err
+	}
+	if len(ownedIDs) == 0 {
+		return nil, nil
+	}
+
+	ownedSet := make(map[uint]struct{}, len(ownedIDs))
+	for _, id := range ownedIDs {
+		ownedSet[id] = struct{}{}
+	}
+
+	all, err := gorm.G[model.AdminGroup](database.DB()).Find(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]uint, 0, len(all))
+	for _, g := range all {
+		if super {
+			result = append(result, g.ID)
+			continue
+		}
+
+		// 超管级分组，非超管一律不可见
+		if g.Rules == nil || strings.Contains(*g.Rules, "*") {
+			continue
+		}
+
+		ruleIDs, err := parseGroupRuleIDs(*g.Rules)
+		if err != nil {
+			// 无法解析视为不可见
+			continue
+		}
+
+		subset := true
+		for _, id := range ruleIDs {
+			if _, ok := ownedSet[id]; !ok {
+				subset = false
+				break
+			}
+		}
+		if subset {
+			result = append(result, g.ID)
+		}
+	}
+	return result, nil
+}
+
+// parseGroupRuleIDs 解析分组 rules 字符串为规则 ID 列表，格式非法时返回错误
+func parseGroupRuleIDs(rules string) ([]uint, error) {
+	ids := make([]uint, 0)
+	for part := range strings.SplitSeq(rules, ",") {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		id, err := strconv.ParseUint(part, 10, 32)
+		if err != nil {
+			return nil, errors.New("权限规则 ID 格式错误")
+		}
+		ids = append(ids, uint(id))
+	}
+	return ids, nil
 }
