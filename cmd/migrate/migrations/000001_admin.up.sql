@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS "__PREFIX__admins" (
 );
 
 CREATE INDEX IF NOT EXISTS "__PREFIX__idx_admins_deleted_at" ON "__PREFIX__admins" ("deleted_at");
+CREATE UNIQUE INDEX IF NOT EXISTS "__PREFIX__idx_admins_username" ON "__PREFIX__admins" ("username") WHERE "deleted_at" IS NULL;
 
 COMMENT ON TABLE "__PREFIX__admins" IS '管理员表';
 COMMENT ON COLUMN "__PREFIX__admins"."id" IS 'ID';
@@ -57,6 +58,8 @@ CREATE TABLE IF NOT EXISTS "__PREFIX__admin_rules" (
 );
 
 CREATE INDEX IF NOT EXISTS "__PREFIX__idx_admin_rules_pid" ON "__PREFIX__admin_rules" ("pid");
+CREATE UNIQUE INDEX IF NOT EXISTS "__PREFIX__idx_admin_rules_name" ON "__PREFIX__admin_rules" ("name");
+CREATE UNIQUE INDEX IF NOT EXISTS "__PREFIX__idx_admin_rules_path" ON "__PREFIX__admin_rules" ("path") WHERE "path" IS NOT NULL AND "path" <> '';
 
 COMMENT ON TABLE "__PREFIX__admin_rules" IS '菜单和权限规则表';
 COMMENT ON COLUMN "__PREFIX__admin_rules"."id" IS 'ID';
