@@ -102,7 +102,16 @@ const openInfo = (row: TableRow) => {
     // 数据来自表格数据，未重新请求 API，深克隆，不然可能会影响表格
     let rowClone = cloneDeep(row)
 
-    rowClone.data = rowClone.data ? [{ label: '点击展开', children: buildJsonToElTreeData(JSON.parse(rowClone.data)) }] : []
+    let children: ReturnType<typeof buildJsonToElTreeData> = []
+    if (rowClone.data) {
+        try {
+            children = buildJsonToElTreeData(JSON.parse(rowClone.data))
+        } catch {
+            // 非 JSON 内容，直接展示原文
+            children = [{ label: rowClone.data, children: [] }]
+        }
+    }
+    rowClone.data = [{ label: '点击展开', children }]
     tableManager.form.extend!['info'] = rowClone
     tableManager.form.operate = 'info'
 }
