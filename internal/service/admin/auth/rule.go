@@ -5,7 +5,6 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/bindx"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
@@ -16,11 +15,6 @@ import (
 
 	"gorm.io/gorm"
 )
-
-// AuthAdminRuleExtension 规则列表扩展参数
-type AuthAdminRuleExtension struct {
-	AdminSession *dto.AdminSession
-}
 
 // AuthAdminRuleService 菜单和权限规则管理服务
 type AuthAdminRuleService struct {
@@ -88,14 +82,13 @@ func (s *AuthAdminRuleService) Delete(ctx context.Context, opts service.Options)
 
 // List 覆写通用查询全部记录方法: 根据管理员权限过滤
 func (s *AuthAdminRuleService) List(ctx context.Context, opts service.Options) ([]model.AdminRule, error) {
-	// 从控制器传来的 `管理员信息` 扩展数据
-	extension, ok := opts.Extension.(*AuthAdminRuleExtension)
-	if !ok || extension.AdminSession == nil {
-		return nil, errors.New("参数错误，缺少 AdminSession 扩展数据")
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return nil, err
 	}
 
 	perm := permission.New()
-	super, err := perm.IsSuperAdmin(ctx, extension.AdminSession.ID)
+	super, err := perm.IsSuperAdmin(ctx, session.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +109,7 @@ func (s *AuthAdminRuleService) List(ctx context.Context, opts service.Options) (
 
 	// 非超管，读取当前管理员拥有的权限规则 IDs
 	if !super {
-		ruleIDs, err := perm.GetRuleIds(ctx, extension.AdminSession.ID, nil)
+		ruleIDs, err := perm.GetRuleIds(ctx, session.ID, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -145,13 +138,13 @@ func (s *AuthAdminRuleService) Count(ctx context.Context, opts service.Options) 
 		return 0, nil
 	}
 
-	extension, ok := opts.Extension.(*AuthAdminRuleExtension)
-	if !ok || extension.AdminSession == nil {
-		return 0, errors.New("参数错误，缺少 AdminSession 扩展数据")
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return 0, err
 	}
 
 	perm := permission.New()
-	rules, err := perm.GetRules(ctx, extension.AdminSession.ID, nil)
+	rules, err := perm.GetRules(ctx, session.ID, nil)
 	if err != nil {
 		return 0, err
 	}

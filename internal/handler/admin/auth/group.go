@@ -22,7 +22,7 @@ func NewAuthAdminGroupHandler(svc *svcAuth.AuthAdminGroupService) *AuthAdminGrou
 	return &AuthAdminGroupHandler{
 		Handler: handler.NewHandler(svc,
 			handler.WithExtension(func(c *gin.Context) any {
-				return &svcAuth.AuthAdminGroupExtension{
+				return &svcAuth.AuthExtension{
 					// 避免 HTTP 层的中间件侵入到服务层，此处显式传递为扩展参数
 					AdminSession: middleware.GetAdmin(c),
 				}

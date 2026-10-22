@@ -100,3 +100,22 @@ func (r *AdminRepository) ReplaceGroupAccesses(ctx context.Context, uid uint, ac
 	// 泛型 Create 只接受单条 *T，批量插入用传统 API
 	return r.DB().WithContext(ctx).Create(&accesses).Error
 }
+
+// UIDsByInvisibleGroups 根据可见分组反向查询不可见管理员 ID
+func (r *AdminRepository) UIDsByInvisibleGroups(ctx context.Context, visibleIDs []uint) ([]uint, error) {
+	var accesses []model.AdminGroupAccess
+	var err error
+	if len(visibleIDs) > 0 {
+		accesses, err = gorm.G[model.AdminGroupAccess](r.DB()).Where("group_id NOT IN ?", visibleIDs).Find(ctx)
+	} else {
+		accesses, err = gorm.G[model.AdminGroupAccess](r.DB()).Find(ctx)
+	}
+	if err != nil {
+		return nil, err
+	}
+	uids := make([]uint, 0, len(accesses))
+	for _, acc := range accesses {
+		uids = append(uids, acc.UID)
+	}
+	return uids, nil
+}

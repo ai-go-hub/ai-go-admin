@@ -2,19 +2,12 @@ package auth
 
 import (
 	"context"
-	"errors"
 
-	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
 	repoAuth "github.com/ai-go-hub/ai-go-admin/internal/repository/admin/auth"
 	"github.com/ai-go-hub/ai-go-admin/internal/service"
 )
-
-// AdminLogExtension 管理员日志操作扩展参数
-type AdminLogExtension struct {
-	AdminSession *dto.AdminSession
-}
 
 // AdminLogService 管理员日志服务
 type AdminLogService struct {
@@ -32,13 +25,13 @@ func NewAdminLogService(repo *repoAuth.AdminLogRepository) *AdminLogService {
 
 // List 覆写通用查询方法: 非超管仅可查看自己的日志
 func (s *AdminLogService) List(ctx context.Context, opts service.Options) ([]model.AdminLog, error) {
-	extension, ok := opts.Extension.(*AdminLogExtension)
-	if !ok || extension.AdminSession == nil {
-		return nil, errors.New("参数错误，缺少 AdminSession 扩展数据")
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return nil, err
 	}
 
 	perm := permission.New()
-	super, err := perm.IsSuperAdmin(ctx, extension.AdminSession.ID)
+	super, err := perm.IsSuperAdmin(ctx, session.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +42,7 @@ func (s *AdminLogService) List(ctx context.Context, opts service.Options) ([]mod
 			Wheres: []service.Where{{
 				Field:    "admin_id",
 				Operator: "eq",
-				Value:    extension.AdminSession.ID,
+				Value:    session.ID,
 			}},
 		})
 	}
@@ -59,13 +52,13 @@ func (s *AdminLogService) List(ctx context.Context, opts service.Options) ([]mod
 
 // Count 覆写通用统计方法: 与 List 使用相同的权限过滤条件
 func (s *AdminLogService) Count(ctx context.Context, opts service.Options) (int64, error) {
-	extension, ok := opts.Extension.(*AdminLogExtension)
-	if !ok || extension.AdminSession == nil {
-		return 0, errors.New("参数错误，缺少 AdminSession 扩展数据")
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return 0, err
 	}
 
 	perm := permission.New()
-	super, err := perm.IsSuperAdmin(ctx, extension.AdminSession.ID)
+	super, err := perm.IsSuperAdmin(ctx, session.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -75,7 +68,7 @@ func (s *AdminLogService) Count(ctx context.Context, opts service.Options) (int6
 			Wheres: []service.Where{{
 				Field:    "admin_id",
 				Operator: "eq",
-				Value:    extension.AdminSession.ID,
+				Value:    session.ID,
 			}},
 		})
 	}

@@ -21,11 +21,6 @@ import (
 	"github.com/ai-go-hub/ai-go-admin/pkg/util"
 )
 
-// AuthAdminGroupExtension 分组列表扩展参数
-type AuthAdminGroupExtension struct {
-	AdminSession *dto.AdminSession
-}
-
 // AuthAdminGroupService 管理员分组管理服务
 type AuthAdminGroupService struct {
 	service.IService[model.AdminGroup]
@@ -44,6 +39,11 @@ func NewAuthAdminGroupService(repo *repoAuth.AdminGroupRepository, ruleRepo *rep
 
 // Create 覆写通用创建方法
 func (s *AuthAdminGroupService) Create(ctx context.Context, tri *bindx.Tri[model.AdminGroup], opts service.Options) error {
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return err
+	}
+
 	// 分组基本信息校验
 	if err := s.validateGroup(ctx, &tri.Model, opts); err != nil {
 		return err
@@ -59,7 +59,7 @@ func (s *AuthAdminGroupService) Create(ctx context.Context, tri *bindx.Tri[model
 	}
 
 	// 权限规则校验
-	if err := s.validateRules(ctx, &tri.Model, opts); err != nil {
+	if err := s.validateRules(ctx, &tri.Model, session); err != nil {
 		return err
 	}
 	return s.IService.Create(ctx, tri, opts)
@@ -72,9 +72,23 @@ func (s *AuthAdminGroupService) Update(ctx context.Context, tri *bindx.Tri[model
 		return errors.New("主键值错误")
 	}
 
-	// 校验目标分组是否在操作者可见范围内，防止低权账号操作更高权限分组
-	if err := s.ensureVisible(ctx, []uint{uint(pk)}, opts); err != nil {
+	session, err := sessionFrom(opts)
+	if err != nil {
 		return err
+	}
+
+	// 校验目标分组是否在操作者可见范围内，防止低权账号操作更高权限分组
+	if err := s.ensureVisible(ctx, []uint{uint(pk)}, session); err != nil {
+		return err
+	}
+
+	// 禁止禁用自己已加入的分组
+	ownGroups, err := s.ownGroupIDs(ctx, session.ID)
+	if err != nil {
+		return err
+	}
+	if _, joined := ownGroups[uint(pk)]; joined && tri.Model.Status != nil && *tri.Model.Status == permission.RuleStatusDisabled {
+		return errors.New("不能禁用自己所在的分组")
 	}
 
 	// 分组基本信息校验
@@ -103,7 +117,7 @@ func (s *AuthAdminGroupService) Update(ctx context.Context, tri *bindx.Tri[model
 	}
 
 	// 权限规则校验
-	if err := s.validateRules(ctx, &tri.Model, opts); err != nil {
+	if err := s.validateRules(ctx, &tri.Model, session); err != nil {
 		return err
 	}
 	return s.IService.Update(ctx, tri, opts)
@@ -127,8 +141,24 @@ func (s *AuthAdminGroupService) Delete(ctx context.Context, opts service.Options
 		pkSet[uint(id)] = struct{}{}
 	}
 
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return err
+	}
+
+	// 禁止删除自己已加入的分组
+	ownGroups, err := s.ownGroupIDs(ctx, session.ID)
+	if err != nil {
+		return err
+	}
+	for _, id := range pks {
+		if _, joined := ownGroups[id]; joined {
+			return errors.New("不能删除自己所在的分组")
+		}
+	}
+
 	// 校验待删分组是否在操作者可见范围内，防止低权账号删除更高权限分组
-	if err := s.ensureVisible(ctx, pks, opts); err != nil {
+	if err := s.ensureVisible(ctx, pks, session); err != nil {
 		return err
 	}
 
@@ -150,23 +180,23 @@ func (s *AuthAdminGroupService) Delete(ctx context.Context, opts service.Options
 
 // List 覆写通用查询全部记录方法: 根据管理员权限过滤（自身所属分组 + 其后代分组）
 func (s *AuthAdminGroupService) List(ctx context.Context, opts service.Options) ([]model.AdminGroup, error) {
-	extension, ok := opts.Extension.(*AuthAdminGroupExtension)
-	if !ok || extension.AdminSession == nil {
-		return nil, errors.New("参数错误，缺少 AdminSession 扩展数据")
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return nil, err
 	}
 
 	// 树状表格无翻页，设定无限 limit
 	opts.Limit = 999999
 
 	perm := permission.New()
-	super, err := perm.IsSuperAdmin(ctx, extension.AdminSession.ID)
+	super, err := perm.IsSuperAdmin(ctx, session.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	// 非超管，需要限定到读取 `自身所属分组 + 其后代分组` 的规则
 	if !super {
-		visibleIDs, err := perm.GetVisibleGroupIDs(ctx, extension.AdminSession.ID, nil)
+		visibleIDs, err := perm.GetVisibleGroupIDs(ctx, session.ID, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -191,19 +221,19 @@ func (s *AuthAdminGroupService) Count(ctx context.Context, opts service.Options)
 		return 0, nil
 	}
 
-	extension, ok := opts.Extension.(*AuthAdminGroupExtension)
-	if !ok || extension.AdminSession == nil {
-		return 0, errors.New("参数错误，缺少 AdminSession 扩展数据")
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return 0, err
 	}
 
 	perm := permission.New()
-	super, err := perm.IsSuperAdmin(ctx, extension.AdminSession.ID)
+	super, err := perm.IsSuperAdmin(ctx, session.ID)
 	if err != nil {
 		return 0, err
 	}
 
 	if !super {
-		visibleIDs, err := perm.GetVisibleGroupIDs(ctx, extension.AdminSession.ID, nil)
+		visibleIDs, err := perm.GetVisibleGroupIDs(ctx, session.ID, nil)
 		if err != nil {
 			return 0, err
 		}
@@ -314,14 +344,9 @@ func (s *AuthAdminGroupService) validateGroup(ctx context.Context, entity *model
 // validateRules 校验 rules 字段格式与越权授权
 //
 // 超管级分组仅允许超级管理员设置，非超管所填的规则 ID 必须都在自己拥有的规则集合内
-func (s *AuthAdminGroupService) validateRules(ctx context.Context, entity *model.AdminGroup, opts service.Options) error {
-	extension, _ := opts.Extension.(*AuthAdminGroupExtension)
-	if extension == nil || extension.AdminSession == nil {
-		return errors.New("参数错误，缺少 AdminSession 扩展数据")
-	}
-
+func (s *AuthAdminGroupService) validateRules(ctx context.Context, entity *model.AdminGroup, session *dto.AdminSession) error {
 	perm := permission.New()
-	super, err := perm.IsSuperAdmin(ctx, extension.AdminSession.ID)
+	super, err := perm.IsSuperAdmin(ctx, session.ID)
 	if err != nil {
 		return err
 	}
@@ -345,7 +370,7 @@ func (s *AuthAdminGroupService) validateRules(ctx context.Context, entity *model
 	}
 
 	// 非超管: 分组的 rules 必须是当前操作人拥有的规则集合的子集
-	ownedIDs, err := perm.GetRuleIds(ctx, extension.AdminSession.ID, nil)
+	ownedIDs, err := perm.GetRuleIds(ctx, session.ID, nil)
 	if err != nil {
 		return err
 	}
@@ -363,14 +388,9 @@ func (s *AuthAdminGroupService) validateRules(ctx context.Context, entity *model
 }
 
 // ensureVisible 校验目标分组是否全部在操作者可见范围内
-func (s *AuthAdminGroupService) ensureVisible(ctx context.Context, groupIDs []uint, opts service.Options) error {
-	extension, ok := opts.Extension.(*AuthAdminGroupExtension)
-	if !ok || extension.AdminSession == nil {
-		return errors.New("参数错误，缺少 AdminSession 扩展数据")
-	}
-
+func (s *AuthAdminGroupService) ensureVisible(ctx context.Context, groupIDs []uint, session *dto.AdminSession) error {
 	perm := permission.New()
-	super, err := perm.IsSuperAdmin(ctx, extension.AdminSession.ID)
+	super, err := perm.IsSuperAdmin(ctx, session.ID)
 	if err != nil {
 		return err
 	}
@@ -378,7 +398,7 @@ func (s *AuthAdminGroupService) ensureVisible(ctx context.Context, groupIDs []ui
 		return nil
 	}
 
-	visible, err := perm.GetVisibleGroupIDs(ctx, extension.AdminSession.ID, nil)
+	visible, err := perm.GetVisibleGroupIDs(ctx, session.ID, nil)
 	if err != nil {
 		return err
 	}
@@ -434,6 +454,19 @@ func (s *AuthAdminGroupService) ensurePidNotDescendant(ctx context.Context, pk u
 		return errors.New("上级分组不能是当前分组的下级")
 	}
 	return nil
+}
+
+// ownGroupIDs 返回管理员自己已加入的分组 ID 集合
+func (s *AuthAdminGroupService) ownGroupIDs(ctx context.Context, adminID uint) (map[uint]struct{}, error) {
+	groups, err := permission.New().GetGroups(ctx, adminID)
+	if err != nil {
+		return nil, err
+	}
+	set := make(map[uint]struct{}, len(groups))
+	for _, g := range groups {
+		set[g.ID] = struct{}{}
+	}
+	return set, nil
 }
 
 // descendantIDs 返回 rootID 在 all 中的所有子级分组 ID（不包含 rootID 自身）

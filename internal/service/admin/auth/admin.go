@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 
-	"github.com/ai-go-hub/ai-go-admin/internal/dto"
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/permission"
 	"github.com/ai-go-hub/ai-go-admin/internal/kit/bindx"
 	"github.com/ai-go-hub/ai-go-admin/internal/model"
@@ -16,11 +16,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
-
-// AuthAdminExtension 管理员操作扩展参数
-type AuthAdminExtension struct {
-	AdminSession *dto.AdminSession
-}
 
 // AuthAdminService 管理员账号管理服务
 type AuthAdminService struct {
@@ -74,6 +69,15 @@ func (s *AuthAdminService) Update(ctx context.Context, tri *bindx.Tri[model.Admi
 	// 校验目标管理员是否在操作者可见范围内，防止低权账号操作更高权限账号
 	if err := s.ensureTargetsVisible(ctx, []uint{uint(pk)}, opts); err != nil {
 		return err
+	}
+
+	// 禁止通过管理员更新接口禁用自己的账号
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return err
+	}
+	if uint(pk) == session.ID && tri.Map["status"] == "disable" {
+		return errors.New("不能禁用自己的账号")
 	}
 
 	// 用户名唯一校验
@@ -136,6 +140,16 @@ func (s *AuthAdminService) Delete(ctx context.Context, opts service.Options) err
 		uids = append(uids, uint(uid))
 	}
 
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return err
+	}
+
+	// 禁止删除自己的账号
+	if slices.Contains(uids, session.ID) {
+		return errors.New("不能删除自己的账号")
+	}
+
 	// 校验目标管理员是否在操作者可见范围内，防止低权账号删除更高权限账号
 	if err := s.ensureTargetsVisible(ctx, uids, opts); err != nil {
 		return err
@@ -153,11 +167,10 @@ func (s *AuthAdminService) Delete(ctx context.Context, opts service.Options) err
 
 // ensureTargetsVisible 校验目标管理员的分组规则是否全部在操作者可见范围内
 func (s *AuthAdminService) ensureTargetsVisible(ctx context.Context, uids []uint, opts service.Options) error {
-	ext, ok := opts.Extension.(*AuthAdminExtension)
-	if !ok || ext.AdminSession == nil {
-		return errors.New("参数错误，缺少 AdminSession 扩展数据")
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return err
 	}
-	session := ext.AdminSession
 
 	perm := permission.New()
 	super, err := perm.IsSuperAdmin(ctx, session.ID)
@@ -189,17 +202,88 @@ func (s *AuthAdminService) ensureTargetsVisible(ctx context.Context, uids []uint
 	return nil
 }
 
+// List 覆写通用查询方法: 只读取自己管理员有权管理的数据
+func (s *AuthAdminService) List(ctx context.Context, opts service.Options) ([]model.Admin, error) {
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	perm := permission.New()
+	super, err := perm.IsSuperAdmin(ctx, session.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !super {
+		wheres, err := s.visibilityWheres(ctx, session.ID)
+		if err != nil {
+			return nil, err
+		}
+		opts.Wheres = append(opts.Wheres, wheres...)
+	}
+
+	return s.IService.List(ctx, opts)
+}
+
+// Count 覆写通用统计方法: 只读取自己管理员有权管理的数据
+func (s *AuthAdminService) Count(ctx context.Context, opts service.Options) (int64, error) {
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return 0, err
+	}
+
+	perm := permission.New()
+	super, err := perm.IsSuperAdmin(ctx, session.ID)
+	if err != nil {
+		return 0, err
+	}
+
+	if !super {
+		wheres, err := s.visibilityWheres(ctx, session.ID)
+		if err != nil {
+			return 0, err
+		}
+		opts.Wheres = append(opts.Wheres, wheres...)
+	}
+
+	return s.IService.Count(ctx, opts)
+}
+
+// visibilityWheres 返回过滤「不可见管理员」的查询条件
+func (s *AuthAdminService) visibilityWheres(ctx context.Context, adminID uint) ([]service.WhereGroup, error) {
+	visibleIDs, err := permission.New().GetVisibleGroupIDs(ctx, adminID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	excludedUIDs, err := s.repo.UIDsByInvisibleGroups(ctx, visibleIDs)
+	if err != nil {
+		return nil, err
+	}
+	if len(excludedUIDs) == 0 {
+		return nil, nil
+	}
+
+	return []service.WhereGroup{{
+		Wheres: []service.Where{{
+			Field:    "id",
+			Operator: "NOT IN",
+			Value:    excludedUIDs,
+		}},
+	}}, nil
+}
+
 // validateGroupAccesses 校验分组权限，待分配分组必须全部在操作者可见范围内
 func (s *AuthAdminService) validateGroupAccesses(ctx context.Context, accesses []model.AdminGroupAccess, opts service.Options) error {
 	if len(accesses) == 0 {
 		return nil
 	}
 
-	ext, ok := opts.Extension.(*AuthAdminExtension)
-	if !ok || ext.AdminSession == nil {
-		return errors.New("参数错误，缺少 AdminSession 扩展数据")
+	session, err := sessionFrom(opts)
+	if err != nil {
+		return err
 	}
-	session := ext.AdminSession
 
 	perm := permission.New()
 	super, err := perm.IsSuperAdmin(ctx, session.ID)
