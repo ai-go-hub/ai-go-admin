@@ -21,7 +21,7 @@ const config = useConfig()
     align-items: center;
     box-sizing: border-box;
     padding: 10px 20px;
-    height: v-bind('config.layout.mode == "Double" ?  "60px":"50px"');
+    height: v-bind('config.layout.mode == "Double" ?  "60px":"46px"');
     background: v-bind('config.layout.mode == "Streamline" ?  "transparent":config.getColorValue("menuTopBarBackground")');
 }
 .layout-title-bar-center {

@@ -267,9 +267,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.default-main {
-    margin-bottom: 0;
-}
 .admin-info {
     background-color: var(--ag-bg-color-overlay);
     border-radius: var(--el-border-radius-base);

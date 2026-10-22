@@ -239,6 +239,7 @@ defineExpose({
     }
 }
 .nav-tabs {
+    position: relative;
     overflow-x: auto;
     overflow-y: hidden;
     margin-right: var(--ag-main-space);
@@ -264,6 +265,6 @@ defineExpose({
 }
 .ai-go-nav-tab {
     white-space: nowrap;
-    height: 40px;
+    height: 46px;
 }
 </style>
