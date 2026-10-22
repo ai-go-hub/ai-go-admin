@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/ai-go-hub/ai-go-admin/internal/infra/config"
@@ -93,7 +94,16 @@ func FromContext(c *gin.Context) *gorm.DB {
 
 // 根据配置构建 PostgreSQL DSN
 func buildDSN(src config.DatabaseSource) string {
-	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
-		src.Host, src.User, src.Password, src.DBName, src.Port, src.SSLMode, config.Get().App.Timezone,
+	// 密码为空时省略 password 键
+	// 非空时按 libpq 规则转义并单引号包裹，兼容密码含空格、引号等特殊字符
+	password := ""
+	if src.Password != "" {
+		escaped := strings.ReplaceAll(src.Password, "\\", "\\\\")
+		escaped = strings.ReplaceAll(escaped, "'", "\\'")
+		password = fmt.Sprintf(" password='%s'", escaped)
+	}
+
+	return fmt.Sprintf("host=%s user=%s%s dbname=%s port=%d sslmode=%s TimeZone=%s",
+		src.Host, src.User, password, src.DBName, src.Port, src.SSLMode, config.Get().App.Timezone,
 	)
 }
